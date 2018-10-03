@@ -1,0 +1,259 @@
+import store from '../'
+
+/*
+
+teamId: 群Id
+appId: 群所属的app的id
+type: 群类型
+name: 群名字
+avatar: 群头像
+intro: 群简介
+announcement: 群公告
+joinMode: 群加入方式, 仅限高级群
+beInviteMode: 群被邀请模式, 仅限高级群
+inviteMode: 群邀请模式, 仅限高级群
+updateTeamMode: 群信息修改权限, 仅限高级群
+updateCustomMode: 群信息自定义字段修改权限, 仅限高级群
+owner: 群主
+level: 群人数上限
+memberNum: 群成员数量
+memberUpdateTime: 群成员最后更新时间
+createTime: 群创建时间
+updateTime: 群最后更新时间
+custom: 第三方扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
+serverCustom: 第三方服务器扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
+valid: 是否有效, 解散后该群无效
+validToCurrentUser: 该群是否对当前用户有效, 如果无效, 那么说明被踢了
+mute: 是否禁言, 禁言状态下成员不能发送消息
+muteType: 禁言类型
+none: 都不禁言
+normal: 普通成员禁言，即普通成员不能发消息
+all: 全体禁言，即所有成员均不能发消息
+
+*/
+
+
+
+
+
+
+/*
+
+群类型
+群对象有一个字段type来标明群类型, 具体类型如下
+
+'normal' (普通群)
+'advanced' (高级群)
+群加入方式
+群加入方式有以下几种
+
+'noVerify' (不需要验证)
+'needVerify' (需要验证)
+'rejectAll' (禁止任何人加入)
+群被邀请模式
+群被邀请模式有以下几种
+
+'needVerify' (需要邀请方同意)
+'noVerify' (不需要邀请方同意)
+群邀请模式
+群邀请模式有以下几种
+
+'manager' (只有管理员/群主可以邀请他人入群)
+'all' (所有人可以邀请他人入群)
+群信息修改权限
+群信息修改权限有以下几种
+
+'manager' (只有管理员/群主可以修改)
+'all' (所有人可以修改)
+群信息自定义字段修改权限
+群信息自定义字段修改权限有以下几种
+
+'manager' (只有管理员/群主可以修改)
+'all' (所有人可以修改)
+群成员对象
+群成员对象有如下字段
+
+teamId: 群ID
+account: 帐号
+type: 群成员类型
+nickInTeam: 在群里面的昵称
+active: 普通群拉人进来的时候, 被拉的人处于未激活状态, 未激活状态下看不到这个群, 当有人说话后自动转为激活状态, 能看到该群
+joinTime: 入群时间
+updateTime: 更新时间
+群成员类型
+'normal' (普通成员)
+'owner' (群主)
+'manager' (管理员)
+
+
+*/
+
+
+
+
+
+// 收到群列表及更新群列表接口
+// 同步群列表的回调, 会传入群数组
+export function onTeams(teams) {
+    if (!Array.isArray(teams)) {
+        teams = [teams]
+    }
+    teams.forEach(team => {
+        if (team.validToCurrentUser === undefined) {
+            team.validToCurrentUser = true
+        }
+        if (team.avatar && team.avatar.indexOf('nim.nosdn.127') > 0 && team.avatar.indexOf('?imageView') === -1) {
+            team.avatar = team.avatar + '?imageView&thumbnail=300y300'
+        }
+    })
+    store.commit('updateTeamList', teams)
+}
+
+// 收到群成员及更新群成员接口
+export function onTeamMembers(obj) {
+    store.commit('updateTeamMembers', obj)
+}
+
+export function onCreateTeam({team, owner}) {
+    onTeams(team)
+    onTeamMembers({
+        teamId: team.teamId,
+        members: [owner]
+    })
+}
+
+export function onSynCreateTeam(team) {
+    onTeams(team)
+}
+
+export function onDismissTeam(obj) {
+    store.commit('updateTeamList', {
+        invalid: {teamId: obj.teamId}
+    })
+}
+
+export function onUpdateTeam(team) {
+    onTeams(team)
+}
+
+export function onTeamNotificationMsg({state, commit}, msg) {
+    if (msg.attach.type === 'updateTeam' && msg.attach.team) {
+        store.commit('updateTeamInfo', msg.attach.team)
+    }
+    if (msg.attach.type === 'transferTeam') {
+        onTeamMembers({
+            teamId: msg.attach.team.teamId,
+            members: msg.attach.members
+        })
+    }
+}
+
+export function onAddTeamMembers(obj) {
+    obj.accounts.forEach(account => {
+        // 自己被拉入群时更新群列表
+        if (account === store.state.userUID) {
+            let team = [obj.team]
+            onTeams(team)
+        }
+    })
+    onTeamMembers({
+        teamId: obj.team.teamId,
+        members: obj.members
+    })
+}
+
+export function onRemoveTeamMembers(obj) {
+    obj.accounts.forEach(account => {
+        // 自己被移出群时，更新群列表
+        if (account === store.state.userUID) {
+            obj.team.validToCurrentUser = false
+            let team = [obj.team]
+            onTeams(team)
+        }
+    })
+    store.commit('removeTeamMembersByAccounts', {
+        teamId: obj.team.teamId,
+        accounts: obj.accounts
+    })
+}
+
+export function onUpdateTeamMember(teamMember) {
+    onTeamMembers({
+        teamId: teamMember.teamId,
+        members: teamMember
+    })
+}
+
+
+export function onUpdateTeamManagers(obj) {
+    onTeamMembers({
+        teamId: obj.team.teamId,
+        members: obj.members
+    })
+}
+
+
+// 进入可配置的群信息设置页，进入前改变state中的配置信息，进入页面后读取配置信息更新视图
+export function enterSettingPage({commit}, obj) {
+    commit('updateTeamSettingConfig', obj)
+    setTimeout(() => {
+        location.href = `#/teamsetting`
+    }, 20)
+}
+
+
+/* 
+* 代理nim sdk中对群组的操作方法
+* @functionName  nim sdk中的方法名
+* @options 传递给sdk方法的参数
+*/
+export function delegateTeamFunction({state}, {functionName, options}) {
+    const nim = state.nim
+    if (functionName && nim[functionName] && typeof nim[functionName] === 'function') {
+        nim[functionName](options)
+    } else {
+        throw(`There is not property of '${functionName}' in nim or '${functionName}' is not a function`)
+    }
+}
+
+export function getTeamMembers({state}, teamId) {
+    const nim = state.nim
+    if (!nim) {
+        // 防止nim未初始化
+        setTimeout(() => {
+            getTeamMembers(store, teamId)
+        }, 200);
+        return
+    }
+    nim.getTeamMembers({
+        teamId: teamId,
+        done: (err, obj) => {
+            if (obj.members) {
+                onTeamMembers({
+                    teamId: obj.teamId,
+                    members: obj.members
+                })
+            } else {
+                setTimeout(() => {
+                    getTeamMembers(store, teamId)
+                }, 200);
+            }
+        }
+    })
+}
+
+
+
+export function getTeamMsgReads({state}, needQuery) {
+    nim.getTeamMsgReads({
+        teamMsgReceipts: needQuery,
+        done: (error, obj, content) => {
+            if (error) {
+                console.log('获取群组消息已读' + error)
+            } else {
+                console.log('获取群组消息已读：', content)
+                store.commit('updateTeamMsgReads', content)
+            }
+        }
+    })
+}
