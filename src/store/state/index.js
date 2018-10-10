@@ -21,8 +21,12 @@ export default {
     userUID: null,
     // 用户名片
     myInfo: {},
-    // 好友/黑名单/陌生人名片, 数据结构如：{cid: {attr: ...}, ...}
-    userInfos: {},
+    // 好友/黑名单/陌生人名片
+    userInfos: {
+        // cid1: {attr: ""},
+        // cid2: {attr: ""},
+        // ...
+    },
 
 
     // 好友列表
@@ -30,19 +34,25 @@ export default {
 
     teamlist: [],
 
-    // 群对象的成员列表，数据结构如：{tid: {members: [...], ...}, ...}
-    teamMembers: {},
+    // 群对象的成员列表
+    teamMembers: {
+        tid1: {members: []},
+    },
 
     // 群设置传递数据
     teamSettingConfig: {},
 
 
     // 消息列表
-    msgs: {}, // 以sessionId作为key
-
-
-    msgsMap: {}, // 以idClient作为key，诸如消息撤回等的消息查找
-
+    msgs: {
+        // sessionId1: "",
+        // sessionId2: ""
+    },
+    // 诸如消息撤回等的消息查找
+    msgsMap: {
+        // idClient1: "",
+        // idClient2: "",
+    },
 
 
     // 会话列表
@@ -63,7 +73,6 @@ export default {
     sysMsgUnread: {
         total: 0
     },
-
 
 
     // 临时变量

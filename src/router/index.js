@@ -145,27 +145,13 @@ let router = new VueRouter({
 
 
 // 路由守卫
-// router.beforeEach((to, from, next) => {
-// if (!localStorage.userToken) {
-//     if (to.path === "/login" || to.path === "/register") {
-//         next();
-//     } else {
-//         next("/login");
-//     }
-// } else {
-//     if (to.path === "/login" || to.path === "/register") {
-//         next("/message");
-//     } else {
-//         next();
-//     }
-// }
-// });
-// router.beforeEach((to, from, next) => {
-//     const title = to.meta && to.meta.title;
-//     if (title) {
-//         document.title = title;
-//     }
-//     next();
-// });
+
+router.beforeEach((to, from, next) => {
+    const title = to.meta && to.meta.title;
+    if (title) {
+        document.title = title;
+    }
+    next();
+});
 
 export default router

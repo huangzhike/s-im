@@ -33,13 +33,30 @@ const SDK = {
         getInstance: function (obj) {
 
             let o = {
+                mergeMsgs: function () { },
+                mergeSysMsgs: function () { },
                 mergeSessions: function () { },
+
                 cutSessionsByIds: function () { },
+
+                mergeTeams: function () { },
+                cutTeams: function () { },
+
+                mergeTeamMembers: function () { },
+                cutTeamMembers: function () { },
+
                 mergeFriends: function () { },
                 cutFriends: function () { },
                 // 搜索
                 getUsers: function () { },
                 getTeam: function () { },
+
+                getHistoryMsgs: function () { },
+
+
+                sendTipMsg: function () { },
+                sendText: function () { },
+                sendFile: function () { },
             }
 
 
@@ -99,7 +116,7 @@ export function initNimSDK({state, commit, dispatch}, loginInfo) {
                         Android: '手机版',
                     }
                     let str = error.from
-                    let errorMsg = `你的帐号于${util.formatDate(new Date())}被${(map[str] || '其他端')}踢出下线，请确定帐号信息安全!`
+                    let errorMsg = `你的帐号于${util.formatDate(new Date())}被${(map[str] || '其他端')}踢出下线!`
                     Vue.router.push('/login')
                     break
                 default:
@@ -142,10 +159,7 @@ export function initNimSDK({state, commit, dispatch}, loginInfo) {
         onupdatesession: onUpdateSession,
 
 
-        // 漫游消息
-        onroamingmsgs: onRoamingMsgs,
-        // 离线消息
-        onofflinemsgs: onOfflineMsgs,
+
         // 消息
         onmsg: onMsg,
         // 系统通知
@@ -153,10 +167,18 @@ export function initNimSDK({state, commit, dispatch}, loginInfo) {
         // 离线系统通知
         onofflinesysmsgs: onSysMsgs,
 
+
+        // 漫游消息
+        onroamingmsgs: onRoamingMsgs,
+        // 离线消息
+        onofflinemsgs: onOfflineMsgs,
+
+
         onupdatesysmsg: onSysMsg, // 通过、拒绝好友申请会收到此回调
 
         onsysmsgunread: onSysMsgUnread,
         onupdatesysmsgunread: onSysMsgUnread,
+
 
         // 同步完成
         onsyncdone: function onSyncDone() {

@@ -12,21 +12,21 @@ import 'vant/lib/vant-css/index.css';
 
 Vue.use(Vant);
 
-
-// axios.defaults.baseURL = 'http://localhost:8080'
-// axios.interceptors.request.use(
-//     config => {
-//         const token = localStorage.getItem('userToken');
-//         if (token) {
-//             // Bearer是JWT的认证头部信息
-//             config.headers.common['Authorization'] = 'Bearer ' + token;
-//         }
-//         return config;
-//     },
-//     error => {
-//         return Promise.reject(error);
-//     }
-// );
+// https://segmentfault.com/q/1010000009530504 看这里
+axios.defaults.baseURL = 'http://localhost:8080'
+axios.interceptors.request.use(
+    config => {
+        const token = sessionStorage.getItem('userToken');
+        if (token) {
+            // Bearer是JWT的认证头部信息
+            config.headers.common['Authorization'] = 'Bearer ' + token;
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
 
 
 new Vue({

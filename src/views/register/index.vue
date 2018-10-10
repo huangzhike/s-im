@@ -101,7 +101,7 @@
                             if (data.res === 200) {
                                 cookie.setCookie('uid', accountLowerCase)
                                 cookie.setCookie('sdktoken', sdktoken)
-                                location.href = config.homeUrl
+                                this.$router.push("/session")
                             } else if (data.res === 414) {
                                 this.errorMsg = data.errmsg
                             } else {

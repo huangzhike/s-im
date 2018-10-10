@@ -1,4 +1,3 @@
-
 import store from '../'
 import cookie from '../../utils/cookie'
 import util from '../../utils'
@@ -94,9 +93,6 @@ export default {
     },
 
 
-
-
-
     // 初始化，收到离线漫游消息时调用
     updateMsgs(state, msgs) {
         const nim = state.nim
@@ -114,7 +110,6 @@ export default {
         store.commit('updateMsgByIdClient', msgs)
         for (let sessionId in tempSessionMap) {
             state.msgs[sessionId].sort((a, b) => {
-
                 return a.time - b.time
             })
             if (sessionId === state.currSessionId) {
@@ -295,8 +290,6 @@ export default {
     },
 
 
-
-
     updateSysMsgs(state, sysMsgs) {
         const nim = state.nim
         if (!Array.isArray(sysMsgs)) {
@@ -329,18 +322,13 @@ export default {
             case 0:
                 state.sysMsgs = []
                 break
-            case 1:
-                state.customSysMsgs = []
-                store.commit('updateCustomSysMsgUnread', {
-                    type: 'reset'
-                })
-                break
+
         }
     },
     deleteSysMsgs(state, obj) {
         let type = obj.type
         let idServer = obj.idServer
-        let arr =  state.sysMsgs
+        let arr = state.sysMsgs
         arr = arr.filter(msg => {
             return msg.idServer !== idServer
         })
@@ -354,10 +342,6 @@ export default {
     resetNoMoreHistoryMsgs(state) {
         state.noMoreHistoryMsgs = false
     },
-
-
-
-
 
 
     updateTeamList(state, teams) {

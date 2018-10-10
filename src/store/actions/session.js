@@ -2,29 +2,21 @@
  * 会话列表
  */
 
-class Session {
-    constructor(id, scene) {
-        this.id = id;
-        this.scene = scene;
-    }
 
-
+let session = {
+    // 会话ID
+    id: "",
+    // 场景
+    scene: "",
+    // 聊天对象, 账号或群ID
+    to: "",
+    // 会话更新的时间
+    updateTime: "",
+    // 未读数
+    unread: "",
+    // 此会话的最后一条消息
+    lastMsg: "",
 }
-
-
-/*
-
-
-会话对象
-会话对象有以下字段:
-
-id: 会话ID
-scene: 场景
-to: 聊天对象, 账号或群ID
-updateTime: 会话更新的时间
-unread: 未读数
-lastMsg: 此会话的最后一条消息
-*/
 
 
 import store from '../'

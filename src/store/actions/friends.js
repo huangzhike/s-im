@@ -2,14 +2,18 @@
  * 用户关系及好友关系托管
  */
 
-/*
-
-account: 账号
-alias: 昵称
-custom: 扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
-createTime: 成为好友的时间
-updateTime: 更新时间
-*/
+let friends = {
+    // 账号
+    account: "",
+    // 昵称
+    alias: "",
+    // 扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
+    custom: "",
+    // 成为好友的时间
+    createTime: "",
+    // 更新时间
+    updateTime: "",
+}
 
 import store from '../'
 import {formatUserInfo} from './userInfo'

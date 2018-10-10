@@ -1,93 +1,75 @@
 import store from '../'
 
-/*
 
-teamId: 群Id
-appId: 群所属的app的id
-type: 群类型
-name: 群名字
-avatar: 群头像
-intro: 群简介
-announcement: 群公告
-joinMode: 群加入方式, 仅限高级群
-beInviteMode: 群被邀请模式, 仅限高级群
-inviteMode: 群邀请模式, 仅限高级群
-updateTeamMode: 群信息修改权限, 仅限高级群
-updateCustomMode: 群信息自定义字段修改权限, 仅限高级群
-owner: 群主
-level: 群人数上限
-memberNum: 群成员数量
-memberUpdateTime: 群成员最后更新时间
-createTime: 群创建时间
-updateTime: 群最后更新时间
-custom: 第三方扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
-serverCustom: 第三方服务器扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
-valid: 是否有效, 解散后该群无效
-validToCurrentUser: 该群是否对当前用户有效, 如果无效, 那么说明被踢了
-mute: 是否禁言, 禁言状态下成员不能发送消息
-muteType: 禁言类型
-none: 都不禁言
-normal: 普通成员禁言，即普通成员不能发消息
-all: 全体禁言，即所有成员均不能发消息
+let team = {
 
-*/
+    // 群Id
+    teamId: "",
+    // 群类型
+    type: "normal" || "advanced",
+    // 群名字
+    name: "",
+    // 群头像
+    avatar: "",
+    // 群简介
+    intro: "",
+    // 群公告
+    announcement: "",
+    // 群加入方式 不需要验证 需要验证 禁止任何人加入
+    joinMode: "noVerify" || "needVerify" || "rejectAll",
+    // 群被邀请模式 需要邀请方同意 不需要邀请方同意
+    beInviteMode: "needVerify" || "noVerify",
+    // 群邀请模式 只有管理员/群主可以邀请他人入群 所有人可以修改
+    inviteMode: "manager" || "all",
+    // 群信息修改权限
+    updateTeamMode: "manager" || "all",
+    // 群信息自定义字段修改权限
+    updateCustomMode: "manager" || "all",
+    // 群主
+    owner: "",
+    // 群人数上限
+    level: "",
+    // 群成员数量
+    memberNum: "",
+    // 群成员最后更新时间
+    memberUpdateTime: "",
+    // 群创建时间
+    createTime: "",
+    // 群最后更新时间
+    updateTime: "",
+    // 第三方扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
+    custom: "",
+    // 第三方服务器扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
+    serverCustom: "",
+    // 是否有效, 解散后该群无效
+    valid: "",
+    // 该群是否对当前用户有效, 如果无效, 那么说明被踢了
+    validToCurrentUser: "",
+    // 是否禁言, 禁言状态下成员不能发送消息
+    mute: "",
+    // 禁言类型 都不禁言 普通成员禁言，即普通成员不能发消息 全体禁言，即所有成员均不能发消息
+    muteType: "none" || "normal" || "all"
 
-
-
-
-
-
-/*
-
-群类型
-群对象有一个字段type来标明群类型, 具体类型如下
-
-'normal' (普通群)
-'advanced' (高级群)
-群加入方式
-群加入方式有以下几种
-
-'noVerify' (不需要验证)
-'needVerify' (需要验证)
-'rejectAll' (禁止任何人加入)
-群被邀请模式
-群被邀请模式有以下几种
-
-'needVerify' (需要邀请方同意)
-'noVerify' (不需要邀请方同意)
-群邀请模式
-群邀请模式有以下几种
-
-'manager' (只有管理员/群主可以邀请他人入群)
-'all' (所有人可以邀请他人入群)
-群信息修改权限
-群信息修改权限有以下几种
-
-'manager' (只有管理员/群主可以修改)
-'all' (所有人可以修改)
-群信息自定义字段修改权限
-群信息自定义字段修改权限有以下几种
-
-'manager' (只有管理员/群主可以修改)
-'all' (所有人可以修改)
-群成员对象
-群成员对象有如下字段
-
-teamId: 群ID
-account: 帐号
-type: 群成员类型
-nickInTeam: 在群里面的昵称
-active: 普通群拉人进来的时候, 被拉的人处于未激活状态, 未激活状态下看不到这个群, 当有人说话后自动转为激活状态, 能看到该群
-joinTime: 入群时间
-updateTime: 更新时间
-群成员类型
-'normal' (普通成员)
-'owner' (群主)
-'manager' (管理员)
+}
 
 
-*/
+let teamMember = {
+    // 群ID
+    teamId: "",
+    // 帐号
+    account: "",
+    // 群成员类型 普通成员 群主 管理员
+    type: 'normal' || 'owner' || 'manager',
+    // 在群里面的昵称
+    nickInTeam: "",
+    // 普通群拉人进来的时候, 被拉的人处于未激活状态, 未激活状态下看不到这个群, 当有人说话后自动转为激活状态, 能看到该群
+    active: "",
+    // 入群时间
+    joinTime: "",
+    // 更新时间
+    updateTime: "",
 
+}
 
 
 
@@ -241,7 +223,6 @@ export function getTeamMembers({state}, teamId) {
         }
     })
 }
-
 
 
 export function getTeamMsgReads({state}, needQuery) {
