@@ -1,36 +1,36 @@
 <template>
 
-        <div class="g-inherit m-album">
-            <div id="form-data" class="g-center m-login"  >
-                <div class="cells">
-                    <img class="logo" :src="logo">
+    <div class="g-inherit m-album">
+        <div id="form-data" class="g-center m-login">
+            <div class="cells">
+                <img class="logo" :src="logo">
+            </div>
+            <div class="cells">
+                <div class="cell">
+                    <span class="icon icon-account"></span>
+                    <input type="text" class="ipt ipt-account" maxlength="20" v-model="account"
+                           placeholder="账号：限20位字母或者数字"/>
                 </div>
-                <div class="cells">
-                    <div class="cell">
-                        <span class="icon icon-account"></span>
-                        <input type="text" class="ipt ipt-account" maxlength="20" v-model="account"
-                               placeholder="账号：限20位字母或者数字"/>
-                    </div>
-                    <div class="cell">
-                        <span class="icon icon-account"></span>
-                        <input type="text" class="ipt ipt-account" maxlength="10" v-model="nickname"
-                               placeholder="昵称：限10位汉字、字母或者数字"/>
-                    </div>
-                    <div class="cell">
-                        <span class="icon icon-pwd"></span>
-                        <input type="password" class="ipt ipt-account" maxlength="20" v-model="password"
-                               placeholder="密码：6-20位字母或数字"/>
-                    </div>
+                <div class="cell">
+                    <span class="icon icon-account"></span>
+                    <input type="text" class="ipt ipt-account" maxlength="10" v-model="nickname"
+                           placeholder="昵称：限10位汉字、字母或者数字"/>
                 </div>
-                <div class="cells">
-                    <div v-show="errorMsg" class="error">{{errorMsg}}</div>
-                </div>
-                <div class="cells">
-                    <button type="button" class="btn btn-login" @click="register">注册</button>
-                    <button type="button" class="btn btn-regist" @click="login">登录</button>
+                <div class="cell">
+                    <span class="icon icon-pwd"></span>
+                    <input type="password" class="ipt ipt-account" maxlength="20" v-model="password"
+                           placeholder="密码：6-20位字母或数字"/>
                 </div>
             </div>
+            <div class="cells">
+                <div v-show="errorMsg" class="error">{{errorMsg}}</div>
+            </div>
+            <div class="cells">
+                <button type="button" class="btn btn-login" @click="register">注册</button>
+                <button type="button" class="btn btn-regist" @click="login">登录</button>
+            </div>
         </div>
+    </div>
 
 </template>
 
@@ -41,6 +41,8 @@
 
     import config from '../../configs'
     import util from '../../utils'
+
+    import {request_post} from "../../common/request";
 
 
     export default {
@@ -85,34 +87,24 @@
 
                 let accountLowerCase = this.account.toLowerCase()
 
-                let xhr = new XMLHttpRequest()
-                xhr.open('POST', `${config.postUrl}/api/createDemoUser`, true)
-                xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded')
-                xhr.setRequestHeader('appkey', config.appkey)
-                xhr.send(util.object2query({
+                request_post(`${config.postUrl}/api`, {
                     username: accountLowerCase,
                     password: sdktoken,
                     nickname: this.nickname
-                }))
-                xhr.onreadystatechange = () => {
-                    if (xhr.readyState == 4) {
-                        if (xhr.status == 200) {
-                            let data = JSON.parse(xhr.responseText)
-                            if (data.res === 200) {
-                                cookie.setCookie('uid', accountLowerCase)
-                                cookie.setCookie('sdktoken', sdktoken)
-                                this.$router.push("/session")
-                            } else if (data.res === 414) {
-                                this.errorMsg = data.errmsg
-                            } else {
-                                this.errorMsg = data.errmsg
-                            }
-                        } else {
-                            this.errorMsg = '网络断开或其他未知错误'
-                        }
-                        this.$forceUpdate()
+                }).then(resp => {
+                    let data = resp.data
+                    if (data.code === 200) {
+                        cookie.setCookie('uid', accountLowerCase)
+                        cookie.setCookie('sdktoken', sdktoken)
+                        this.$router.push("/session")
+                    } else {
+                        this.errorMsg = data.msg
                     }
-                }
+                    this.$forceUpdate()
+                }).catch(e => {
+
+                })
+
             },
             login() {
 
@@ -125,11 +117,6 @@
 
 
 </script>
-
-
-
-
-
 
 
 <style lang="less">

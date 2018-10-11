@@ -5,9 +5,7 @@ import config from '../../configs'
 import Vue from 'Vue'
 
 export default {
-    updateRefreshState(state) {
-        state.isRefresh = false
-    },
+
     updateLoading(state, status) {
         clearTimeout(state.loadingTimer)
         state.loadingTimer = setTimeout(() => {
@@ -35,6 +33,7 @@ export default {
     },
     updateUserInfo(state, users) {
         let userInfos = state.userInfos
+        // userInfos {}
         users.forEach(user => {
             let account = user.account
             if (account) {

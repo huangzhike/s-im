@@ -56,9 +56,6 @@ function connectNim({state, commit, dispatch}, obj) {
 
 
 export default {
-    updateRefreshState({commit}) {
-        commit('updateRefreshState')
-    },
 
     // UI 及页面状态变更
     showLoading,

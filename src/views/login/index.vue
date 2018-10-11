@@ -21,7 +21,7 @@
                 <div v-show="errorMsg" class="error">{{errorMsg}}</div>
             </div>
             <div class="cells">
-                <button class="btn btn-login" @click="">登录</button>
+                <button class="btn btn-login" @click="login">登录</button>
                 <button class="btn btn-regist" @click="register">注册</button>
             </div>
         </div>
@@ -63,9 +63,9 @@
                     return
                 }
                 this.errorMsg = ''
-                // 本demo做一次假登录
+
                 // 真实场景应在此向服务器发起ajax请求
-                let sdktoken = md5(this.password)
+                let sdktoken = md5(this.account + this.password)
                 // 服务端帐号均为小写
                 cookie.setCookie('uid', this.account.toLowerCase())
                 cookie.setCookie('sdktoken', sdktoken)
@@ -81,10 +81,6 @@
 
 
 </script>
-
-
-
-
 
 
 <style lang="less">
@@ -145,7 +141,7 @@
                 height: 2.4rem;
                 border-radius: 0.4rem;
                 background: #fff;
-                color: @color_button_primary;
+
                 font-size: 1rem;
                 border: none;
                 cursor: pointer;
@@ -158,7 +154,7 @@
             .error {
                 float: right;
                 clear: both;
-                color: @color_error;
+
             }
         }
 

@@ -153,83 +153,12 @@ Utils.parseSession = function (sessionId) {
     }
 }
 
-Utils.parseCustomMsg = function (msg) {
-    if (msg.type === 'custom') {
-        try {
-            let cnt = JSON.parse(msg.content)
-            switch (cnt.type) {
-                case 1:
-                    return '[猜拳消息]'
-                case 2:
-                    return '[阅后即焚]'
-                case 3:
-                    return '[贴图表情]'
-                case 4:
-                    return '[白板消息]'
-            }
-        } catch (e) {
-        }
-        return '[自定义消息]'
-    }
-    return ''
-}
 /* 获得有效的备注名 */
 Utils.getFriendAlias = function (userInfo) {
     userInfo.alias = userInfo.alias ? userInfo.alias.trim() : ''
     return userInfo.alias || userInfo.nick || userInfo.account
 }
 
-Utils.generateChatroomSysMsg = function (data) {
-    let text
-    switch (data.attach.type) {
-        case 'memberEnter':
-            text = `欢迎${data.attach.fromNick}进入直播间`
-            break
-        case 'memberExit':
-            text = `${data.attach.fromNick}离开了直播间`
-            break
-        case 'blackMember':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被管理员拉入黑名单`
-            break
-        case 'unblackMember':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被管理员解除拉黑`
-            break
-        case 'gagMember':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被管理员禁言`
-            break
-        case 'ungagMember':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被管理员解除禁言`
-            break
-        case 'addManager':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被任命管理员身份`
-            break
-        case 'removeManager':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被解除管理员身份`
-            break;
-        case 'addTempMute':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被管理员临时禁言`
-            break;
-        case 'removeTempMute':
-            text = `${(data.attach.toNick[0] || data.attach.to[0])}被管理员解除临时禁言`
-            break;
-        case 'addCommon':
-            text = `管理员添加普通成员`
-            break
-        case 'removeCommon':
-            text = `管理员删除普通成员`
-            break
-        case 'kickMember':
-            text = `${data.attach.toNick[0]}被管理员踢出房间`
-            break;
-        // case 'xxx':
-        // 直播公告已更新
-        // break;
-        default:
-            text = '通知消息'
-            break
-    }
-    return text
-}
 
 Utils.generateTeamSysmMsg = function (data) {
     var text, nicks = this.getNickNames(data.attach.users)

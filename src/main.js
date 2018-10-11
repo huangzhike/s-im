@@ -1,33 +1,16 @@
 import Vue from 'vue'
 
 import App from './App'
-import './common/rem';
+
 import store from './store'
 import router from './router'
 
-import axios from 'axios'
+import './common/rem';
 
 import Vant from 'vant';
 import 'vant/lib/vant-css/index.css';
 
 Vue.use(Vant);
-
-// https://segmentfault.com/q/1010000009530504 看这里
-axios.defaults.baseURL = 'http://localhost:8080'
-axios.interceptors.request.use(
-    config => {
-        const token = sessionStorage.getItem('userToken');
-        if (token) {
-            // Bearer是JWT的认证头部信息
-            config.headers.common['Authorization'] = 'Bearer ' + token;
-        }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
-
 
 new Vue({
     el: '#app',

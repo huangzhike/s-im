@@ -1,5 +1,5 @@
 <template>
-    <div class="g-window" id="app">
+    <div id="app" class="g-window">
 
         <nav-bar v-show="showNav"></nav-bar>
         <!-- 切页动画设置 -->
@@ -15,7 +15,6 @@
 
     import Loading from './components/Loading'
     import FullscreenImg from './components/FullscreenImg'
-
     import NavBar from './components/NavBar'
 
     import pageUtil from './utils/page'
@@ -25,8 +24,6 @@
     export default {
         data() {
 
-
-            // this.$router.push("/session")
             return {
                 transitionName: 'forward'
             }
@@ -45,7 +42,7 @@
                         count = 1
                         this.transitionName = 'forward'
                     } else {
-                        count += 1
+                        count++
                         let fromCount = parseInt(sessionHistory.getItem(fromPath))
                         let toCount = parseInt(sessionHistory.getItem(toPath))
                         if (toCount < fromCount && fromCount < count && (!pageUtil.showNav(fromPath))) {
@@ -69,7 +66,7 @@
             // 异步加载组件都会update
             // 提交sdk连接请求
             this.$store.dispatch('connect')
-            this.$store.dispatch('updateRefreshState')
+
 
 
         },
@@ -91,34 +88,6 @@
 <style scoped lang="less">
 
 
-    /* 封面背景及主题背景，可以设置图片 */
-    @album_background: #0091e4;
-    @theme_background: #f9fcff;
-
-    /* 导航及tab相关颜色 */
-    @color_nav_background: #fff;
-    @color_nav_font: #333;
-    @color_nav_active_background: #e5f4ff;
-    @color_nav_active_font: #0091e4;
-
-    /* 输入框颜色 */
-    @color_chat_editor_background: #e5f4ff;
-    @color_chat_editor_button: #0091e4;
-
-    /* 基础按钮颜色 */
-    @color_base_font: #333;
-    @color_error: #ed0e0e;
-    @color_tip_background: #e0e0e0;
-    @color_tip_font: #ccc;
-    @color_button_font: #fff;
-    @color_button_primary: #0091e4;
-    @color_button_warn: #f04d64;
-
-    @color_input_dark: #333;
-    @color_input_light: #999;
-
-    /* 设置颜色变量 */
-    @color_white: #fff;
 
     /* 顶部导航高度 */
     @height_nav: 3.6rem;
@@ -128,11 +97,6 @@
 
     @height_editor: 4rem;
 
-    /* 消息变量 */
-    @msg_bg_you: #5cacde;
-    @msg_tx_you: #fff;
-    @msg_bg_me: #e5f4ff;
-    @msg_tx_me: #666;
     /***************************************************************/
 
     /* 样式初始化 */
@@ -226,7 +190,7 @@
         height: 100%;
         overflow: hidden;
         font-size: 1rem;
-        color: @color_base_font;
+
     }
 
     .g-window {
@@ -280,12 +244,12 @@
 
         .m-tab-top {
             .u-tab-top {
-                color: @color_nav_font;
-                border: 1px solid @color_nav_active_font;
+
+                border: 1px solid ;
                 /* 选中状态 */
                 &.vux-button-group-current {
-                    color: @color_nav_background;
-                    background-color: @color_nav_active_font;
+
+
                 }
             }
         }
