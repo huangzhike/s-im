@@ -34,7 +34,7 @@ export default {
 
     // 群对象的成员列表
     teamMembers: {
-        // tid1: {members: []},
+        // tid1:[member,...],
     },
 
     // 群设置传递数据
@@ -43,8 +43,8 @@ export default {
 
     // 消息列表
     msgs: {
-        // sessionId1: "",
-        // sessionId2: ""
+        // sessionId1:  [],
+        // sessionId2: []
     },
     // 诸如消息撤回等的消息查找
     msgsMap: {
@@ -54,8 +54,11 @@ export default {
 
 
     // 会话列表
-    sessionlist: [],
-    sessionMap: {},
+    sessionlist: [  ],
+    sessionMap: {
+        // sessionId1:session
+
+    },
 
 
     // 当前会话ID（即当前聊天列表，只有单聊群聊采用，可用于判别）

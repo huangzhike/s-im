@@ -127,9 +127,7 @@
             userInfos() {
                 return this.$store.state.userInfos
             },
-            robotInfos() {
-                return this.$store.state.robotInfos
-            },
+
             msglist() {
                 let msgs = this.$store.state.currSessionMsgs
                 return msgs

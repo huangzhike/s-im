@@ -76,27 +76,27 @@ export default {
 
     // 会话
 
-    updateSessions(state, sessions) {
+    updateSessions(state, sessionList) {
         const nim = state.nim
-        state.sessionlist = nim.mergeSessions(state.sessionlist, sessions)
+        state.sessionlist = nim.mergeSessions(state.sessionlist, sessionList)
         state.sessionlist.sort((a, b) => {
             return b.updateTime - a.updateTime
         })
-        state.sessionlist.forEach(item => {
-            state.sessionMap[item.id] = item
+        state.sessionlist.forEach(session => {
+            state.sessionMap[session.id] = session
         })
     },
-    deleteSessions(state, sessionIds) {
+    deleteSessions(state, sessionIdList) {
         const nim = state.nim
-        state.sessionlist = nim.cutSessionsByIds(state.sessionlist, sessionIds)
+        state.sessionlist = nim.cutSessionsByIds(state.sessionlist, sessionIdList)
     },
 
 
     // 初始化，收到离线漫游消息时调用
-    updateMsgs(state, msgs) {
+    updateMsgs(state, msgList) {
         const nim = state.nim
         let tempSessionMap = {}
-        msgs.forEach(msg => {
+        msgList.forEach(msg => {
             let sessionId = msg.sessionId
             tempSessionMap[sessionId] = true
             if (!state.msgs[sessionId]) {
@@ -106,7 +106,7 @@ export default {
             state.msgs[sessionId] = nim.mergeMsgs(state.msgs[sessionId], [msg])
             // state.msgs[sessionId].push(msg)
         })
-        store.commit('updateMsgByIdClient', msgs)
+        store.commit('updateMsgByIdClient', msgList)
         for (let sessionId in tempSessionMap) {
             state.msgs[sessionId].sort((a, b) => {
                 return a.time - b.time
@@ -173,14 +173,14 @@ export default {
         }
     },
     // 用idClient 更新消息，目前用于消息撤回
-    updateMsgByIdClient(state, msgs) {
-        if (!Array.isArray(msgs)) {
-            msgs = [msgs]
+    updateMsgByIdClient(state, msgList) {
+        if (!Array.isArray(msgList)) {
+            msgList = [msgList]
         }
-        let tempTime = (new Date()).getTime()
-        msgs.forEach(msg => {
+        let now = (new Date()).getTime()
+        msgList.forEach(msg => {
             // 有idClient 且 5分钟以内的消息
-            if (msg.idClient && (tempTime - msg.time < 1000 * 300)) {
+            if (msg.idClient && (now - msg.time < 1000 * 300)) {
                 state.msgsMap[msg.idClient] = msg
             }
         })
@@ -348,13 +348,28 @@ export default {
         store.state.teamlist = nim.mergeTeams(store.state.teamlist, teams)
         store.state.teamlist = nim.cutTeams(store.state.teamlist, teams.invalid)
     },
+
+    updateTeamInfo(state, team) {
+        let index = state.teamlist.findIndex(item => item.teamId === team.teamId)
+        if (index === -1) return
+        for (const key in team) {
+            if (key !== 'teamId' && team.hasOwnProperty(key) && team[key]) {
+                state.teamlist[index][key] = team[key]
+            }
+        }
+    },
+    updateTeamSettingConfig(state, obj) {
+        state.teamSettingConfig = obj
+    },
+
     updateTeamMembers(state, obj) {
         const nim = state.nim
-        var teamId = obj.teamId
-        var members = obj.members
+        let teamId = obj.teamId
+        let members = obj.members
         state.teamMembers = state.teamMembers || {}
         state.teamMembers[teamId] = nim.mergeTeamMembers(state.teamMembers[teamId], members)
         state.teamMembers[teamId] = nim.cutTeamMembers(state.teamMembers[teamId], members.invalid)
+
         state.teamMembers[teamId].sort((a, b) => {
             // 将群主和管理员排在队列前方
             if (a.type === 'owner' || b.type === 'owner') {
@@ -367,28 +382,15 @@ export default {
         })
         state.teamMembers = Object.assign({}, state.teamMembers)
     },
+
     removeTeamMembersByAccounts(state, obj) {
-        var teamId = obj.teamId
-        var invalidAccounts = obj.accounts
+        let teamId = obj.teamId
+        let invalidAccounts = obj.accounts
         if (state.teamMembers[teamId] === undefined) return
         state.teamMembers[teamId] = state.teamMembers[teamId].filter((member, index) => {
             return invalidAccounts.indexOf(member.account) === -1
         })
         state.teamMembers = Object.assign({}, state.teamMembers)
-    },
-    updateTeamInfo(state, team) {
-        var index = state.teamlist.findIndex(item => {
-            return item.teamId === team.teamId
-        })
-        if (index === -1) return
-        for (const key in team) {
-            if (key !== 'teamId' && team.hasOwnProperty(key) && team[key]) {
-                state.teamlist[index][key] = team[key]
-            }
-        }
-    },
-    updateTeamSettingConfig(state, obj) {
-        state.teamSettingConfig = obj
     },
 
 }
