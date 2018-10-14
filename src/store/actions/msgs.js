@@ -3,6 +3,10 @@ import config from '../../configs'
 import util from '../../utils'
 
 
+import {request_post} from "../../common/request";
+import {onDeleteFriend} from "./friends";
+
+
 /*
 
 离线消息：他人发给自己的消息，且自己的账号在任何客户端都未读过，则算离线消息；离线消息只要其它任何一端(包括自己)已读，则不会再收到对应消息。
@@ -73,8 +77,8 @@ let msg = {
         ,
 
         // 如果attach有account或者accounts字段, 那么attach的字段users包含这些账号对应的用户名片
-        account:"",
-        accounts:"",
+        account: "",
+        accounts: "",
     },
 
     // SDK生成的消息id, 在发送消息之后会返回给开发者, 开发者可以在发送消息的回调里面根据这个ID来判断相应消息的发送状态, 到底是发送成功了还是发送失败了,
@@ -83,7 +87,6 @@ let msg = {
     idClient: "",
     // 服务器用于区分消息用的ID, 主要用于获取云端历史记录/
     idServer: "",
-
 
 
     // 该消息在接收方是否应该被静音
@@ -243,7 +246,7 @@ function onSendMsgDone(error, msg) {
 
 // 消息撤回
 export function onRevocateMsg(error, msg) {
-    const nim = store.state.nim
+
     if (error) {
         if (error.code === 508) {
             alert('发送时间超过2分钟的消息，不能被撤回')
@@ -263,58 +266,76 @@ export function onRevocateMsg(error, msg) {
             tip = '对方撤回了一条消息'
         }
     }
-    nim.sendTipMsg({
+
+
+    request_post("sendTipMsg", {
         isLocal: true,
         scene: msg.scene,
         to: msg.to,
         tip,
         time: msg.time,
-        done: function sendTipMsgDone(error, tipMsg) {
-            let idClient = msg.deletedIdClient || msg.idClient
-            store.commit('replaceMsg', {
-                sessionId: msg.sessionId,
+
+    }).then(resp => {
+
+        let idClient = msg.deletedIdClient || msg.idClient
+        store.commit('replaceMsg', {
+            sessionId: msg.sessionId,
+            idClient,
+            msg: resp.data
+        })
+        if (msg.sessionId === store.state.currSessionId) {
+            store.commit('updateCurrSessionMsgs', {
+                type: 'replace',
                 idClient,
-                msg: tipMsg
+                msg: resp.data
             })
-            if (msg.sessionId === store.state.currSessionId) {
-                store.commit('updateCurrSessionMsgs', {
-                    type: 'replace',
-                    idClient,
-                    msg: tipMsg
-                })
-            }
         }
+
+    }).catch(err => {
     })
+
+
 }
 
 
 export function revocateMsg({state, commit}, msg) {
-    const nim = state.nim
+
     let {idClient} = msg
     msg = Object.assign(msg, state.msgsMap[idClient])
-    nim.deleteMsg({
-        msg,
-        done: function deleteMsgDone(error) {
-            onRevocateMsg(error, msg)
-        }
+
+
+    request_post("deleteMsg", {
+        msg
+
+
+    }).then(resp => {
+        onRevocateMsg(null, resp.data)
+
+    }).catch(err => {
     })
+
+
 }
 
 // 发送普通消息
 export function sendMsg({state, commit}, obj) {
-    const nim = state.nim
+
     obj = obj || {}
     let type = obj.type || ''
     store.dispatch('showLoading')
     switch (type) {
         case 'text':
-            nim.sendText({
+
+            request_post("sendText", {
                 scene: obj.scene,
                 to: obj.to,
                 text: obj.text,
                 done: onSendMsgDone,
                 needMsgReceipt: obj.needMsgReceipt || false
+            }).then(resp => {
+            }).catch(err => {
             })
+
             break
 
     }
@@ -322,7 +343,7 @@ export function sendMsg({state, commit}, obj) {
 
 // 发送文件消息
 export function sendFileMsg({state, commit}, obj) {
-    const nim = state.nim
+
     let {scene, to, fileInput} = obj
     let type = 'file'
     if (/\.(png|jpg|bmp|jpeg|gif)$/i.test(fileInput.value)) {
@@ -331,30 +352,20 @@ export function sendFileMsg({state, commit}, obj) {
         type = 'video'
     }
     store.dispatch('showLoading')
-    nim.sendFile({
+
+
+    request_post("sendFile", {
         scene,
         to,
         type,
         fileInput,
-        uploadprogress: function (data) {
-            // console.log(data.percentageText)
-        },
-        uploaderror: function () {
-            console && console.log('上传失败')
-        },
-        uploaddone: function (error, file) {
-            // console.log(error);
-            // console.log(file);
-        },
-        beforesend: function (msg) {
-            // console && console.log('正在发送消息, id=', msg);
-        },
-        done: function (error, msg) {
-            onSendMsgDone(error, msg)
-        }
+    }).then(resp => {
+        onSendMsgDone(null, resp.data)
+    }).catch(err => {
     })
-}
 
+
+}
 
 
 export function getHistoryMsgs({state, commit}, obj) {
@@ -367,22 +378,7 @@ export function getHistoryMsgs({state, commit}, obj) {
             reverse: false,
             asc: true,
             limit: config.localMsglimit || 20,
-            done: function getHistoryMsgsDone(error, obj) {
-                if (obj.msgs) {
-                    if (obj.msgs.length === 0) {
-                        commit('setNoMoreHistoryMsgs')
-                    } else {
-                        let msgs = obj.msgs.map(msg => {
-                            return formatMsg(msg)
-                        })
-                        commit('updateCurrSessionMsgs', {
-                            type: 'concat',
-                            msgs: msgs
-                        })
-                    }
-                }
-                store.dispatch('hideLoading')
-            }
+
         }
         if (state.currSessionLastMsg) {
             options = Object.assign(options, {
@@ -391,7 +387,29 @@ export function getHistoryMsgs({state, commit}, obj) {
             })
         }
         store.dispatch('showLoading')
-        nim.getHistoryMsgs(options)
+
+
+        request_post("getHistoryMsgs", options).then(resp => {
+
+
+            if (resp.data.msgs) {
+                if (resp.data.msgs.length === 0) {
+                    commit('setNoMoreHistoryMsgs')
+                } else {
+                    let msgs = resp.data.msgs.map(msg => {
+                        return formatMsg(msg)
+                    })
+                    commit('updateCurrSessionMsgs', {
+                        type: 'concat',
+                        msgs: msgs
+                    })
+                }
+            }
+            store.dispatch('hideLoading')
+
+        }).catch(err => {
+        })
+
     }
 }
 

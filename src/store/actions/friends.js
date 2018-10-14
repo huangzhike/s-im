@@ -1,13 +1,15 @@
-/*
- * 用户关系及好友关系托管
- */
+import store from '../'
+import {formatUserInfo} from './userInfo'
 
-let friends = {
+import {request_post} from "../../common/request";
+
+
+let friend = {
     // 账号
     account: "",
     // 昵称
     alias: "",
-    // 扩展字段, 开发者可以自行扩展, 建议封装成JSON格式字符串
+    // 扩展字段, JSON格式字符串
     custom: "",
     // 成为好友的时间
     createTime: "",
@@ -15,33 +17,52 @@ let friends = {
     updateTime: "",
 }
 
-import store from '../'
-import {formatUserInfo} from './userInfo'
 
 // 好友关系，回调
-export function onFriends(friends) {
-    friends = friends.map(item => {
-        if (typeof item.isFriend !== 'boolean') {
-            item.isFriend = true
-        }
-        return item
-    })
-    store.commit('updateFriends', friends)
-    // 更新好友信息字典，诸如昵称
-    store.commit('updateUserInfo', friends)
+export function onFriends(obj) {
+
+
+    switch (obj.type) {
+        case 'addFriend':
+            console.error('你直接加了一个好友' + obj.account + ', 附言' + obj.ps);
+            onUpdateFriend(null, obj.friend);
+            break;
+        case 'applyFriend':
+            console.error('你申请加了一个好友' + obj.account + ', 附言' + obj.ps);
+            break;
+        case 'passFriendApply':
+            console.error('你通过了一个好友申请' + obj.account + ', 附言' + obj.ps);
+            onUpdateFriend(null, obj.friend);
+            break;
+        case 'rejectFriendApply':
+            console.error('你拒绝了一个好友申请' + obj.account + ', 附言' + obj.ps);
+            break;
+        case 'deleteFriend':
+            console.error('你删了一个好友' + obj.account);
+            onDeleteFriend(null, {
+                account: obj.account
+            });
+            break;
+        case 'updateFriend':
+            console.error('你更新了一个好友', obj.friend);
+            onUpdateFriend(null, obj.friend);
+            break;
+    }
+
+
 }
 
 // 更新好友资料，添加好友成功
-export function onUpdateFriend(error, friends) {
+export function onUpdateFriend(error, friendList) {
     if (error) {
         console.error(error)
         return
     }
-    if (!Array.isArray(friends)) {
-        friends = [friends]
+    if (!Array.isArray(friendList)) {
+        friendList = [friendList]
     }
 
-    friends = friends.map(item => {
+    friendList = friendList.map(item => {
         if (typeof item.isFriend !== 'boolean') {
             item.isFriend = true
         }
@@ -50,105 +71,87 @@ export function onUpdateFriend(error, friends) {
 
     // 补充好友资料
     store.dispatch('searchUsers', {
-        accounts: friends.map(item => {
-            return item.account
-        }),
+        accounts: friendList.map(item => item.account),
         done: (users) => {
             const nim = store.state.nim
-            friends = nim.mergeFriends(friends, users).map(formatUserInfo)
+            friendList = nim.mergeFriends(friendList, users).map(formatUserInfo)
             // 更新好友列表
-            store.commit('updateFriends', friends)
+            store.commit('updateFriends', friendList)
             // 更新好友资料
-            store.commit('updateUserInfo', friends)
+            store.commit('updateUserInfo', friendList)
         }
     })
 }
 
 // 删除好友，这里使用标记删除
-export function onDeleteFriend(error, friends) {
+export function onDeleteFriend(error, friendList) {
     if (error) {
         console.error(error)
         return
     }
-    if (!Array.isArray(friends)) {
-        friends = [friends]
+    if (!Array.isArray(friendList)) {
+        friendList = [friendList]
     }
-    friends = friends.map(item => {
+    friendList = friendList.map(item => {
         item.isFriend = false
         return item
     })
     // 更新好友列表
-    store.commit('updateFriends', [], friends)
+    store.commit('updateFriends', [], friendList)
     // 更新好友资料
-    store.commit('updateUserInfo', friends)
+    store.commit('updateUserInfo', friendList)
 }
+
 
 /*
-        当前登录用户在其它端进行好友相关的操作后的回调 包括
-        直接加为好友
-        申请加为好友
-        通过好友申请
-        拒绝好友申请
-        删除好友
-        更新好友
+* 暴露给用户调用的
+* */
 
- */
-
-export function onSyncFriendAction(obj) {
-    switch (obj.type) {
-        case 'addFriend':
-            console.error('你在其它端直接加了一个好友' + obj.account + ', 附言' + obj.ps);
-            onUpdateFriend(null, obj.friend);
-            break;
-        case 'applyFriend':
-            console.error('你在其它端申请加了一个好友' + obj.account + ', 附言' + obj.ps);
-            break;
-        case 'passFriendApply':
-            console.error('你在其它端通过了一个好友申请' + obj.account + ', 附言' + obj.ps);
-            onUpdateFriend(null, obj.friend);
-            break;
-        case 'rejectFriendApply':
-            console.error('你在其它端拒绝了一个好友申请' + obj.account + ', 附言' + obj.ps);
-            break;
-        case 'deleteFriend':
-            console.error('你在其它端删了一个好友' + obj.account);
-            onDeleteFriend(null, {
-                account: obj.account
-            });
-            break;
-        case 'updateFriend':
-            console.error('你在其它端更新了一个好友', obj.friend);
-            onUpdateFriend(null, obj.friend);
-            break;
-    }
-}
 
 // 更新好友昵称
 export function updateFriend({state, commit}, friend) {
-    const nim = state.nim
-    nim.updateFriend({
+
+    request_post("updateFriend", {
         account: friend.account,
         alias: friend.alias,
-        done: onUpdateFriend
+
+    }).then(resp => {
+        // todo
+        onUpdateFriend(null, resp.data)
+    }).catch(err => {
     })
+
+
 }
 
 export function addFriend({state, commit}, account) {
-    const nim = state.nim
-    nim.addFriend({
+
+
+    request_post("addFriend", {
         // 帐号
         account,
         // 附言
         ps: '',
-        done: onUpdateFriend
+
+    }).then(resp => {
+        // todo
+        onUpdateFriend(null, resp.data)
+    }).catch(err => {
     })
+
 }
 
 export function deleteFriend({state, commit}, account) {
-    const nim = state.nim
-    nim.deleteFriend({
+
+    request_post("deleteFriend", {
+        // 帐号
         account,
-        done: onDeleteFriend
+
+
+    }).then(resp => {
+        // todo
+        onDeleteFriend(null, resp.data)
+    }).catch(err => {
     })
 }
 

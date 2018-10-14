@@ -4,6 +4,8 @@ import {onRevocateMsg} from './msgs'
 
 
 
+import {request_post} from "../../common/request";
+
 
 
 export function onSysMsgs(sysMsgs) {
@@ -72,11 +74,17 @@ export function markSysMsgRead({state, commit}, obj) {
         sysMsgs = state.sysMsgs
     }
     if (Array.isArray(sysMsgs) && sysMsgs.length > 0) {
-        nim.markSysMsgRead({
+
+
+        request_post("markSysMsgRead", {
             sysMsgs,
-            done: function (error, obj) {
-            }
+        }).then(resp => {
+            // todo
+
+        }).catch(err => {
         })
+
+
     }
 }
 

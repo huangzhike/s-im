@@ -3,6 +3,9 @@
  */
 
 
+import {request_post} from "../../common/request";
+
+
 let session = {
     // 会话ID
     id: "",
@@ -52,7 +55,7 @@ export function onUpdateSession(session) {
 }
 
 export function deleteSession({state, commit}, sessionId) {
-    const nim = state.nim
+
     sessionId = sessionId || ''
     let scene = null
     let account = null
@@ -64,26 +67,22 @@ export function deleteSession({state, commit}, sessionId) {
         account = sessionId.replace(/^team-/, '')
     }
     if (account && scene) {
-        nim.deleteSession({
+
+
+
+
+        request_post("deleteSession", {
             scene,
             to: account,
-            done: function deleteServerSessionDone(error, obj) {
-                if (error) {
-                    alert(error)
-                    return
-                }
-                nim.deleteLocalSession({
-                    id: sessionId,
-                    done: function deleteLocalSessionDone(error, obj) {
-                        if (error) {
-                            alert(error)
-                            return
-                        }
-                        commit('deleteSessions', [sessionId])
-                    }
-                })
-            }
+        }).then(resp => {
+            // deleteServerSessionDone
+            commit('deleteSessions', [sessionId])
+            // deleteLocalSessionDone
+        }).catch(err => {
         })
+
+
+
     }
 }
 

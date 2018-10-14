@@ -28,32 +28,10 @@ import {
     enterSettingPage,
     getTeamMembers,
 
-    getTeamMsgReads
 } from './team'
 
 
-import  Vue from  'vue'
-
-function connectNim({state, commit, dispatch}, obj) {
-    let {force} = Object.assign({}, obj)
-    // 操作为内容页刷新页面，此时无nim实例
-    if (!state.nim || force) {
-        let loginInfo = {
-            uid: cookie.readCookie('uid'),
-            sdktoken: cookie.readCookie('sdktoken'),
-        }
-        if (!loginInfo.uid) {
-            // 无cookie，直接跳转登录页
-
-            Vue.router.push('/login')
-            // 无历史登录记录，请重新登录
-        } else {
-            // 有cookie，重新登录
-            dispatch('initNimSDK', loginInfo)
-        }
-    }
-}
-
+import Vue from 'vue'
 
 export default {
 
@@ -63,28 +41,42 @@ export default {
     showFullscreenImg,
     hideFullscreenImg,
 
-    // 连接sdk请求，false表示强制重连
-    connect(store, obj) {
-        console.error("connect",obj)
-        let {type} = Object.assign({}, obj)
+    // 连接sdk请求
+    connect(store) {
+        console.error("connect...")
 
-        type = type || 'nim'
-        connectNim(store, obj)
+
+        if (!store.state.nim) {
+            let loginInfo = {
+                uid: cookie.readCookie('uid'),
+                sdktoken: cookie.readCookie('sdktoken'),
+            }
+            if (!loginInfo.uid) {
+                // 无cookie，直接跳转登录页
+
+                Vue.router.push('/login')
+                // 无历史登录记录，请重新登录
+            } else {
+                // 有cookie，重新登录
+                store.dispatch('initNimSDK', loginInfo)
+            }
+        }
     },
 
     // 用户触发的登出逻辑
     logout({state, commit}) {
         cookie.delCookie('uid')
         cookie.delCookie('sdktoken')
-        if (state.nim) {
-            state.nim.disconnect()
-        }
+
+        state.nim && state.nim.disconnect()
+
 
         Vue.router.push('/login')
     },
 
     // 初始化 重新连接SDK
     initNimSDK,
+
     // 清空所有搜索历史纪录
     resetSearchResult,
     // 搜索用户信息
@@ -94,12 +86,15 @@ export default {
     addFriend,
     deleteFriend,
     updateFriend,
+
     // 删除会话
     deleteSession,
     // 设置当前会话
     setCurrSession,
     // 重置当前会话
     resetCurrSession,
+
+
     // 发送消息
     sendMsg,
     sendFileMsg,
@@ -114,6 +109,8 @@ export default {
 
     resetSysMsgs,
     deleteSysMsgs,
+
+
 
     // 搜索群
     searchTeam,

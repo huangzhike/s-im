@@ -1,5 +1,10 @@
 import {formatUserInfo} from './userInfo'
 
+
+import {request_post} from "../../common/request";
+import {onUpdateFriend} from "./friends";
+
+
 export function resetSearchResult({state, commit}) {
     commit('updateSearchlist', {
         type: 'user',
@@ -13,76 +18,79 @@ export function resetSearchResult({state, commit}) {
 
 export function searchUsers({state, commit}, obj) {
     let {accounts, done} = obj
-    const nim = state.nim
+
     if (!Array.isArray(accounts)) {
         accounts = [accounts]
     }
     // todo
-    nim.getUsers({
-        accounts,
-        done: function searchUsersDone(error, users) {
-            if (error) {
-                alert(error)
-                return
+
+
+    request_post("getUsers", {
+        accounts
+    }).then(resp => {
+        // todo
+        onUpdateFriend(null, resp.data)
+
+
+        commit('updateSearchlist', {
+            type: 'user',
+            list: resp.data
+        })
+        let updateUsers = resp.data.filter(item => {
+            let account = item.account
+            if (item.account === state.userUID) {
+                return false
             }
-            commit('updateSearchlist', {
-                type: 'user',
-                list: users
-            })
-            let updateUsers = users.filter(item => {
-                let account = item.account
-                if (item.account === state.userUID) {
-                    return false
-                }
-                let userInfo = state.userInfos[account] || {}
-                if (userInfo.isFriend) {
-                    return false
-                }
-                return true
-            })
-            updateUsers = updateUsers.map(item => {
-                return formatUserInfo(item)
-            })
-            commit('updateUserInfo', updateUsers)
-            if (done instanceof Function) {
-                done(users)
+            let userInfo = state.userInfos[account] || {}
+            if (userInfo.isFriend) {
+                return false
             }
+            return true
+        })
+        updateUsers = updateUsers.map(item => {
+            return formatUserInfo(item)
+        })
+        commit('updateUserInfo', updateUsers)
+        if (done instanceof Function) {
+            done(resp.data)
         }
+
+    }).catch(err => {
     })
+
+
 }
 
 export function searchTeam({state, commit}, obj) {
     let {teamId, done} = obj
-    const nim = state.nim
+
 
     // todo
-    nim.getTeam({
-        teamId: teamId,
-        done: function searchTeamDone(error, teams) {
-            if (error) {
-                if (error.code === 803) {
-                    // 群不存在或未发生变化
-                    teams = []
-                } else {
-                    alert(error)
-                    return
-                }
-            }
-            if (!Array.isArray(teams)) {
-                teams = [teams]
-            }
-            teams.forEach(team => {
-                if (team.avatar) {
-                    team.avatar = team.avatar
-                }
-            })
-            commit('updateSearchlist', {
-                type: 'team',
-                list: teams
-            })
-            if (done instanceof Function) {
-                done(teams)
-            }
+
+    request_post("getTeam", {
+        teamId
+
+    }).then(resp => {
+        // todo
+
+        if (!Array.isArray(resp.data)) {
+            resp.data = [resp.data]
         }
+        resp.data.forEach(team => {
+            if (team.avatar) {
+                team.avatar = team.avatar
+            }
+        })
+        commit('updateSearchlist', {
+            type: 'team',
+            list: resp.data
+        })
+        if (done instanceof Function) {
+            done(resp.data)
+        }
+
+    }).catch(err => {
     })
+
+
 }

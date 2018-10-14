@@ -1,6 +1,10 @@
 import store from '../'
 
 
+import {request_post} from "../../common/request";
+import {onDeleteFriend} from "./friends";
+
+
 let team = {
 
     // 群Id
@@ -70,8 +74,6 @@ let teamMember = {
     updateTime: "",
 
 }
-
-
 
 
 // 收到群列表及更新群列表接口
@@ -178,9 +180,9 @@ export function onUpdateTeamManagers(obj) {
 // 进入可配置的群信息设置页，进入前改变state中的配置信息，进入页面后读取配置信息更新视图
 export function enterSettingPage({commit}, obj) {
     commit('updateTeamSettingConfig', obj)
-    setTimeout(() => {
-        location.href = `#/teamsetting`
-    }, 20)
+    setTimeout(() =>
+            location.href = `#/teamsetting`
+        , 20)
 }
 
 
@@ -207,34 +209,40 @@ export function getTeamMembers({state}, teamId) {
         }, 200);
         return
     }
-    nim.getTeamMembers({
-        teamId: teamId,
-        done: (err, obj) => {
-            if (obj.members) {
-                onTeamMembers({
-                    teamId: obj.teamId,
-                    members: obj.members
-                })
-            } else {
-                setTimeout(() => {
-                    getTeamMembers(store, teamId)
-                }, 200);
-            }
+
+
+    request_post("getTeamMembers", {
+        teamId
+    }).then(resp => {
+        // todo
+        if (resp.data.members) {
+            onTeamMembers({
+                teamId: resp.data.teamId,
+                members: resp.data.members
+            })
+        } else {
+            setTimeout(() => {
+                getTeamMembers(store, teamId)
+            }, 200);
         }
+
+    }).catch(err => {
     })
+
 }
 
 
 export function getTeamMsgReads({state}, needQuery) {
-    nim.getTeamMsgReads({
-        teamMsgReceipts: needQuery,
-        done: (error, obj, content) => {
-            if (error) {
-                console.log('获取群组消息已读' + error)
-            } else {
-                console.log('获取群组消息已读：', content)
-                store.commit('updateTeamMsgReads', content)
-            }
-        }
+
+
+    request_post("getTeamMsgReads", {
+
+    }).then(resp => {
+        // todo
+        console.log('获取群组消息已读：', resp.data)
+        store.commit('updateTeamMsgReads', resp.data)
+
+    }).catch(err => {
     })
+
 }
