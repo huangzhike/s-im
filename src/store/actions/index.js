@@ -33,11 +33,7 @@ import Vue from 'vue'
 
 export default {
 
-    // UI 及页面状态变更
-    showLoading,
-    hideLoading,
-    showFullscreenImg,
-    hideFullscreenImg,
+
 
     // 连接sdk请求
     connect(store) {
@@ -71,7 +67,11 @@ export default {
 
         Vue.router.push('/login')
     },
-
+    // UI 及页面状态变更
+    showLoading,
+    hideLoading,
+    showFullscreenImg,
+    hideFullscreenImg,
     // 初始化 重新连接SDK
     initNimSDK,
 
