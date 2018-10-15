@@ -24,36 +24,31 @@ let session = {
 
 import store from '../'
 
-// 如果会话对象不是好友，需要更新好友名片
-function updateSessionAccount(sessions) {
-    let accountsNeedSearch = []
-    sessions.forEach(item => {
-        if (item.scene === 'p2p') {
-            // 如果不存在缓存资料
-            if (!store.state.userInfos[item.to]) {
-                accountsNeedSearch.push(item.to)
-            }
-        }
-    })
-    if (accountsNeedSearch.length > 0) {
-        store.dispatch('searchUsers', {
-            accounts: accountsNeedSearch
-        })
-    }
-}
 
 // onSessions只在初始化完成后回调
-export function onSessions(sessions) {
-    updateSessionAccount(sessions)
-    store.commit('updateSessions', sessions)
+export function onSessions(sessionList) {
+
+    // // 如果会话对象不是好友，需要更新好友名片
+    // let accountsNeedSearch = []
+    // sessionList.forEach(item => {
+    //     if (item.scene === 'p2p') {
+    //         // 如果不存在缓存资料
+    //         if (!store.state.userInfos[item.to]) {
+    //             accountsNeedSearch.push(item.to)
+    //         }
+    //     }
+    // })
+    // if (accountsNeedSearch.length > 0) {
+    //     store.dispatch('searchUsers', {
+    //         accounts: accountsNeedSearch
+    //     })
+    // }
+
+    store.commit('updateSessions', sessionList)
 }
 
-export function onUpdateSession(session) {
-    let sessions = [session]
-    updateSessionAccount(sessions)
-    store.commit('updateSessions', sessions)
-}
 
+// 删除会话
 export function deleteSession({state, commit}, sessionId) {
 
     sessionId = sessionId || ''
@@ -68,9 +63,6 @@ export function deleteSession({state, commit}, sessionId) {
     }
     if (account && scene) {
 
-
-
-
         request_post("deleteSession", {
             scene,
             to: account,
@@ -82,33 +74,30 @@ export function deleteSession({state, commit}, sessionId) {
         })
 
 
-
     }
 }
 
+// 点击设置当前会话
 export function setCurrSession({state, commit, dispatch}, sessionId) {
-    const nim = state.nim
+
     if (sessionId) {
         commit('updateCurrSessionId', {
             type: 'init',
             sessionId
         })
-        if (nim) {
-            // 如果在聊天页面刷新，此时还没有nim实例，需要在onSessions里同步
-            nim.setCurrSession(sessionId)
-            commit('updateCurrSessionMsgs', {
-                type: 'init',
-                sessionId
-            })
-            // 发送已读回执
-            dispatch('sendMsgReceipt')
-        }
+        commit('updateCurrSessionMsgs', {
+            type: 'init',
+            sessionId
+        })
+        // 发送已读回执
     }
 }
 
 export function resetCurrSession({state, commit}) {
-    const nim = state.nim
-    nim.resetCurrSession()
+    commit('updateCurrSessionId', {
+        type: 'destroy',
+
+    })
     commit('updateCurrSessionMsgs', {
         type: 'destroy'
     })

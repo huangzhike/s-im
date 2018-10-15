@@ -3,7 +3,6 @@
 import cookie from '../../utils/cookie'
 
 
-/* 导出actions方法 */
 import {showLoading, hideLoading, showFullscreenImg, hideFullscreenImg} from './widgetUi'
 
 import {initNimSDK} from './initNimSDK'
@@ -14,7 +13,6 @@ import {deleteSession, setCurrSession, resetCurrSession} from './session'
 import {
     sendMsg,
     sendFileMsg,
-
     revocateMsg,
     getHistoryMsgs,
     resetNoMoreHistoryMsgs,

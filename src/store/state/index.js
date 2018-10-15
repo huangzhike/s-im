@@ -12,7 +12,7 @@ export default {
     // 切页动画 forward，backward
     transitionName: 'forward',
 
-    // IM SDK 实例
+    // IM   实例
     nim: null,
 
     // 登录账户ID

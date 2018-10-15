@@ -62,6 +62,31 @@ Utils.mergeVueObject = function (dest, src) {
     return dest
 }
 
+
+Utils.mergeArrayById = function (dest, src) {
+    dest.forEach((item, index) => {
+        src.forEach((itm, idx) => {
+            if (item.id == itm.id) {
+                Object.assign(item, itm)
+            }
+        })
+    })
+
+
+    return dest
+}
+
+
+Utils.deleteArrayByIdList = function (dest, idList) {
+
+    let i = dest.length;
+    while (i--) {
+        idList.indexOf(dest[i].id) !== -1 && dest.splice(i, 1)
+    }
+
+    return dest
+}
+
 // 消息类型列表
 Utils.mapMsgType = function (msg) {
     let map = {
