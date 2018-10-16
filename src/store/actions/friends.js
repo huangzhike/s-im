@@ -73,8 +73,8 @@ export function onUpdateFriend(error, friendList) {
     store.dispatch('searchUsers', {
         accounts: friendList.map(item => item.account),
         done: (users) => {
-            const nim = store.state.nim
-            friendList = nim.mergeFriends(friendList, users).map(formatUserInfo)
+            const sim = store.state.sim
+            friendList = sim.mergeFriends(friendList, users).map(formatUserInfo)
             // 更新好友列表
             store.commit('updateFriends', friendList)
             // 更新好友资料

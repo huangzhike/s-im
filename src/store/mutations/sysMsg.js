@@ -3,7 +3,7 @@ import config from '../../configs'
 import Vue from 'Vue'
 
 export function updateSysMsgs(state, sysMsgs) {
-    const nim = state.nim
+    const sim = state.sim
     if (!Array.isArray(sysMsgs)) {
         sysMsgs = [sysMsgs]
     }
@@ -11,8 +11,8 @@ export function updateSysMsgs(state, sysMsgs) {
         msg.showTime = util.formatDate(msg.time, false)
         return msg
     })
-    // state.sysMsgs = nim.mergeSysMsgs(state.sysMsgs, sysMsgs)
-    state.sysMsgs = [].concat(nim.mergeSysMsgs(state.sysMsgs, sysMsgs))
+    // state.sysMsgs = sim.mergeSysMsgs(state.sysMsgs, sysMsgs)
+    state.sysMsgs = [].concat(sim.mergeSysMsgs(state.sysMsgs, sysMsgs))
     Vue.set(state, sysMsgs, state.sysMsgs)
 }
 

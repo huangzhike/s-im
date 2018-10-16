@@ -13,6 +13,7 @@ import {onMsg} from './msgs'
 import {onSysMsg} from './sysMsgs'
 import {onTeamMembers, onTeams,} from './team'
 
+import config from '../../configs'
 
 let resp = {
     msg: "",
@@ -22,18 +23,18 @@ let resp = {
 }
 
 // 重新初始化
-export function initNimSDK({state, commit, dispatch}, loginInfo) {
+export function initSIM({state, commit, dispatch}, loginInfo) {
 
-    state.nim && state.nim.disconnect()
+    state.sim && state.sim.disconnect()
 
     dispatch('showLoading')
 
 
     // 初始化
-    window.nim = state.nim = {
+    window.sim = state.sim = {
 
         account: loginInfo.uid,
-        token: loginInfo.sdktoken,
+        token: loginInfo.token,
 
         // 好友
         onfriends: onFriends,
@@ -69,7 +70,7 @@ export function initNimSDK({state, commit, dispatch}, loginInfo) {
     }
 
 
-    window.ws = new WS("url",
+    window.ws = new WS(config.webSocketUrl + loginInfo.token,
         async (evt) => {
             console.error(evt)
             // 连接建立后的回调
@@ -77,33 +78,33 @@ export function initNimSDK({state, commit, dispatch}, loginInfo) {
             loginInfo && commit('updateUserUID', loginInfo)
 
             // 开始同步消息
-            await request_post("getSessions", {}).then(resp => {
-                state.nim.onsessions(resp.data.data)
+            await request_post(`${config.apiUrl}getSessions`, {}).then(resp => {
+                state.sim.onsessions(resp.data.data)
             }).catch(err => {
             })
-            await request_post("getTeams", {}).then(resp => {
-                state.nim.onteams(resp.data.data)
+            await request_post(`${config.apiUrl}getTeams`, {}).then(resp => {
+                state.sim.onteams(resp.data.data)
             }).catch(err => {
             })
-            await request_post("getFriends", {}).then(resp => {
-                state.nim.onfriends(resp.data.data)
+            await request_post(`${config.apiUrl}getFriends`, {}).then(resp => {
+                state.sim.onfriends(resp.data.data)
             }).catch(err => {
             })
 
-            state.nim.onsyncdone()
+            state.sim.onsyncdone()
 
         },
         (data) => {
             // onMessage
             console.error("onMessage: ", data)
             if (data.type === "msg") {
-                state.nim.onmsg(resp.data.data)
+                state.sim.onmsg(resp.data.data)
             } else if (data.type === "sysMsg") {
-                state.nim.onsysmsg(resp.data.data)
+                state.sim.onsysmsg(resp.data.data)
             } else if (data.type === "team") {
-                state.nim.onteams(resp.data.data)
+                state.sim.onteams(resp.data.data)
             } else if (data.type === "friend") {
-                state.nim.onfriends(resp.data.data)
+                state.sim.onfriends(resp.data.data)
             } else {
                 console.error("else end: ", data)
             }
@@ -123,7 +124,6 @@ export function initNimSDK({state, commit, dispatch}, loginInfo) {
                 // 账号或者密码错误, 请跳转到登录页面并提示错误
                 case 302:
                     Vue.router.push('/login')
-                    // 帐号或密码错误
                     break
                 // 被踢, 请提示错误后跳转到登录页面
                 case 'kicked':

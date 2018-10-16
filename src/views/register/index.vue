@@ -83,19 +83,19 @@
                 this.errorMsg = ''
                 // 本demo做一次假登录
                 // 真实场景应在此向服务器发起ajax请求
-                let sdktoken = md5(this.password)
+                let token = md5(this.password)
 
                 let accountLowerCase = this.account.toLowerCase()
 
                 request_post(`${config.postUrl}/api`, {
                     username: accountLowerCase,
-                    password: sdktoken,
+                    password: token,
                     nickname: this.nickname
                 }).then(resp => {
                     let data = resp.data
                     if (data.code === 200) {
                         cookie.setCookie('uid', accountLowerCase)
-                        cookie.setCookie('sdktoken', sdktoken)
+                        cookie.setCookie('token', token)
                         this.$router.push("/session")
                     } else {
                         this.errorMsg = data.msg

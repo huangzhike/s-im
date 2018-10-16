@@ -1,9 +1,9 @@
 import store from "../index";
 
 export function updateTeamList(state, teams) {
-    const nim = state.nim
-    store.state.teamlist = nim.mergeTeams(store.state.teamlist, teams)
-    store.state.teamlist = nim.cutTeams(store.state.teamlist, teams.invalid)
+    const sim = state.sim
+    store.state.teamlist = sim.mergeTeams(store.state.teamlist, teams)
+    store.state.teamlist = sim.cutTeams(store.state.teamlist, teams.invalid)
 }
 
 export function updateTeamInfo(state, team) {
@@ -21,12 +21,12 @@ export function updateTeamSettingConfig(state, obj) {
 }
 
 export function updateTeamMembers(state, obj) {
-    const nim = state.nim
+    const sim = state.sim
     let teamId = obj.teamId
     let members = obj.members
     state.teamMembers = state.teamMembers || {}
-    state.teamMembers[teamId] = nim.mergeTeamMembers(state.teamMembers[teamId], members)
-    state.teamMembers[teamId] = nim.cutTeamMembers(state.teamMembers[teamId], members.invalid)
+    state.teamMembers[teamId] = sim.mergeTeamMembers(state.teamMembers[teamId], members)
+    state.teamMembers[teamId] = sim.cutTeamMembers(state.teamMembers[teamId], members.invalid)
 
     state.teamMembers[teamId].sort((a, b) => {
         // 将群主和管理员排在队列前方

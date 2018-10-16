@@ -13,7 +13,7 @@ export default {
     transitionName: 'forward',
 
     // IM   实例
-    nim: null,
+    sim: null,
 
     // 登录账户ID
     userUID: null,

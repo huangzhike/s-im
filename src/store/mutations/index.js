@@ -23,7 +23,15 @@ import {updateCurrSessionId, updateCurrSessionMsgs, updateSessions, deleteSessio
 
 import {updateSearchlist} from './search'
 import {updateFriends} from './friend'
-import {updateMsgByIdClient, updateMsgs, putMsg, replaceMsg, deleteMsg} from './msg'
+import {
+    updateMsgByIdClient,
+    updateMsgs,
+    putMsg,
+    replaceMsg,
+    deleteMsg,
+    setNoMoreHistoryMsgs,
+    resetNoMoreHistoryMsgs
+} from './msg'
 
 
 export default {
@@ -31,16 +39,9 @@ export default {
 
     updateUserUID(state, loginInfo) {
         state.userUID = loginInfo.uid
-        state.sdktoken = loginInfo.sdktoken
+        state.token = loginInfo.token
         cookie.setCookie('uid', loginInfo.uid)
-        cookie.setCookie('sdktoken', loginInfo.sdktoken)
-    },
-
-    setNoMoreHistoryMsgs(state) {
-        state.noMoreHistoryMsgs = true
-    },
-    resetNoMoreHistoryMsgs(state) {
-        state.noMoreHistoryMsgs = false
+        cookie.setCookie('token', loginInfo.token)
     },
 
 
@@ -71,7 +72,9 @@ export default {
     updateMsgs,
     putMsg,
     replaceMsg,
-    deleteMsg
+    deleteMsg,
+    setNoMoreHistoryMsgs,
+    resetNoMoreHistoryMsgs
 
 
 }

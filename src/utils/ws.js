@@ -4,14 +4,14 @@ let WS = function (url, onConnect, onMessage, onError, onClose) {
 
     t.running = true
 
-
     t.timeOut = undefined
 
-
-    t.close = function () {
+    t.close = (event) => {
+        event.returnValue = "Fucking..."
         t.running = false
         t.websocket.close()
     }
+
     t.open = function () {
 
         try {
@@ -19,34 +19,33 @@ let WS = function (url, onConnect, onMessage, onError, onClose) {
             if ('WebSocket' in window) {
                 t.websocket = new WebSocket(url);
             } else {
-                onError('不支持该浏览器')
+                onError('不支持该浏览器...')
             }
+
+            t.websocket.addEventListener('open', function (event) {
+                onConnect()
+                console.log('WebSocket opened', event)
+                t.websocket.send('Hello Server!');
+            });
+
+            t.websocket.addEventListener('message', function (event) {
+                onMessage(event.data);
+                console.log('Message from server ', event);
+            });
 
             t.websocket.onerror = onError
 
-            t.websocket.onopen = function (event) {
-                console.log('websocket opened', event)
-                onConnect()
-            }
-            t.websocket.onmessage = function (event) {
-                console.log('websocket onmessage', event)
-                onMessage(event.data);
-            }
-            t.websocket.onclose = function () {
-
-                console.error("websocket.onclose")
+            t.websocket.onclose = function (event) {
                 if (t.running) {
                     clearTimeout(t.timeOut)
                     t.timeOut = setTimeout(() => t.open(), 30000)
-
                 }
                 onClose()
-
-
+                console.error("WebSocket is closed now.", event);
             }
-            window.onbeforeunload = function () {
-                t.close()
-            }
+
+            window.addEventListener('beforeunload', t.close, true);
+
 
         } catch (e) {
             onError(e)

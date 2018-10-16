@@ -5,7 +5,7 @@ import cookie from '../../utils/cookie'
 
 import {showLoading, hideLoading, showFullscreenImg, hideFullscreenImg} from './widgetUi'
 
-import {initNimSDK} from './initNimSDK'
+import {initSIM} from './initSIM'
 
 import {updateFriend, addFriend, deleteFriend} from './friends'
 import {resetSearchResult, searchUsers, searchTeam} from './search'
@@ -13,7 +13,7 @@ import {deleteSession, setCurrSession, resetCurrSession} from './session'
 import {
     sendMsg,
     sendFileMsg,
-    revocateMsg,
+    revokeMsg,
     getHistoryMsgs,
     resetNoMoreHistoryMsgs,
 
@@ -34,25 +34,24 @@ import Vue from 'vue'
 export default {
 
 
-
     // 连接sdk请求
     connect(store) {
         console.error("connect...")
 
-
-        if (!store.state.nim) {
+        if (!store.state.sim) {
+            console.error("connecting...")
             let loginInfo = {
                 uid: cookie.readCookie('uid'),
-                sdktoken: cookie.readCookie('sdktoken'),
+                token: cookie.readCookie('token'),
             }
             if (!loginInfo.uid) {
                 // 无cookie，直接跳转登录页
-
-                Vue.router.push('/login')
                 // 无历史登录记录，请重新登录
+                Vue.router.push('/login')
+
             } else {
                 // 有cookie，重新登录
-                store.dispatch('initNimSDK', loginInfo)
+                store.dispatch('initSIM', loginInfo)
             }
         }
     },
@@ -60,11 +59,8 @@ export default {
     // 用户触发的登出逻辑
     logout({state, commit}) {
         cookie.delCookie('uid')
-        cookie.delCookie('sdktoken')
-
-        state.nim && state.nim.disconnect()
-
-
+        cookie.delCookie('token')
+        state.sim && state.sim.disconnect()
         Vue.router.push('/login')
     },
     // UI 及页面状态变更
@@ -72,11 +68,16 @@ export default {
     hideLoading,
     showFullscreenImg,
     hideFullscreenImg,
-    // 初始化 重新连接SDK
-    initNimSDK,
+
+
+    // 初始化 重新连接
+    initSIM,
+
 
     // 清空所有搜索历史纪录
     resetSearchResult,
+    // 搜索群
+    searchTeam,
     // 搜索用户信息
     searchUsers,
 
@@ -98,10 +99,16 @@ export default {
     sendFileMsg,
 
     // 消息撤回
-    revocateMsg,
+    revokeMsg,
     getHistoryMsgs,
+
     // 重置历史消息状态
     resetNoMoreHistoryMsgs,
+
+    // 设置没有更多历史消息不暴露出来
+
+
+
     // 标记系统消息已读
     markSysMsgRead,
 
@@ -109,9 +116,6 @@ export default {
     deleteSysMsgs,
 
 
-
-    // 搜索群
-    searchTeam,
     // 代理sdk中的群方法
     delegateTeamFunction,
     // 处理群消息回调

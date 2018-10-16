@@ -196,27 +196,14 @@ updateTeam' (更新群)
 */
 
 export function formatMsg(msg) {
-
     return msg
-}
-
-export function onRoamingMsgs(obj) {
-    let msgs = obj.msgs.map(msg => {
-        return formatMsg(msg)
-    })
-    store.commit('updateMsgs', msgs)
-}
-
-export function onOfflineMsgs(obj) {
-    let msgs = obj.msgs.map(msg => {
-        return formatMsg(msg)
-    })
-    store.commit('updateMsgs', msgs)
 }
 
 export function onMsg(msg) {
     msg = formatMsg(msg)
+    // 丢进去
     store.commit('putMsg', msg)
+    // 如果当前会话打开了
     if (msg.sessionId === store.state.currSessionId) {
         store.commit('updateCurrSessionMsgs', {
             type: 'put',
@@ -225,6 +212,7 @@ export function onMsg(msg) {
         // 发送已读回执
 
     }
+    // 群消息
     if (msg.scene === 'team' && msg.type === 'notification') {
         store.dispatch('onTeamNotificationMsg', msg)
     }
@@ -266,7 +254,7 @@ export function onRevocateMsg(error, msg) {
             tip = '对方撤回了一条消息'
         }
     }
-
+    // 收到服务器应答后发送给对方并删除消息
 
     request_post("sendTipMsg", {
         isLocal: true,
@@ -291,28 +279,22 @@ export function onRevocateMsg(error, msg) {
             })
         }
 
-    }).catch(err => {
-    })
+    }).catch(console.error)
 
 
 }
 
 
-export function revocateMsg({state, commit}, msg) {
+export function revokeMsg({state, commit}, msg) {
 
     let {idClient} = msg
     msg = Object.assign(msg, state.msgsMap[idClient])
 
-
     request_post("deleteMsg", {
         msg
-
-
     }).then(resp => {
         onRevocateMsg(null, resp.data)
-
-    }).catch(err => {
-    })
+    }).catch(console.error)
 
 
 }
@@ -325,16 +307,13 @@ export function sendMsg({state, commit}, obj) {
     store.dispatch('showLoading')
     switch (type) {
         case 'text':
-
             request_post("sendText", {
                 scene: obj.scene,
                 to: obj.to,
                 text: obj.text,
-                done: onSendMsgDone,
-                needMsgReceipt: obj.needMsgReceipt || false
             }).then(resp => {
-            }).catch(err => {
-            })
+                onSendMsgDone(null, resp.data)
+            }).catch(console.error)
 
             break
 
@@ -367,18 +346,15 @@ export function sendFileMsg({state, commit}, obj) {
 
 }
 
-
+// 获取更多历史消息
 export function getHistoryMsgs({state, commit}, obj) {
-    const nim = state.nim
-    if (nim) {
+    const sim = state.sim
+    if (sim) {
         let {scene, to} = obj
         let options = {
             scene,
             to,
-            reverse: false,
-            asc: true,
-            limit: config.localMsglimit || 20,
-
+            limit: config.localMsgLimitCount || 20,
         }
         if (state.currSessionLastMsg) {
             options = Object.assign(options, {
@@ -388,17 +364,15 @@ export function getHistoryMsgs({state, commit}, obj) {
         }
         store.dispatch('showLoading')
 
-
         request_post("getHistoryMsgs", options).then(resp => {
 
-
-            if (resp.data.msgs) {
-                if (resp.data.msgs.length === 0) {
+            let msg = resp.data.data
+            if (msg) {
+                if (msg.length === 0) {
                     commit('setNoMoreHistoryMsgs')
                 } else {
-                    let msgs = resp.data.msgs.map(msg => {
-                        return formatMsg(msg)
-                    })
+                    let msgs = msg.map(msg => formatMsg(msg))
+                    // 合并历史消息
                     commit('updateCurrSessionMsgs', {
                         type: 'concat',
                         msgs: msgs
@@ -407,8 +381,7 @@ export function getHistoryMsgs({state, commit}, obj) {
             }
             store.dispatch('hideLoading')
 
-        }).catch(err => {
-        })
+        }).catch(err => console.error(err))
 
     }
 }

@@ -65,10 +65,10 @@
                 this.errorMsg = ''
 
                 // 真实场景应在此向服务器发起ajax请求
-                let sdktoken = md5(this.account + this.password)
+                let token = md5(this.account + this.password)
                 // 服务端帐号均为小写
                 cookie.setCookie('uid', this.account.toLowerCase())
-                cookie.setCookie('sdktoken', sdktoken)
+                cookie.setCookie('token', token)
                 this.$router.push("/session")
 
             },

@@ -66,18 +66,18 @@ export function onSysMsgUnread(obj) {
 
 // 不传obj则全部重置
 export function markSysMsgRead({state, commit}, obj) {
-    const nim = state.nim
-    let sysMsgs = []
+
+    let sysMsgList = []
     if (obj && obj.sysMsgs) {
-        sysMsgs = obj.sysMsgs
+        sysMsgList = obj.sysMsgs
     } else {
-        sysMsgs = state.sysMsgs
+        sysMsgList = state.sysMsgs
     }
-    if (Array.isArray(sysMsgs) && sysMsgs.length > 0) {
+    if (Array.isArray(sysMsgList) && sysMsgList.length > 0) {
 
 
         request_post("markSysMsgRead", {
-            sysMsgs,
+            sysMsgList,
         }).then(resp => {
             // todo
 

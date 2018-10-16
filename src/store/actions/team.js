@@ -86,7 +86,7 @@ export function onTeams(teams) {
         if (team.validToCurrentUser === undefined) {
             team.validToCurrentUser = true
         }
-        if (team.avatar && team.avatar.indexOf('nim.nosdn.127') > 0 && team.avatar.indexOf('?imageView') === -1) {
+        if (team.avatar && team.avatar.indexOf('sim.nosdn.127') > 0 && team.avatar.indexOf('?imageView') === -1) {
             team.avatar = team.avatar + '?imageView&thumbnail=300y300'
         }
     })
@@ -186,23 +186,23 @@ export function enterSettingPage({commit}, obj) {
 }
 
 
-/* 
+/*
 * 代理nim sdk中对群组的操作方法
-* @functionName  nim sdk中的方法名
+* @functionName  sim sdk中的方法名
 * @options 传递给sdk方法的参数
 */
 export function delegateTeamFunction({state}, {functionName, options}) {
-    const nim = state.nim
-    if (functionName && nim[functionName] && typeof nim[functionName] === 'function') {
-        nim[functionName](options)
+    const sim = state.sim
+    if (functionName && sim[functionName] && typeof sim[functionName] === 'function') {
+        sim[functionName](options)
     } else {
-        throw(`There is not property of '${functionName}' in nim or '${functionName}' is not a function`)
+        throw(`There is not property of '${functionName}' in sim or '${functionName}' is not a function`)
     }
 }
 
 export function getTeamMembers({state}, teamId) {
-    const nim = state.nim
-    if (!nim) {
+    const sim = state.sim
+    if (!sim) {
         // 防止nim未初始化
         setTimeout(() => {
             getTeamMembers(store, teamId)

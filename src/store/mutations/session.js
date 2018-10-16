@@ -45,7 +45,7 @@ export function updateCurrSessionMsgs(state, obj) {
             let sessionId = state.currSessionId
             let currSessionMsgs = [].concat(state.msgs[sessionId] || [])
             // 消息截断 数量限制
-            let limit = config.localMsglimit
+            let limit = config.localMsgLimitCount
             let msgLen = currSessionMsgs.length
             if (msgLen - limit > 0) {
                 // 当前会话最后一条消息

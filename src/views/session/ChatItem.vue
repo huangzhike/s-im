@@ -21,7 +21,7 @@
                 :time="msg.time"
                 :flow="msg.flow"
                 :type="msg.type"
-                @click="revocateMsg"
+                @click="revokeMsg"
         >
             <!--头像-->
             <a class="msg-head" v-if="msg.avatar" :href="msg.link">
@@ -284,7 +284,7 @@
         },
         methods: {
             // 撤回
-            revocateMsg(vNode) {
+            revokeMsg(vNode) {
                 // 在会话聊天页
                 if (this.$store.state.currSessionId) {
                     if (vNode && vNode.data && vNode.data.attrs) {
@@ -294,7 +294,7 @@
                         if (attrs.flow === 'out') {
                             let that = this
                             // 确定需要撤回消息',
-                            that.$store.dispatch('revocateMsg', {
+                            that.$store.dispatch('revokeMsg', {
                                 idClient: attrs.idClient
                             })
 
