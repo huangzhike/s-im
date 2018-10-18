@@ -26,23 +26,20 @@ import store from '../'
 
 
 // onSessions只在初始化完成后回调
-export function onSessions(sessionList) {
+export function onSessions(obj) {
 
-    // // 如果会话对象不是好友，需要更新好友名片
-    // let accountsNeedSearch = []
-    // sessionList.forEach(item => {
-    //     if (item.scene === 'p2p') {
-    //         // 如果不存在缓存资料
-    //         if (!store.state.userInfos[item.to]) {
-    //             accountsNeedSearch.push(item.to)
-    //         }
-    //     }
-    // })
-    // if (accountsNeedSearch.length > 0) {
-    //     store.dispatch('searchUsers', {
-    //         accounts: accountsNeedSearch
-    //     })
-    // }
+    let sessionList = obj.data
+
+    // 如果会话对象不是好友，需要更新好友名片
+    let accountsNeedSearch = []
+    sessionList.forEach(item => {
+        if (item.scene === 'p2p') {
+            // 如果不存在缓存资料
+            !store.state.userInfos[item.to] && accountsNeedSearch.push(item.to)
+        }
+    })
+
+    accountsNeedSearch.length > 0 && store.dispatch('searchUsers', {accounts: accountsNeedSearch})
 
     store.commit('updateSessions', sessionList)
 }

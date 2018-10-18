@@ -44,8 +44,8 @@ export function onFriends(obj) {
             });
             break;
         case 'updateFriend':
-            console.error('你更新了一个好友', obj.friend);
-            onUpdateFriend(null, obj.friend);
+            console.error('你更新了一个好友', obj);
+            onUpdateFriend(null, obj.data);
             break;
     }
 

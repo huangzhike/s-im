@@ -19,7 +19,7 @@ let respSession = {
     msg: "OK",
     code: "200",
     type: "session",
-    data: {
+    body: {
         event: "init",
         data: [{}, {}],
     },
@@ -30,7 +30,7 @@ let respMsg = {
     msg: "OK",
     code: "200",
     type: "msg",
-    data: {
+    body: {
         event: "init",
         data: [{}, {}],
     },
@@ -41,7 +41,7 @@ let respTeam = {
     msg: "OK",
     code: "200",
     type: "team",
-    data: {
+    body: {
         event: "init",
         data: [{}, {}],
     },
@@ -52,7 +52,7 @@ let respFriend = {
     msg: "OK",
     code: "200",
     type: "friend",
-    data: {
+    body: {
         event: "init",
         data: [{}, {}],
     },
@@ -118,21 +118,31 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
             // 开始同步消息 并行
 
             let getFriendList = request_post(`${config.apiUrl}getFriendList`, loginInfo)
-            let getFriendListResp = await getFriendList;
-            state.sim.onfriends(getFriendListResp.data.data.data)
 
             let getSessionList = request_post(`${config.apiUrl}getSessionList`, loginInfo)
-            let getSessionListResp = await getSessionList;
-            state.sim.onfriends(getSessionListResp.data.data.data)
 
             let getTeamList = request_post(`${config.apiUrl}getTeamList`, loginInfo)
+
+            let getUserInfo = request_post(`${config.apiUrl}getUserInfo`, loginInfo)
+
+
+
+            // list
+            let getSessionListResp = await getSessionList;
+
+            state.sim.onsessions(getSessionListResp.data.body)
+
+
+
+            let getFriendListResp = await getFriendList;
+            state.sim.onfriends(getFriendListResp.data.body)
+
+
             let getTeamListResp = await getTeamList;
-            state.sim.onfriends(getTeamListResp.data.data.data)
+            state.sim.onteams(getTeamListResp.data.body)
 
-            let getUserInfo = request_post(`${config.apiUrl}getTeamList`, loginInfo)
             let getUserInfoResp = await getUserInfo;
-            state.sim.onfriends(getUserInfoResp.data.data.data)
-
+            state.sim.onmyinfo(getUserInfoResp.data.body)
 
             state.sim.onsyncdone()
 
@@ -141,13 +151,13 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
             // onMessage
             console.error("onMessage: ", data)
             if (data.type === "msg") {
-                state.sim.onmsg(resp.data.data)
+                state.sim.onmsg(data.body)
             } else if (data.type === "sysMsg") {
-                state.sim.onsysmsg(resp.data.data)
+                state.sim.onsysmsg(data.body)
             } else if (data.type === "team") {
-                state.sim.onteams(resp.data.data)
+                state.sim.onteams(data.body)
             } else if (data.type === "friend") {
-                state.sim.onfriends(resp.data.data)
+                state.sim.onfriends(data.body)
             } else {
                 console.error("else end: ", data)
             }
