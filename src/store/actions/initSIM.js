@@ -14,12 +14,48 @@ import {onSysMsg} from './sysMsgs'
 import {onTeamMembers, onTeams,} from './team'
 
 import config from '../../configs'
+// 会话列表
+let respSession = {
+    msg: "OK",
+    code: "200",
+    type: "session",
+    data: {
+        event: "init",
+        data: [{}, {}],
+    },
+}
 
-let resp = {
-    msg: "",
-    code: "",
-    type: "",
-    data: {},
+
+let respMsg = {
+    msg: "OK",
+    code: "200",
+    type: "msg",
+    data: {
+        event: "init",
+        data: [{}, {}],
+    },
+}
+
+// 群组列表
+let respTeam = {
+    msg: "OK",
+    code: "200",
+    type: "team",
+    data: {
+        event: "init",
+        data: [{}, {}],
+    },
+}
+
+// 好友列表List
+let respFriend = {
+    msg: "OK",
+    code: "200",
+    type: "friend",
+    data: {
+        event: "init",
+        data: [{}, {}],
+    },
 }
 
 // 重新初始化
@@ -28,7 +64,6 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
     state.sim && state.sim.disconnect()
 
     dispatch('showLoading')
-
 
     // 初始化
     window.sim = state.sim = {
@@ -62,6 +97,8 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
 
         // 同步完成
         onsyncdone: function onSyncDone() {
+
+            console.error("onsyncdone...")
             dispatch('hideLoading')
             // 说明在聊天列表页
             state.currSessionId && dispatch('setCurrSession', state.currSessionId)
@@ -77,19 +114,25 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
             // 连接上以后更新uid
             loginInfo && commit('updateUserUID', loginInfo)
 
-            // 开始同步消息
-            await request_post(`${config.apiUrl}getSessions`, {}).then(resp => {
-                state.sim.onsessions(resp.data.data)
-            }).catch(err => {
-            })
-            await request_post(`${config.apiUrl}getTeams`, {}).then(resp => {
-                state.sim.onteams(resp.data.data)
-            }).catch(err => {
-            })
-            await request_post(`${config.apiUrl}getFriends`, {}).then(resp => {
-                state.sim.onfriends(resp.data.data)
-            }).catch(err => {
-            })
+
+            // 开始同步消息 并行
+
+            let getFriendList = request_post(`${config.apiUrl}getFriendList`, loginInfo)
+            let getFriendListResp = await getFriendList;
+            state.sim.onfriends(getFriendListResp.data.data.data)
+
+            let getSessionList = request_post(`${config.apiUrl}getSessionList`, loginInfo)
+            let getSessionListResp = await getSessionList;
+            state.sim.onfriends(getSessionListResp.data.data.data)
+
+            let getTeamList = request_post(`${config.apiUrl}getTeamList`, loginInfo)
+            let getTeamListResp = await getTeamList;
+            state.sim.onfriends(getTeamListResp.data.data.data)
+
+            let getUserInfo = request_post(`${config.apiUrl}getTeamList`, loginInfo)
+            let getUserInfoResp = await getUserInfo;
+            state.sim.onfriends(getUserInfoResp.data.data.data)
+
 
             state.sim.onsyncdone()
 
