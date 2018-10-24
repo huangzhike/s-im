@@ -28,7 +28,7 @@ export function onFriends(obj) {
             onUpdateFriend(null, obj.friend);
             break;
         case 'applyFriend':
-            console.error('你申请加了一个好友' + obj.account + ', 附言' + obj.ps);
+            console.error('你申请加了一个好友' + obj);
             break;
         case 'passFriendApply':
             console.error('你通过了一个好友申请' + obj.account + ', 附言' + obj.ps);

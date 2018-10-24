@@ -55,6 +55,7 @@ let respFriend = {
     body: {
         event: "init",
         data: [{}, {}],
+        friend:{}
     },
 }
 
