@@ -22,9 +22,7 @@ export function deleteSessions(state, sessionIdList) {
 export function updateCurrSessionId(state, obj) {
     let type = obj.type || ''
     if (type === 'init' && obj.sessionId) {
-
         state.currSessionId = obj.sessionId
-
     } else if (type === 'destroy') {
         state.currSessionId = null
     }
@@ -40,7 +38,9 @@ export function updateCurrSessionMsgs(state, obj) {
         store.commit('updateCurrSessionId', {
             type: 'destroy'
         })
-    } else if (type === 'init') { // 初始化会话消息列表
+
+        // 初始化会话消息列表
+    } else if (type === 'init') {
         if (state.currSessionId) {
             let sessionId = state.currSessionId
             let currSessionMsgs = [].concat(state.msgs[sessionId] || [])
@@ -72,7 +72,8 @@ export function updateCurrSessionMsgs(state, obj) {
             })
             // 这里可以设置群消息已读
         }
-    } else if (type === 'put') { // 追加一条消息
+        // 追加一条消息
+    } else if (type === 'put') {
         let newMsg = obj.msg
         let lastMsgTime = 0
         let lenCurrMsgs = state.currSessionMsgs.length
@@ -89,8 +90,9 @@ export function updateCurrSessionMsgs(state, obj) {
             state.currSessionMsgs.push(newMsg)
             // 这里可以设置群消息已读
         }
-    } else if (type === 'concat') {
         // 一般用于历史消息拼接
+    } else if (type === 'concat') {
+
         let currSessionMsgs = []
         let lastMsgTime = 0
         obj.msgs.forEach(msg => {

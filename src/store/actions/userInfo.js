@@ -80,16 +80,16 @@ export function formatUserInfo(obj) {
     return result
 }
 
-export function onMyInfo(obj) {
-    obj = util.mergeObject(store.state.myInfo, obj);
-    let myInfo = formatUserInfo(obj)
+export function onMyInfo({myInfo}) {
+    myInfo = util.mergeObject(store.state.myInfo, myInfo);
+    myInfo = formatUserInfo(myInfo)
     store.commit('updateMyInfo', myInfo)
 }
 
-export function onUserInfo(users) {
-    if (!Array.isArray(users)) {
-        users = [users]
+export function onUserInfo({userList}) {
+    if (!Array.isArray(userList)) {
+        userList = [userList]
     }
-    users = users.map(formatUserInfo)
-    store.commit('updateUserInfo', users)
+    userList = userList.map(formatUserInfo)
+    store.commit('updateUserInfo', userList)
 }

@@ -2,6 +2,7 @@ import store from '../'
 import {formatUserInfo} from './userInfo'
 
 import {request_post} from "../../common/request";
+import util from "../../utils";
 
 
 let friend = {
@@ -44,8 +45,8 @@ export function onFriends(obj) {
             });
             break;
         case 'updateFriend':
-            console.error('你更新了一个好友', obj);
-            onUpdateFriend(null, obj.data);
+            console.error('你更新了好友', obj);
+            onUpdateFriend(null, obj.list);
             break;
     }
 
@@ -54,27 +55,25 @@ export function onFriends(obj) {
 
 // 更新好友资料，添加好友成功
 export function onUpdateFriend(error, friendList) {
-    if (error) {
-        console.error(error)
-        return
-    }
+
     if (!Array.isArray(friendList)) {
         friendList = [friendList]
     }
 
     friendList = friendList.map(item => {
-        if (typeof item.isFriend !== 'boolean') {
-            item.isFriend = true
+        if (typeof item.valid !== 'boolean') {
+            item.valid = true
         }
         return item
     })
 
+
     // 补充好友资料
     store.dispatch('searchUsers', {
         accounts: friendList.map(item => item.account),
-        done: (users) => {
-            const sim = store.state.sim
-            friendList = sim.mergeFriends(friendList, users).map(formatUserInfo)
+        done: (userList) => {
+            // 合并
+            friendList = util.mergeArrayById(friendList, userList).map(formatUserInfo)
             // 更新好友列表
             store.commit('updateFriends', friendList)
             // 更新好友资料
@@ -83,28 +82,26 @@ export function onUpdateFriend(error, friendList) {
     })
 }
 
-// 删除好友，这里使用标记删除
+// 删除好友
 export function onDeleteFriend(error, friendList) {
-    if (error) {
-        console.error(error)
-        return
-    }
+
     if (!Array.isArray(friendList)) {
         friendList = [friendList]
     }
     friendList = friendList.map(item => {
-        item.isFriend = false
+        // 标记删除
+        item.valid = false
         return item
     })
     // 更新好友列表
-    store.commit('updateFriends', [], friendList)
+    store.commit('updateFriends', friendList)
     // 更新好友资料
     store.commit('updateUserInfo', friendList)
 }
 
 
 /*
-* 暴露给用户调用的
+* 暴露给前端调用的
 * */
 
 
@@ -115,15 +112,12 @@ export function updateFriend({state, commit}, friend) {
         account: friend.account,
         alias: friend.alias,
 
-    }).then(resp => {
-        // todo
-        onUpdateFriend(null, resp.data)
-    }).catch(err => {
-    })
+    }).then(resp => onUpdateFriend(null, resp.data.friend))
 
 
 }
 
+// 添加好友申请
 export function addFriend({state, commit}, account) {
 
 
@@ -133,24 +127,19 @@ export function addFriend({state, commit}, account) {
         // 附言
         ps: '',
 
-    }).then(resp => {
-        // todo
-        onUpdateFriend(null, resp.data)
-    }).catch(err => {
-    })
+    }).then(resp => onUpdateFriend(null, resp.data.friend))
 
 }
 
+
+// 删除好友申请
 export function deleteFriend({state, commit}, account) {
 
     request_post("deleteFriend", {
-        // 帐号
         account,
-
-
     }).then(resp => {
         // todo
-        onDeleteFriend(null, resp.data)
+        onDeleteFriend(null, resp.data.friend)
     }).catch(err => {
     })
 }

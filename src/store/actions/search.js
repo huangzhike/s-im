@@ -29,31 +29,36 @@ export function searchUsers({state, commit}, obj) {
         accounts
     }).then(resp => {
         // todo
-        onUpdateFriend(null, resp.data)
+
+
+        let data = resp.data.list
+
+        onUpdateFriend(null, data)
 
 
         commit('updateSearchlist', {
             type: 'user',
-            list: resp.data
+            list: data
         })
-        let updateUsers = resp.data.filter(item => {
+        let updateUsers = data.filter(item => {
             let account = item.account
             if (item.account === state.userUID) {
+                // 本人
                 return false
             }
             let userInfo = state.userInfos[account] || {}
-            if (userInfo.isFriend) {
+            // 已经是好友
+            if (userInfo.valid) {
                 return false
             }
             return true
         })
-        updateUsers = updateUsers.map(item => {
-            return formatUserInfo(item)
-        })
+        // 格式化
+        updateUsers = updateUsers.map(item => formatUserInfo(item))
+        // 更新用户信息
         commit('updateUserInfo', updateUsers)
-        if (done instanceof Function) {
-            done(resp.data)
-        }
+        // 回调
+        done instanceof Function && done(data)
 
     }).catch(err => {
     })
@@ -73,21 +78,21 @@ export function searchTeam({state, commit}, obj) {
     }).then(resp => {
         // todo
 
-        if (!Array.isArray(resp.data)) {
-            resp.data = [resp.data]
+        let data = resp.data.list
+
+        if (!Array.isArray(data)) {
+            data = [data]
         }
-        resp.data.forEach(team => {
+        data.forEach(team => {
             if (team.avatar) {
                 team.avatar = team.avatar
             }
         })
         commit('updateSearchlist', {
             type: 'team',
-            list: resp.data
+            list: data
         })
-        if (done instanceof Function) {
-            done(resp.data)
-        }
+        done instanceof Function && done(data)
 
     }).catch(err => {
     })

@@ -28,7 +28,7 @@ import store from '../'
 // onSessions只在初始化完成后回调
 export function onSessions(obj) {
 
-    let sessionList = obj.data
+    let sessionList = obj.list
 
     // 如果会话对象不是好友，需要更新好友名片
     let accountsNeedSearch = []

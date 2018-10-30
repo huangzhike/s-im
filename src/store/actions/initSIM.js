@@ -19,9 +19,9 @@ let respSession = {
     msg: "OK",
     code: "200",
     type: "session",
-    body: {
+    data: {
         event: "init",
-        data: [{}, {}],
+        list: [{}, {}],
     },
 }
 
@@ -30,9 +30,9 @@ let respMsg = {
     msg: "OK",
     code: "200",
     type: "msg",
-    body: {
+    data: {
         event: "init",
-        data: [{}, {}],
+        list: [{}, {}],
     },
 }
 
@@ -41,9 +41,9 @@ let respTeam = {
     msg: "OK",
     code: "200",
     type: "team",
-    body: {
+    data: {
         event: "init",
-        data: [{}, {}],
+        list: [{}, {}],
     },
 }
 
@@ -52,10 +52,10 @@ let respFriend = {
     msg: "OK",
     code: "200",
     type: "friend",
-    body: {
+    data: {
         event: "init",
-        data: [{}, {}],
-        friend:{}
+        list: [{}, {}],
+        friend: {}
     },
 }
 
@@ -104,6 +104,7 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
             // 说明在聊天列表页
             state.currSessionId && dispatch('setCurrSession', state.currSessionId)
         },
+        // 关闭连接
         disconnect: window.ws.close
     }
 
@@ -124,52 +125,65 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
 
             let getTeamList = request_post(`${config.apiUrl}getTeamList`, loginInfo)
 
+            getTeamList.then(resp => {
+
+                let teamIdList = resp.data.list.map(v => v.id)
+
+                request_post(`${config.apiUrl}getTeamMember`, {teamIdList}).then(resp => {
+                    //  更新群成员列表
+                    state.sim.onteammembers(resp.data.list)
+                })
+
+            })
+
+
             let getUserInfo = request_post(`${config.apiUrl}getUserInfo`, loginInfo)
 
 
 
-            // list
             let getSessionListResp = await getSessionList;
-
-            state.sim.onsessions(getSessionListResp.data.body)
-
+            // 更新会话
+            state.sim.onsessions(getSessionListResp.data)
 
 
             let getFriendListResp = await getFriendList;
-            state.sim.onfriends(getFriendListResp.data.body)
+            // 更新好友列表
+            state.sim.onfriends(getFriendListResp.data)
 
 
             let getTeamListResp = await getTeamList;
-            state.sim.onteams(getTeamListResp.data.body)
+            // 更新群列表
+            state.sim.onteams(getTeamListResp.data)
 
             let getUserInfoResp = await getUserInfo;
-            state.sim.onmyinfo(getUserInfoResp.data.body)
+            // 更新你的个人信息
+            state.sim.onmyinfo(getUserInfoResp.data)
 
+            // 回调
             state.sim.onsyncdone()
 
         },
-        (data) => {
+        (msg) => {
             // onMessage
-            console.error("onMessage: ", data)
-            if (data.type === "msg") {
-                state.sim.onmsg(data.body)
-            } else if (data.type === "sysMsg") {
-                state.sim.onsysmsg(data.body)
-            } else if (data.type === "team") {
-                state.sim.onteams(data.body)
-            } else if (data.type === "friend") {
-                state.sim.onfriends(data.body)
+            console.error("onMessage: ", msg)
+            if (msg.type === "msg") {
+                state.sim.onmsg(msg.data)
+            } else if (msg.type === "sysMsg") {
+                state.sim.onsysmsg(msg.data)
+            } else if (msg.type === "team") {
+                state.sim.onteams(msg.data)
+            } else if (msg.type === "friend") {
+                state.sim.onfriends(msg.data)
             } else {
-                console.error("else end: ", data)
+                console.error("else end: ", msg)
             }
 
 
         },
         (err) => {
             // 错误回调
-            console.error(JSON.stringify(err))
+            console.error('网络连接状态异常', JSON.stringify(err))
 
-            alert('网络连接状态异常')
             Vue.router.push('/login')
         },
         (err) => {
@@ -188,7 +202,7 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
                     }
 
                     let errorMsg = `你的帐号于${util.formatDate(new Date())}被${(map[err.from] || '其他端')}踢出下线!`
-                    console.error(errorMsg)
+                    console.error("关闭回调", errorMsg)
                     Vue.router.push('/login')
                     break
                 default:

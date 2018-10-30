@@ -78,19 +78,13 @@ let teamMember = {
 
 // 收到群列表及更新群列表接口
 // 同步群列表的回调, 会传入群数组
-export function onTeams(teams) {
-    if (!Array.isArray(teams)) {
-        teams = [teams]
+export function onTeams({list}) {
+    if (!Array.isArray(list)) {
+        list = [list]
     }
-    teams.forEach(team => {
-        if (team.validToCurrentUser === undefined) {
-            team.validToCurrentUser = true
-        }
-        if (team.avatar && team.avatar.indexOf('sim.nosdn.127') > 0 && team.avatar.indexOf('?imageView') === -1) {
-            team.avatar = team.avatar + '?imageView&thumbnail=300y300'
-        }
-    })
-    store.commit('updateTeamList', teams)
+    // 默认是有效的
+    list.forEach(team => team.validToCurrentUser === undefined && (team.validToCurrentUser = true))
+    store.commit('updateTeamList', list)
 }
 
 // 收到群成员及更新群成员接口
@@ -99,7 +93,7 @@ export function onTeamMembers(obj) {
 }
 
 export function onCreateTeam({team, owner}) {
-    onTeams(team)
+    onTeams({list: team})
     onTeamMembers({
         teamId: team.teamId,
         members: [owner]
@@ -107,7 +101,7 @@ export function onCreateTeam({team, owner}) {
 }
 
 export function onSynCreateTeam(team) {
-    onTeams(team)
+    onTeams({list: team})
 }
 
 export function onDismissTeam(obj) {
@@ -117,7 +111,7 @@ export function onDismissTeam(obj) {
 }
 
 export function onUpdateTeam(team) {
-    onTeams(team)
+    onTeams({list: team})
 }
 
 export function onTeamNotificationMsg({state, commit}, msg) {
@@ -137,7 +131,7 @@ export function onAddTeamMembers(obj) {
         // 自己被拉入群时更新群列表
         if (account === store.state.userUID) {
             let team = [obj.team]
-            onTeams(team)
+            onTeams({list: team})
         }
     })
     onTeamMembers({
@@ -152,7 +146,7 @@ export function onRemoveTeamMembers(obj) {
         if (account === store.state.userUID) {
             obj.team.validToCurrentUser = false
             let team = [obj.team]
-            onTeams(team)
+            onTeams({list: team})
         }
     })
     store.commit('removeTeamMembersByAccounts', {
@@ -235,9 +229,7 @@ export function getTeamMembers({state}, teamId) {
 export function getTeamMsgReads({state}, needQuery) {
 
 
-    request_post("getTeamMsgReads", {
-
-    }).then(resp => {
+    request_post("getTeamMsgReads", {}).then(resp => {
         // todo
         console.log('获取群组消息已读：', resp.data)
         store.commit('updateTeamMsgReads', resp.data)

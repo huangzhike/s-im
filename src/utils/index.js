@@ -10,7 +10,7 @@ Utils.encode = function (_map, _content) {
         return _content || ''
     }
     return _content.replace(_map.r, function ($1) {
-        var _result = _map[!_map.i ? $1.toLowerCase() : $1]
+        let _result = _map[!_map.i ? $1.toLowerCase() : $1]
         return _result != null ? _result : $1
     });
 };
@@ -64,14 +64,21 @@ Utils.mergeVueObject = function (dest, src) {
 
 
 Utils.mergeArrayById = function (dest, src) {
-    dest.forEach((item, index) => {
-        src.forEach((itm, idx) => {
-            if (item.id == itm.id) {
-                Object.assign(item, itm)
-            }
-        })
-    })
 
+
+    let temp = []
+
+    for (let i of dest) {
+        for (let j of src) {
+            if (i.id === j.id) {
+                Object.assign(i, j)
+            } else {
+                temp.push(j)
+            }
+        }
+    }
+
+    dest.push(...temp)
 
     return dest
 }
