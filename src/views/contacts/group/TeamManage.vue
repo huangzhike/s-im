@@ -21,7 +21,7 @@
                         <img class='avatar u-circle' :src='teamAvatar'>
                         <div class='u-info'>
                             <p>{{teamInfo.name}}</p>
-                            <span>{{`${teamInfo.teamId} 于${formateDate(teamInfo.createTime)}创建`}}</span>
+                            <span>{{`${teamInfo.teamId} 于${formatDate(teamInfo.createTime)}创建`}}</span>
                         </div>
                     </div>
                     <form>
@@ -82,8 +82,8 @@
                 return this.$route.params.teamId
             },
             teamInfo() {
-                var teamList = this.$store.state.teamlist
-                var team = teamList && teamList.find(team => {
+                let teamList = this.$store.state.teamlist
+                let team = teamList && teamList.find(team => {
                     return team.teamId === this.teamId
                 })
                 if (!team) {
@@ -105,14 +105,14 @@
             },
             nickName() {
                 if (!this.teamMembers) return '未设置'
-                var selfInfo = this.teamMembers.find(item => {
+                let selfInfo = this.teamMembers.find(item => {
                     return item.account === this.$store.state.userUID
                 })
                 return (selfInfo && selfInfo.nickInTeam) || '未设置'
             },
             hasManagePermission() {
                 if (!this.teamMembers) return false
-                var self = this.teamMembers.find(member => member.account === this.$store.state.userUID)
+                let self = this.teamMembers.find(member => member.account === this.$store.state.userUID)
                 this.isOwner = self.type === 'owner'
                 return self.type !== 'normal'
             },
@@ -128,73 +128,61 @@
             },
             onFileSelected(event) {
                 this.$store.dispatch('showLoading')
-                var fileInput = event.target
+                let fileInput = event.target
                 if (fileInput.files.length === 0) {
                     return
                 }
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'previewFile',
-                    options: {
-                        fileInput,
-                        done: (err, data) => {
-                            this.$store.dispatch('hideLoading')
-                            if (err) {
-                                alert(err)
-                            } else {
-                                if (data.w < 300 || data.h < 300) {
-                                    alert("图片长宽不能小于300")
-                                    return
-                                }
-                                this.updateTeamAvatar(data.url)
+                this.$store.dispatch('previewFile', {
+                    fileInput,
+                    done: (err, data) => {
+                        this.$store.dispatch('hideLoading')
+                        if (err) {
+                            console.error(err)
+                        } else {
+                            if (data.w < 300 || data.h < 300) {
+                                console.error("图片长宽不能小于300")
+                                return
                             }
+                            this.updateTeamAvatar(data.url)
                         }
                     }
                 })
             },
             updateTeamAvatar(url) {
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'updateTeam',
-                    options: {
-                        teamId: this.teamId,
-                        avatar: url,
-                        done: (err, data) => {
-                            alert(err ? err : '修改群头像成功')
-                        }
+                this.$store.dispatch('updateTeam', {
+                    teamId: this.teamId,
+                    avatar: url,
+                    done: (err, data) => {
+                        console.error(err ? err : '修改群头像成功')
                     }
                 })
             },
             dismissTeam() {
                 // 确定要解散群
-                var that = this
+                let that = this
 
                 that.$store.dispatch('showLoading')
-                that.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'dismissTeam',
-                    options: {
-                        teamId: that.teamId,
-                        done: (error, obj) => {
-                            that.$store.dispatch('hideLoading')
-                            that.$toast(error ? error : '已解散群')
-                            window.history.go(-1)
-                        }
+                that.$store.dispatch('dismissTeam', {
+                    teamId: that.teamId,
+                    done: (error, obj) => {
+                        that.$store.dispatch('hideLoading')
+                        console.error(error ? error : '已解散群')
+                        window.history.go(-1)
                     }
                 })
 
             },
             leaveTeam() {
-                var that = this
+                let that = this
 
                 // 确定要退出群
                 that.$store.dispatch('showLoading')
-                that.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'leaveTeam',
-                    options: {
-                        teamId: that.teamId,
-                        done: (error, obj) => {
-                            that.$store.dispatch('hideLoading')
-                            that.$toast(error ? error : '已退出群')
-                            window.history.go(-2)
-                        }
+                that.$store.dispatch('leaveTeam', {
+                    teamId: that.teamId,
+                    done: (error, obj) => {
+                        that.$store.dispatch('hideLoading')
+                        console.error(error ? error : '已退出群')
+                        window.history.go(-2)
                     }
                 })
             },
@@ -212,8 +200,8 @@
             getTeamInfo(key) {
                 return Utils.teamConfigMap[key][this.teamInfo[key]]
             },
-            formateDate: function (timeMill) {
-                var date = new Date(timeMill)
+            formatDate: function (timeMill) {
+                let date = new Date(timeMill)
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
             }
         },

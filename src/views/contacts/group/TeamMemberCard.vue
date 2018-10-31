@@ -106,36 +106,23 @@
         },
         methods: {
             changeMute() {
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'updateMuteStateInTeam',
-                    options: {
-                        teamId: this.teamId,
-                        account: this.account,
-                        mute: this.mute,
-                        done: (error, obj) => {
-                            if (error) {
-                                this.$toast(error)
-                            } else {
-                                this.$toast(this.mute ? '已禁言' : '已取消禁言')
-                            }
-                        }
+                this.$store.dispatch('updateMuteStateInTeam', {
+                    teamId: this.teamId,
+                    account: this.account,
+                    mute: this.mute,
+                    done: (error, obj) => {
+                        console.error(this.mute ? '已禁言' : '已取消禁言')
                     }
                 })
             },
             getUpdateCallBcak() {
-                var account = this.member.account
-                var store = this.$store
-                var toast = this.$toast
+                let account = this.member.account
+                let store = this.$store
 
-                var doneCallBack = (error, obj) => {
-                    if (error) {
-                        this.$toast(error)
-                    } else {
-                        this.$toast('更改成功')
-                        setTimeout(() => {
-                            history.go(-1)
-                        }, 200);
-                    }
+
+                let doneCallBack = (error, obj) => {
+                    console.error('更改成功')
+                    setTimeout(() => history.go(-1), 200);
                     store.dispatch('hideLoading')
                 }
                 return function (teamId, updateKey, newValue) {
@@ -150,17 +137,14 @@
                         action = newValue === 'manager' ? 'addTeamManagers' : 'removeTeamManagers'
                         opts.accounts = [account]
                     }
-                    store.dispatch('delegateTeamFunction', {
-                        functionName: action,
-                        options: Object.assign({
-                            teamId: teamId,
-                            done: doneCallBack
-                        }, opts)
-                    })
+                    store.dispatch(action, Object.assign({
+                        teamId: teamId,
+                        done: doneCallBack
+                    }, opts))
                 }
             },
             onEditItemClick(title, inputType, updateKey, confirmCallback) {
-                var updateSelfNick = this.isSelf && updateKey === 'nickInTeam'
+                let updateSelfNick = this.isSelf && updateKey === 'nickInTeam'
                 this.$store.dispatch('enterSettingPage', {
                     title: title,
                     inputType: inputType,
@@ -174,16 +158,13 @@
             },
             remove() {
                 this.$store.dispatch('showLoading')
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'removeTeamMembers',
-                    options: {
-                        teamId: this.teamId,
-                        accounts: [this.member.account],
-                        done: (error, obj) => {
-                            this.$toast(error ? error : '移除成功')
-                            history.go(-1)
-                            this.$store.dispatch('hideLoading')
-                        }
+                this.$store.dispatch('removeTeamMembers', {
+                    teamId: this.teamId,
+                    accounts: [this.member.account],
+                    done: (error, obj) => {
+                        console.error(error ? error : '移除成功')
+                        history.go(-1)
+                        this.$store.dispatch('hideLoading')
                     }
                 })
             }

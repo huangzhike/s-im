@@ -124,15 +124,13 @@
                     console.log(msg)
                     return false
                 })
-                sysMsgs.sort((msg1, msg2) => {
-                    // 最新的排在前
-                    return msg2.time - msg1.time
-                })
+                // 最新的排在前
+                sysMsgs.sort((msg1, msg2) => (msg2.time - msg1.time))
                 return sysMsgs
             },
 
             msgList() {
-                return  this.sysMsgs
+                return this.sysMsgs
             }
 
         },
@@ -144,11 +142,11 @@
                 })
             },
             clearMsgs() {
-                var that = this
+
                 // 确认要清空消息吗？
 
-                that.$store.dispatch('resetSysMsgs', {
-                    type: that.sysType
+                this.$store.dispatch('resetSysMsgs', {
+                    type: this.sysType
                 })
             },
             getTeamName(teamId) {

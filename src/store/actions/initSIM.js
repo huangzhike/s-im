@@ -10,8 +10,9 @@ import {onFriends} from './friends'
 import {onMyInfo, onUserInfo} from './userInfo'
 import {onSessions} from './session'
 import {onMsg} from './msgs'
-import {onSysMsg} from './sysMsgs'
-import {onTeamMembers, onTeams,} from './team'
+import {onSysMsgs} from './sysMsgs'
+import {onTeams,} from './team'
+import {onTeamMembers,} from './teamMembers'
 
 import config from '../../configs'
 // 会话列表
@@ -94,7 +95,7 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
         onmsg: onMsg,
 
         // 系统通知
-        onsysmsg: onSysMsg,
+        onsysmsg: onSysMsgs,
 
         // 同步完成
         onsyncdone: function onSyncDone() {
@@ -127,18 +128,17 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
 
             getTeamList.then(resp => {
 
-                let teamIdList = resp.data.list.map(v => v.id)
+                let teamId = resp.data.list.map(v => v.id)
 
-                request_post(`${config.apiUrl}getTeamMember`, {teamIdList}).then(resp => {
+                request_post(`${config.apiUrl}getTeamMemberList`, {teamId}).then(resp => {
                     //  更新群成员列表
-                    state.sim.onteammembers(resp.data.list)
+                    state.sim.onteammembers(resp.data)
                 })
 
             })
 
 
             let getUserInfo = request_post(`${config.apiUrl}getUserInfo`, loginInfo)
-
 
 
             let getSessionListResp = await getSessionList;
@@ -196,7 +196,6 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
                 // 被踢, 请提示错误后跳转到登录页面
                 case 'kicked':
                     let map = {
-                        PC: '电脑版',
                         Web: '网页版',
                         Android: '手机版',
                     }

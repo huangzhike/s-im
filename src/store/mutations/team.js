@@ -1,9 +1,23 @@
 import store from "../index";
+import util from "../../utils";
 
-export function updateTeamList(state, teams) {
-    const sim = state.sim
-    store.state.teamlist = sim.mergeTeams(store.state.teamlist, teams)
-    store.state.teamlist = sim.cutTeams(store.state.teamlist, teams.invalid)
+export function updateTeamList(state, teamList) {
+
+
+    // 合并
+    state.teamlist = util.mergeArrayById(state.teamlist, teamList)
+
+
+    let len = state.teamlist.length
+    // 删除
+    while (len--) {
+        if (!state.teamlist[len].valid) {
+            state.teamlist.splice(len, 1)
+        }
+    }
+
+
+
 }
 
 export function updateTeamInfo(state, team) {
@@ -18,35 +32,4 @@ export function updateTeamInfo(state, team) {
 
 export function updateTeamSettingConfig(state, obj) {
     state.teamSettingConfig = obj
-}
-
-export function updateTeamMembers(state, obj) {
-    const sim = state.sim
-    let teamId = obj.teamId
-    let members = obj.members
-    state.teamMembers = state.teamMembers || {}
-    state.teamMembers[teamId] = sim.mergeTeamMembers(state.teamMembers[teamId], members)
-    state.teamMembers[teamId] = sim.cutTeamMembers(state.teamMembers[teamId], members.invalid)
-
-    state.teamMembers[teamId].sort((a, b) => {
-        // 将群主和管理员排在队列前方
-        if (a.type === 'owner' || b.type === 'owner') {
-            return a.type === 'owner' ? -1 : 1
-        }
-        if (a.type === 'manager' || b.type === 'manager') {
-            return a.type === 'manager' ? -1 : b.type === 'manager' ? 1 : 0
-        }
-        return -1
-    })
-    state.teamMembers = Object.assign({}, state.teamMembers)
-}
-
-export function removeTeamMembersByAccounts(state, obj) {
-    let teamId = obj.teamId
-    let invalidAccounts = obj.accounts
-    if (state.teamMembers[teamId] === undefined) return
-    state.teamMembers[teamId] = state.teamMembers[teamId].filter((member, index) => {
-        return invalidAccounts.indexOf(member.account) === -1
-    })
-    state.teamMembers = Object.assign({}, state.teamMembers)
 }

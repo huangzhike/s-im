@@ -1,9 +1,17 @@
 import store from '../'
 
+import Vue from 'vue'
+
+import {onTeamMembers} from 'teamMembers'
+import {handleSysMsgs} from 'sysMsgs'
+
 
 import {request_post} from "../../common/request";
-import {onDeleteFriend} from "./friends";
 
+
+import config from '../../configs'
+import util from "../../utils";
+import {formatUserInfo} from "./userInfo";
 
 let team = {
 
@@ -57,184 +65,184 @@ let team = {
 }
 
 
-let teamMember = {
-    // 群ID
-    teamId: "",
-    // 帐号
-    account: "",
-    // 群成员类型 普通成员 群主 管理员
-    type: 'normal' || 'owner' || 'manager',
-    // 在群里面的昵称
-    nickInTeam: "",
-    // 普通群拉人进来的时候, 被拉的人处于未激活状态, 未激活状态下看不到这个群, 当有人说话后自动转为激活状态, 能看到该群
-    active: "",
-    // 入群时间
-    joinTime: "",
-    // 更新时间
-    updateTime: "",
-
-}
-
-
 // 收到群列表及更新群列表接口
 // 同步群列表的回调, 会传入群数组
-export function onTeams({list}) {
-    if (!Array.isArray(list)) {
-        list = [list]
+export function onTeams({type, list}) {
+
+
+    let msg
+
+    switch (type) {
+
+
+
+        // 创建群
+        case 'createTeam':
+            break;
+
+
+        // 更新群
+        case 'updateTeam':
+            // 更新群后, 所有群成员会收到一条类型为'updateTeam'的群通知消息
+            msg = {
+                from: "更新群的人的帐号",
+                to: "对应的群ID",
+                attach: {
+                    team: "被更新的群信息",
+                }
+            }
+
+            break;
+
+        // 解散群
+        case 'dismissTeam':
+            // 解散群后, 所有群成员会收到一条类型为'dismissTeam'的群通知消息
+
+            msg = {
+                from: "解散群的人的帐号",
+                to: "对应的群ID",
+            }
+
+            break;
+        // 更新群成员禁言状态
+        case 'updateTeamMute':
+            // 更新群成员禁言状态后, 所有群成员会收到一条类型为'updateTeamMute'的群通知消息
+
+            msg = {
+                from: "操作方",
+                to: "对应的群ID",
+                attach: {
+                    team: "对应的群对象",
+                    account: "被禁言的帐号",
+                    members: "被禁言的群成员列表",
+                }
+            }
+            break;
+
+        default:
+            break;
+
+
     }
-    // 默认是有效的
-    list.forEach(team => team.validToCurrentUser === undefined && (team.validToCurrentUser = true))
-    store.commit('updateTeamList', list)
+
+    handleSysMsgs(msg)
+
+
 }
 
-// 收到群成员及更新群成员接口
-export function onTeamMembers(obj) {
-    store.commit('updateTeamMembers', obj)
-}
 
-export function onCreateTeam({team, owner}) {
-    onTeams({list: team})
+// 创建群
+export function onCreateTeam(error, {team, owner}) {
+
     onTeamMembers({
         teamId: team.teamId,
         members: [owner]
     })
 }
 
-export function onSynCreateTeam(team) {
-    onTeams({list: team})
+
+// 解散群
+export function onDismissTeam(error, teamList) {
+
+
+    if (!Array.isArray(teamList)) {
+        teamList = [teamList]
+    }
+    teamList = teamList.map(item => {
+        // 标记删除
+        item.valid = false
+        return item
+    })
+
+
+    store.commit('updateTeamList', teamList)
 }
 
-export function onDismissTeam(obj) {
-    store.commit('updateTeamList', {
-        invalid: {teamId: obj.teamId}
+// 更新群
+export function onUpdateTeam(error, teamList) {
+
+
+    if (!Array.isArray(teamList)) {
+        teamList = [teamList]
+    }
+    // 默认是有效的
+    teamList.forEach(team => team.validToCurrentUser === undefined && (team.validToCurrentUser = true))
+
+
+    store.commit('updateTeamList', teamList)
+
+}
+
+
+/*
+* 暴露给前端调用的
+* */
+
+// 更新群信息
+export function updateTeam({state, commit}, friend) {
+
+    request_post("updateTeam", {
+        account: friend.account,
+        alias: friend.alias,
+
+    }).then(resp => onUpdateTeam(null, resp.data))
+
+
+}
+
+// 创建群
+export function createTeam({state, commit}, account) {
+
+    request_post("createTeam", {
+        // 帐号
+        account,
+        // 附言
+        ps: '',
+
+    }).then(resp => onCreateTeam(null, resp.data))
+
+}
+
+
+// 删除群
+export function dismissTeam({state, commit}, account) {
+
+    request_post("dismissTeam", {
+        account,
+    }).then(resp => {
+
+        onDismissTeam(null, resp.data.friend)
+    }).catch(err => {
     })
 }
 
-export function onUpdateTeam(team) {
-    onTeams({list: team})
-}
 
 export function onTeamNotificationMsg({state, commit}, msg) {
     if (msg.attach.type === 'updateTeam' && msg.attach.team) {
         store.commit('updateTeamInfo', msg.attach.team)
     }
-    if (msg.attach.type === 'transferTeam') {
-        onTeamMembers({
-            teamId: msg.attach.team.teamId,
-            members: msg.attach.members
-        })
-    }
-}
 
-export function onAddTeamMembers(obj) {
-    obj.accounts.forEach(account => {
-        // 自己被拉入群时更新群列表
-        if (account === store.state.userUID) {
-            let team = [obj.team]
-            onTeams({list: team})
-        }
-    })
-    onTeamMembers({
-        teamId: obj.team.teamId,
-        members: obj.members
-    })
-}
-
-export function onRemoveTeamMembers(obj) {
-    obj.accounts.forEach(account => {
-        // 自己被移出群时，更新群列表
-        if (account === store.state.userUID) {
-            obj.team.validToCurrentUser = false
-            let team = [obj.team]
-            onTeams({list: team})
-        }
-    })
-    store.commit('removeTeamMembersByAccounts', {
-        teamId: obj.team.teamId,
-        accounts: obj.accounts
-    })
-}
-
-export function onUpdateTeamMember(teamMember) {
-    onTeamMembers({
-        teamId: teamMember.teamId,
-        members: teamMember
-    })
-}
-
-
-export function onUpdateTeamManagers(obj) {
-    onTeamMembers({
-        teamId: obj.team.teamId,
-        members: obj.members
-    })
 }
 
 
 // 进入可配置的群信息设置页，进入前改变state中的配置信息，进入页面后读取配置信息更新视图
 export function enterSettingPage({commit}, obj) {
     commit('updateTeamSettingConfig', obj)
-    setTimeout(() =>
-            location.href = `#/teamsetting`
-        , 20)
+    setTimeout(() => Vue.router.push('/teamsetting'), 0)
 }
 
 
 /*
-* 代理nim sdk中对群组的操作方法
-* @functionName  sim sdk中的方法名
-* @options 传递给sdk方法的参数
+* 代理操作方法
+* @functionName 方法名
+* @options 方法的参数
 */
-export function delegateTeamFunction({state}, {functionName, options}) {
+export function delegateFunction({state}, {functionName, options}) {
     const sim = state.sim
     if (functionName && sim[functionName] && typeof sim[functionName] === 'function') {
         sim[functionName](options)
     } else {
-        throw(`There is not property of '${functionName}' in sim or '${functionName}' is not a function`)
+        throw(`There is not property of '${functionName}' or '${functionName}' is not a function`)
     }
 }
 
-export function getTeamMembers({state}, teamId) {
-    const sim = state.sim
-    if (!sim) {
-        // 防止nim未初始化
-        setTimeout(() => {
-            getTeamMembers(store, teamId)
-        }, 200);
-        return
-    }
-
-
-    request_post("getTeamMembers", {
-        teamId
-    }).then(resp => {
-        // todo
-        if (resp.data.members) {
-            onTeamMembers({
-                teamId: resp.data.teamId,
-                members: resp.data.members
-            })
-        } else {
-            setTimeout(() => {
-                getTeamMembers(store, teamId)
-            }, 200);
-        }
-
-    }).catch(err => {
-    })
-
-}
-
-
-export function getTeamMsgReads({state}, needQuery) {
-
-
-    request_post("getTeamMsgReads", {}).then(resp => {
-        // todo
-        console.log('获取群组消息已读：', resp.data)
-        store.commit('updateTeamMsgReads', resp.data)
-
-    }).catch(err => {
-    })
-
-}

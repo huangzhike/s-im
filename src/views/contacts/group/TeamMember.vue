@@ -130,14 +130,13 @@
                 this.$store.dispatch('searchUsers',
                     {
                         accounts: Accounts,
-                        done: (users) => {
-                            this.updateTeamMember(users)
-                        }
+                        done: (users) => this.updateTeamMember(users)
+
                     })
             },
             updateTeamMember(users) {
                 users.forEach(user => {
-                    var member = this.members.find(member => {
+                    let member = this.members.find(member => {
                         return member.account === user.account
                     })
                     if (member) {
@@ -151,15 +150,12 @@
             },
             remove(e, member) {
                 this.$store.dispatch('showLoading')
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'removeTeamMembers',
-                    options: {
-                        teamId: this.teamId,
-                        accounts: [member.account],
-                        done: (error, obj) => {
-                            this.$toast('移除成功')
-                            this.$store.dispatch('hideLoading')
-                        }
+                this.$store.dispatch('removeTeamMembers', {
+                    teamId: this.teamId,
+                    accounts: [member.account],
+                    done: (error, obj) => {
+                        console.error('移除成功')
+                        this.$store.dispatch('hideLoading')
                     }
                 })
                 e.cancelBubble = true

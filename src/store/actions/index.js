@@ -3,31 +3,19 @@
 import cookie from '../../utils/cookie'
 
 
-import {showLoading, hideLoading, showFullscreenImg, hideFullscreenImg} from './widgetUi'
+import {hideFullscreenImg, hideLoading, showFullscreenImg, showLoading} from './widgetUi'
 
 import {initSIM} from './initSIM'
 
-import {updateFriend, addFriend, deleteFriend} from './friends'
-import {resetSearchResult, searchUsers, searchTeam} from './search'
-import {deleteSession, setCurrSession, resetCurrSession} from './session'
-import {
-    sendMsg,
-    sendFileMsg,
-    revokeMsg,
-    getHistoryMsgs,
-    resetNoMoreHistoryMsgs,
+import {addFriend, deleteFriend, updateFriend} from './friends'
+import {resetSearchResult, searchTeam, searchUsers} from './search'
+import {deleteSession, resetCurrSession, setCurrSession} from './session'
+import {getHistoryMsgs, resetNoMoreHistoryMsgs, revokeMsg, sendFileMsg, sendMsg,} from './msgs'
+import {deleteSysMsgs, markSysMsgRead, resetSysMsgs} from './sysMsgs'
 
-} from './msgs'
-import {markSysMsgRead, resetSysMsgs, deleteSysMsgs} from './sysMsgs'
+import {enterSettingPage, onTeamNotificationMsg,} from './team'
 
-import {
-    delegateTeamFunction,
-    onTeamNotificationMsg,
-    enterSettingPage,
-    getTeamMembers,
-
-} from './team'
-
+import {getTeamMembers} from './teamMembers'
 
 import Vue from 'vue'
 
@@ -108,16 +96,12 @@ export default {
     // 设置没有更多历史消息不暴露出来
 
 
-
     // 标记系统消息已读
     markSysMsgRead,
 
     resetSysMsgs,
     deleteSysMsgs,
 
-
-    // 代理sdk中的群方法
-    delegateTeamFunction,
     // 处理群消息回调
     onTeamNotificationMsg,
     // 进入群信息设置页

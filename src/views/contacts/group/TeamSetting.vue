@@ -33,14 +33,14 @@
         },
         computed: {
             config() {
-                var config = this.$store.state.teamSettingConfig
+                let config = this.$store.state.teamSettingConfig
                 this.inputModel = config.defaultValue ? config.defaultValue : ''
                 this.placeHolder = config.placeHolder ? config.placeHolder : config.enable ? '请输入' : '无'
                 return config
             },
             selects() {
-                var map = Utils.teamConfigMap[this.config.updateKey]
-                var list = []
+                let map = Utils.teamConfigMap[this.config.updateKey]
+                let list = []
                 for (const key in map) {
                     if (map.hasOwnProperty(key)) {
                         list.push({'key': key, 'value': map[key]})
@@ -51,39 +51,28 @@
         },
         mounted() {
             // 立即focus会引起切页时白屏，故增加timeout
-            setTimeout(() => {
-                this.$refs.input && this.$refs.input.focus()
-            }, 500);
+            setTimeout(() => this.$refs.input && this.$refs.input.focus(), 500);
         },
         methods: {
             update(value) {
                 if (value === undefined && this.inputModel.length < 1) {
-                    alert('请输入内容后提交')
+                    console.error('请输入内容后提交')
                     return
                 }
-                var callback = this.config.confirmCallback
+                let callback = this.config.confirmCallback
                 if (callback && typeof callback === 'function') {
                     callback(this.config.teamId, this.config.updateKey, value ? value : this.inputModel)
                     return
                 }
                 this.$store.dispatch('showLoading')
-                var action = this.config.updateInfoInTeam ? 'updateInfoInTeam' : 'updateTeam'
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: action,
-                    options: {
-                        teamId: this.config.teamId,
-                        [this.config.updateKey]: value ? value : this.inputModel,
-                        done: (error, team) => {
-                            this.$store.dispatch('hideLoading')
-                            if (error) {
-                                alert(error)
-                            } else {
-                                alert('更改成功')
-                                setTimeout(() => {
-                                    history.go(-1)
-                                }, 200);
-                            }
-                        }
+                let action = this.config.updateInfoInTeam ? 'updateInfoInTeam' : 'updateTeam'
+                this.$store.dispatch(action, {
+                    teamId: this.config.teamId,
+                    [this.config.updateKey]: value ? value : this.inputModel,
+                    done: (error, team) => {
+                        this.$store.dispatch('hideLoading')
+                        console.error('更改成功')
+                        setTimeout(() => history.go(-1), 200);
                     }
                 })
             }

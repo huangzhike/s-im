@@ -52,9 +52,9 @@
         },
         computed: {
             frinedList() {
-                var teamMember = this.$store.state.teamMembers && this.$store.state.teamMembers[this.teamId]
-                var list = this.$store.state.friendslist.map(item => {
-                    var friend = Object.assign({}, item)
+                let teamMember = this.$store.state.teamMembers && this.$store.state.teamMembers[this.teamId]
+                let list = this.$store.state.friendslist.map(item => {
+                    let friend = Object.assign({}, item)
                     let account = friend.account
                     let thisAttrs = this.userInfos[account]
                     let alias = thisAttrs.alias ? thisAttrs.alias.trim() : ''
@@ -77,7 +77,7 @@
                 return list
             },
             friendsGroups() {
-                var map = Object.create(null)
+                let map = Object.create(null)
                 this.frinedList.forEach(friend => {
                     var firstLetter = friend.pinyin[0]
                     var firstLetter = firstLetter >= 'A' && firstLetter <= 'Z' ? firstLetter : '#'
@@ -86,7 +86,7 @@
                     }
                     map[firstLetter].push(friend)
                 })
-                var groups = []
+                let groups = []
                 for (const key in map) {
                     groups.push({
                         letter: key,
@@ -124,7 +124,7 @@
             },
             onNext() {
                 if (this.selected.length < 1) {
-                    alert('未选择成员')
+                    console.error('未选择成员')
                     return
                 }
                 if (this.teamId === "0") {
@@ -140,28 +140,20 @@
                 var accounts = this.selected.map((friend) => {
                     return friend.account
                 })
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'addTeamMembers',
-                    options: {
-                        teamId: this.teamId,
-                        accounts: accounts,
-                        done: (error, obj) => {
-                            this.$store.dispatch('hideLoading')
-                            if (error) {
-                                alert(error)
-                                return
-                            }
-                            alert('邀请成员成功')
-                            setTimeout(() => {
-                                window.history.go(-1)
-                            }, 200);
-                        }
+                this.$store.dispatch('addTeamMembers', {
+                    teamId: this.teamId,
+                    accounts: accounts,
+                    done: (error, obj) => {
+                        this.$store.dispatch('hideLoading')
+
+                        console.error('邀请成员成功')
+                        setTimeout(() => window.history.go(-1), 200);
                     }
                 })
             },
             // 选择成员后是创建什么类型的群
             onActionClick(key) {
-                var type, name, accounts = this.selected.map((friend) => {
+                let type, name, accounts = this.selected.map((friend) => {
                     return friend.account
                 })
                 switch (key) {
@@ -178,29 +170,26 @@
                         return
                 }
                 this.$store.dispatch('showLoading')
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'createTeam',
-                    options: {
-                        type: type,
-                        name: name,
-                        avatar: '',
-                        accounts: accounts,
-                        done: (error, obj) => {
-                            if (error) {
-                                alert('创群失败' + error)
+                this.$store.dispatch('createTeam', {
+                    type: type,
+                    name: name,
+                    avatar: '',
+                    accounts: accounts,
+                    done: (error, obj) => {
+
+                        error && console.error('创群失败' + error)
+
+                        if (!error) {
+                            if (history.replaceState) {
+                                // 改变当前页路由的hash值为联系人页，这样从会话页返回时，不再回到邀请页
+                                history.replaceState(null, null, '#/contacts')
+                            } else {
+                                history.go(-1)
                             }
-                            if (!error) {
-                                if (history.replaceState) {
-                                    // 改变当前页路由的hash值为联系人页，这样从会话页返回时，不再回到邀请页
-                                    history.replaceState(null, null, '#/contacts')
-                                } else {
-                                    history.go(-1)
-                                }
-                                setTimeout(() => {
-                                    location.href = `#/chat/team-${obj.team.teamId}`
-                                    this.$store.dispatch('hideLoading')
-                                }, 20);
-                            }
+                            setTimeout(() => {
+                                location.href = `#/chat/team-${obj.team.teamId}`
+                                this.$store.dispatch('hideLoading')
+                            }, 20);
                         }
                     }
                 })
@@ -312,8 +301,8 @@
             }
 
             em:after {
-                left: 15;
-                right: 15;
+                left: 15px;
+                right: 15px;
             }
 
         }

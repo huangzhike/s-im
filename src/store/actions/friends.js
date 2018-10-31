@@ -1,6 +1,6 @@
 import store from '../'
 import {formatUserInfo} from './userInfo'
-
+import {handleSysMsgs} from 'sysMsgs'
 import {request_post} from "../../common/request";
 import util from "../../utils";
 
@@ -24,29 +24,40 @@ export function onFriends(obj) {
 
 
     switch (obj.type) {
+        // 通过 API POST 申请好友但是不需要验证，成功响应回调（加了好友）
+        // 通过 WebSocket Push 过来的新增好友回调（被加了好友）
         case 'addFriend':
-            console.error('你直接加了一个好友' + obj.account + ', 附言' + obj.ps);
+            console.error('直接加好友' + obj.account + ', 附言' + obj.ps);
             onUpdateFriend(null, obj.friend);
             break;
+        // 通过API POST 申请好友但是需要验证，成功响应回调
         case 'applyFriend':
-            console.error('你申请加了一个好友' + obj);
+            console.error('申请加好友' + obj);
             break;
+        // API POST 通过 WebSocket Push 过来的好友申请，成功响应回调
         case 'passFriendApply':
-            console.error('你通过了一个好友申请' + obj.account + ', 附言' + obj.ps);
+            console.error('通过好友申请' + obj.account + ', 附言' + obj.ps);
             onUpdateFriend(null, obj.friend);
             break;
+        // API POST 拒绝 WebSocket Push 过来的好友申请，成功响应回调
         case 'rejectFriendApply':
-            console.error('你拒绝了一个好友申请' + obj.account + ', 附言' + obj.ps);
+            console.error('拒绝好友申请' + obj.account + ', 附言' + obj.ps);
             break;
+        // 通过 API POST 删除好友，成功响应回调（删了好友）
+        // 通过 WebSocket Push 过来的删除好友回调（被删了好友）
         case 'deleteFriend':
-            console.error('你删了一个好友' + obj.account);
+            console.error('删好友' + obj.account);
             onDeleteFriend(null, {
                 account: obj.account
             });
             break;
+        // 初始化时通过 API POST 拉取好友列表
+        // 通过 API POST 更新好友资料如昵称的回调
         case 'updateFriend':
-            console.error('你更新了好友', obj);
+            console.error('更新好友', obj);
             onUpdateFriend(null, obj.list);
+            break;
+        default:
             break;
     }
 

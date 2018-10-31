@@ -128,72 +128,6 @@ let msg = {
 
 }
 
-/*
-
-updateTeam' (更新群)
-更新群后, 所有群成员会收到一条类型为'updateTeam'的群通知消息。
-
-{
-}
-此类群通知消息的from字段的值为更新群的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为被更新的群信息
-
-
-'addTeamMembers' (拉人入群)
-普通群, 拉人入群后, 所有群成员会收到一条类型为'addTeamMembers'的群通知消息。
-
-此类群通知消息的from字段的值为拉人的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象, attach有一个字段accounts的值为被拉的人的帐号列表, attach有一个字段members的值为被拉的群成员列表。
-
-
-'removeTeamMembers' (踢人出群)
-踢人出群后, 所有群成员会收到一条类型为'removeTeamMembers'的群通知消息。
-此类群通知消息的from字段的值为踢人的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象, attach有一个字段accounts的值为被踢的人的帐号列表。
-
-
-'acceptTeamInvite' (接受入群邀请)
-高级群的群主和管理员在邀请成员加入群（通过操作创建群或拉人入群）之后, 被邀请的人会收到一条类型为'teamInvite'的系统通知,
-此类系统通知的from字段的值为邀请方的帐号, to字段的值为对应的群ID,
-此类系统通知的attach有一个字段team的值为被邀请进入的群, 被邀请的人可以选择接受邀请或者拒绝邀请。
-如果接受邀请, 那么该群的所有群成员会收到一条类型为'acceptTeamInvite'的群通知消息, 此类群通知消息的from字段的值为接受入群邀请的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象, attach有一个字段members的值为接收入群邀请的群成员列表。
-如果拒绝邀请, 那么邀请你的人会收到一条类型为'rejectTeamInvite'的系统通知, 此类系统通知的from字段的值为拒绝入群邀请的用户的帐号, to字段的值为对应的群ID。
-
-
-
-'passTeamApply' (通过入群申请)
-用户可以申请加入高级群, 目标群的群主和管理员会收到一条类型为'applyTeam'的系统通知,
-此类系统通知的from字段的值为申请方的帐号, to字段的值为对应的群ID, 高级群的群主和管理员在收到入群申请后, 可以选择通过或者拒绝入群申请。
-如果通过申请, 那么该群的所有群成员会收到一条类型为'passTeamApply'的群通知消息, 此类群通知消息的from字段的值为通过入群申请的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象, attach有一个字段account的值为申请方的帐号, attach有一个字段members的值为被通过申请的群成员列表。
-如果拒绝申请, 那么申请人会收到一条类型为'rejectTeamApply'的系统通知, 此类系统通知的from字段的值为拒绝方的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群。
-
-
-'addTeamManagers' (添加群管理员)
-添加群管理员后, 所有群成员会收到一条类型为'addTeamManagers'的群通知消息。
-此类群通知消息的from字段的值为添加群管理员的人的帐号, to字段的值为对应的群ID, attach有一个字段accounts的值为被加为管理员的帐号列表, attach有一个字段members的值为被加为管理员的群成员列表
-
-'removeTeamManagers' (移除群管理员)
-移除群管理员后, 所有群成员会收到一条类型为'removeTeamManagers'的群通知消息。
-此类群通知消息的from字段的值为移除群管理员的人的帐号, to字段的值为对应的群ID, attach有一个字段accounts的值为被移除的管理员的帐号列表, attach有一个字段members的值为被移除管理员的群成员列表
-
-
-'leaveTeam' (主动退群)
-主动退群后, 所有群成员会收到一条类型为'leaveTeam'的群通知消息。
-此类群通知消息的from字段的值为退群的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象。
-
-
-'dismissTeam' (解散群)
-解散群后, 所有群成员会收到一条类型为'dismissTeam'的群通知消息。
-此类群通知消息的from字段为解散群的人的帐号, to字段的值为被对应的群ID。
-
-
-'transferTeam' (转让群)
-转让群后, 所有群成员会收到一条类型为'transferTeam'的群通知消息。
-此类群通知消息的from字段的值为转让群的人的帐号, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象, attach有一个字段account的值为为新群主的帐号, attach有一个字段members的值为包含新旧群主的群成员列表。
-
-
-'updateTeamMute' (更新群成员禁言状态)
-更新群成员禁言状态后, 所有群成员会收到一条类型为'updateTeamMute'的群通知消息。
-此类群通知消息的from字段的值为操作方, to字段的值为对应的群ID, attach有一个字段team的值为对应的群对象, attach有一个字段account的值为被禁言的帐号, attach有一个字段members的值为被禁言的群成员列表。
-
-*/
 
 export function formatMsg(msg) {
     return msg
@@ -236,11 +170,7 @@ function onSendMsgDone(error, msg) {
 export function onRevocateMsg(error, msg) {
 
     if (error) {
-        if (error.code === 508) {
-            alert('发送时间超过2分钟的消息，不能被撤回')
-        } else {
-            alert(error)
-        }
+        error.code === 508 ? console.error('发送时间超过2分钟的消息，不能被撤回') : console.error(error)
         return
     }
     let tip = ''

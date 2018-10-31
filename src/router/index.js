@@ -124,18 +124,7 @@ const routes = [
         name: 'teammembercard',
         component: () => import('../views/contacts/group/TeamMemberCard'),
     },
-    // 发送群消息回执页
-    {
-        path: '/teamSendMsgReceipt/:teamId',
-        name: 'TeamSeamMsgReceipt',
-        component: () => import('../views/contacts/group/TeamSendMsgReceipt'),
-    },
-    // 群消息回执详情页
-    {
-        path: '/msgReceiptDetail/:msgInfo',
-        name: 'msgReceiptDetail',
-        component: () => import('../views/contacts/group/TeamMsgReceiptDetail'),
-    }
+
 ]
 
 let router = new VueRouter({

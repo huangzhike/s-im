@@ -38,7 +38,7 @@
         },
         methods: {
             applyClick() {
-                var team = this.$store.state.teamlist.find(team => {
+                let team = this.$store.state.teamlist.find(team => {
                     return team.teamId === this.teamId
                 })
                 if (team && team.validToCurrentUser) {
@@ -61,36 +61,19 @@
             showConfirm() {
                 // 请输入验证信息
 
-                // this.$vux.confirm.prompt('限十字以内', {
-                //     title: '请输入验证信息',
-                //     closeOnConfirm: false,
-                //     inputAttrs: {
-                //         maxlength: '10'
-                //     },
-                //     onConfirm: (msg) => {
-                //         if (msg) {
-                //             this.applyTeam(msg)
-                //             this.$vux.confirm.hide()
-                //         } else {
-                //            alert('请输入验证信息')
-                //         }
-                //     }
-                // })
+                this.applyTeam(msg)
             },
             applyTeam(msg) {
-                this.$store.dispatch('delegateTeamFunction', {
-                    functionName: 'applyTeam',
-                    options: {
-                        teamId: this.teamId,
-                        ps: msg || '',
-                        done: (error, obj) => {
-                            if (error) {
-                                alert(error)
-                                return
-                            }
-                            alert(msg ? '申请成功 等待验证' : '已加入群')
-                            history.go(-2)
+                this.$store.dispatch('applyTeam', {
+                    teamId: this.teamId,
+                    ps: msg || '',
+                    done: (error, obj) => {
+                        if (error) {
+                            alert(error)
+                            return
                         }
+                        alert(msg ? '申请成功 等待验证' : '已加入群')
+                        history.go(-2)
                     }
                 })
             }

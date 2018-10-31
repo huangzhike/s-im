@@ -3,30 +3,24 @@ import {onUpdateFriend, onDeleteFriend} from './friends'
 import {onRevocateMsg} from './msgs'
 
 
-
 import {request_post} from "../../common/request";
 
 
-
-export function onSysMsgs(sysMsgs) {
-    store.commit('updateSysMsgs', sysMsgs)
-}
-
-export function onSysMsg(sysMsg) {
-/*
-    friend: 所有跟好友相关的系统通知的未读数
-    addFriend: 直接加为好友的未读数
-    applyFriend: 申请加为好友的未读数
-    passFriendApply: 通过好友申请的未读数
-    rejectFriendApply: 拒绝好友申请的未读数
-    deleteFriend: 删除好友的未读数
-    team: 所有跟群相关的系统通知的未读数
-    teamInvite: 入群邀请的未读数
-    rejectTeamInvite: 接受入群邀请的未读数
-    applyTeam: 入群申请的未读数
-    rejectTeamApply: 拒绝入群申请的未读数
-    deleteMsg: 撤回消息的未读数
-    */
+export function onSysMsgs(sysMsg) {
+    /*
+        friend: 所有跟好友相关的系统通知的未读数
+        addFriend: 直接加为好友的未读数
+        applyFriend: 申请加为好友的未读数
+        passFriendApply: 通过好友申请的未读数
+        rejectFriendApply: 拒绝好友申请的未读数
+        deleteFriend: 删除好友的未读数
+        team: 所有跟群相关的系统通知的未读数
+        teamInvite: 入群邀请的未读数
+        rejectTeamInvite: 接受入群邀请的未读数
+        applyTeam: 入群申请的未读数
+        rejectTeamApply: 拒绝入群申请的未读数
+        deleteMsg: 撤回消息的未读数
+        */
 
     switch (sysMsg.type) {
         // 在其他端添加或删除好友
@@ -75,15 +69,12 @@ export function markSysMsgRead({state, commit}, obj) {
     }
     if (Array.isArray(sysMsgList) && sysMsgList.length > 0) {
 
-
         request_post("markSysMsgRead", {
             sysMsgList,
         }).then(resp => {
             // todo
-
         }).catch(err => {
         })
-
 
     }
 }
@@ -97,35 +88,36 @@ export function deleteSysMsgs({commit}, obj) {
     commit('deleteSysMsgs', obj)
 }
 
-//
-// function handleSysMsgs(sysMsgs) {
-//     if (!Array.isArray(sysMsgs)) {sysMsgs=[sysMsgs];}
-//     sysMsgs.forEach(function(sysMsg) {
-//         var idServer = sysMsg.idServer;
-//         switch (sysMsg.type) {
-//             case 'addFriend':
-//                 onAddFriend(sysMsg.friend);
-//                 break;
-//             case 'applyFriend':
-//                 break;
-//             case 'passFriendApply':
-//                 onAddFriend(sysMsg.friend);
-//                 break;
-//             case 'rejectFriendApply':
-//                 break;
-//             case 'deleteFriend':
-//                 onDeleteFriend(sysMsg.from);
-//                 break;
-//             case 'applyTeam':
-//                 break;
-//             case 'rejectTeamApply':
-//                 break;
-//             case 'teamInvite':
-//                 break;
-//             case 'rejectTeamInvite':
-//                 break;
-//             default:
-//                 break;
-//         }
-//     });
-// }
+
+export function handleSysMsgs(sysMsgs) {
+    (!Array.isArray(sysMsgs)) && (sysMsgs = [sysMsgs])
+
+    sysMsgs.forEach(function (sysMsg) {
+
+        switch (sysMsg.type) {
+            // case 'addFriend':
+            //     onAddFriend(sysMsg.friend);
+            //     break;
+            // case 'applyFriend':
+            //     break;
+            // case 'passFriendApply':
+            //     onAddFriend(sysMsg.friend);
+            //     break;
+            // case 'rejectFriendApply':
+            //     break;
+            // case 'deleteFriend':
+            //     onDeleteFriend(sysMsg.from);
+            //     break;
+            // case 'applyTeam':
+            //     break;
+            // case 'rejectTeamApply':
+            //     break;
+            // case 'teamInvite':
+            //     break;
+            // case 'rejectTeamInvite':
+            //     break;
+            default:
+                break;
+        }
+    });
+}
