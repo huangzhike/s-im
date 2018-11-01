@@ -4,7 +4,6 @@ import util from '../../utils'
 
 
 import {request_post} from "../../common/request";
-import {onDeleteFriend} from "./friends";
 
 
 /*
@@ -148,7 +147,7 @@ export function onMsg(msg) {
     }
     // 群消息
     if (msg.scene === 'team' && msg.type === 'notification') {
-        store.dispatch('onTeamNotificationMsg', msg)
+
     }
 }
 

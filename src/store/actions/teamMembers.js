@@ -25,11 +25,11 @@ let teamMember = {
 
 
 // 收到群成员及更新群成员接口
-export function onTeamMembers({teamMemberList, type}) {
+export function onTeamMembers(obj) {
 
-    let msg
+    let msg = null
 
-    switch (type) {
+    switch (obj.type) {
 
         /**********************/
 
@@ -46,36 +46,48 @@ export function onTeamMembers({teamMemberList, type}) {
                     members: "被拉的群成员列表",
                 }
             }
+
+            onAddTeamMembers(obj)
             break;
+
+        /**********************/
 
         // 被邀请入群
         case 'teamInvite':
             // 邀请成员加入群（创建群或拉人入群）后, 被邀请的人会收到一条类型为'teamInvite'的系统通知，可以选择接受或者拒绝
+            msg = {
+                from: "拉人的人的帐号",
+                to: "被拉的人的帐号",
+                attach: {
+                    team: "对应的群对象",
+                }
+            }
             break;
 
         // 接受入群邀请
         case 'acceptTeamInvite':
 
             // 如果接受邀请, 该群的所有群成员会收到一条类型为'acceptTeamInvite'的群通知消息,
-            // 此类群通知消息的from字段的值为接受入群邀请的人的帐号, to字段的值为对应的群ID,
-            // attach有一个字段team的值为对应的群对象, attach有一个字段members的值为接收入群邀请的群成员列表
-
             msg = {
-                from: "邀请方的帐号",
+                from: "接受入群邀请的人的帐号",
                 to: "对应的群ID",
                 attach: {
                     team: "被邀请进入的群",
+                    member: "接收入群邀请的群成员"
+
                 }
             }
+
+            onAddTeamMembers(obj)
             break;
 
 
         // 拒绝入群邀请
         case 'rejectTeamInvite':
-            // 如果拒绝邀请, 那么邀请你的人会收到一条类型为'rejectTeamInvite'的系统通知
+            // 如果拒绝邀请, 邀请你的人会收到一条类型为'rejectTeamInvite'的系统通知
             msg = {
                 from: "拒绝入群邀请的用户的帐号",
-                to: "对应的群ID",
+                to: "发送邀请的人的帐号",
 
             }
             break;
@@ -87,6 +99,11 @@ export function onTeamMembers({teamMemberList, type}) {
         // 申请入群
         case 'applyTeam':
             // 用户申请入群, 群主和管理员会收到一条类型为'applyTeam'的系统通知, 收到入群申请后, 可以选择通过或者拒绝
+            msg = {
+                from: "发出申请用户的帐号",
+                to: "接受申请的帐号",
+
+            }
             break;
 
 
@@ -95,16 +112,16 @@ export function onTeamMembers({teamMemberList, type}) {
         case 'passTeamApply':
 
             // 如果通过申请, 所有群成员会收到一条类型为'passTeamApply'的群通知消息,
-            // 此类群通知消息的from字段的值为通过入群申请的人的帐号, to字段的值为对应的群ID,
-            // attach有一个字段team的值为对应的群对象, attach有一个字段account的值为申请方的帐号, attach有一个字段members的值为被通过申请的群成员列表
 
             msg = {
-                from: "申请方的帐号",
+                from: "通过入群申请的人的帐号",
                 to: "对应的群ID",
                 attach: {
                     team: "被邀请进入的群",
+                    account: "申请方的帐号"
                 }
             }
+            onAddTeamMembers(obj)
 
             break;
 
@@ -116,7 +133,7 @@ export function onTeamMembers({teamMemberList, type}) {
 
             msg = {
                 from: "拒绝方的帐号",
-                to: "对应的群ID",
+                to: "申请人的账号",
                 attach: {
                     team: "对应的群",
                 }
@@ -124,7 +141,7 @@ export function onTeamMembers({teamMemberList, type}) {
 
             break;
 
-
+        /**********************/
 
         // 主动退群
         case 'leaveTeam':
@@ -137,6 +154,8 @@ export function onTeamMembers({teamMemberList, type}) {
 
                 }
             }
+
+            onRemoveTeamMembers(obj)
             break;
 
         // 踢人出群
@@ -152,6 +171,8 @@ export function onTeamMembers({teamMemberList, type}) {
                     accounts: "被踢的人的帐号列表",
                 }
             }
+
+            onRemoveTeamMembers(obj)
             break;
 
 
@@ -167,6 +188,8 @@ export function onTeamMembers({teamMemberList, type}) {
                     members: "被加为管理员的群成员列表",
                 }
             }
+
+            onUpdateTeamManagers(obj)
             break;
 
         // 移除群管理员
@@ -181,20 +204,23 @@ export function onTeamMembers({teamMemberList, type}) {
                 }
             }
 
+            onUpdateTeamManagers(obj)
+
             break;
         default:
+            msg = {}
             break;
     }
 
 
     handleSysMsgs(msg)
 
-    store.commit('updateTeamMembers', teamMemberList)
+    store.commit('updateTeamMembers', obj.list)
 }
 
 
 // 群成员添加
-export function onAddTeamMembers(obj) {
+function onAddTeamMembers(obj) {
     obj.accounts.forEach(account => {
         // 自己被拉入群时更新群列表
         if (account === store.state.userUID) {
@@ -209,7 +235,7 @@ export function onAddTeamMembers(obj) {
 }
 
 // 群成员删除
-export function onRemoveTeamMembers(obj) {
+function onRemoveTeamMembers(obj) {
     obj.accounts.forEach(account => {
         // 自己被移出群时，更新群列表
         if (account === store.state.userUID) {
@@ -225,18 +251,140 @@ export function onRemoveTeamMembers(obj) {
 }
 
 // 更新群成员
-export function onUpdateTeamMember(teamMember) {
+function onUpdateTeamMember(obj) {
     onTeamMembers({
-        teamId: teamMember.teamId,
-        members: teamMember
+        teamId: obj.teamMember.teamId,
+        members: obj.teamMember
     })
 }
 
 // 更新群管理员
-export function onUpdateTeamManagers(obj) {
+function onUpdateTeamManagers(obj) {
     onTeamMembers({
         teamId: obj.team.teamId,
         members: obj.members
+    })
+}
+
+
+/*
+* 前端真jb烦
+* */
+
+// 拉人入群
+export function addTeamMembers({state, commit}, obj) {
+
+    let {teamId, accounts, done} = obj
+
+    request_post('addTeamMembers', {
+        teamId, accounts
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+}
+
+// 邀请入群
+export function inviteTeam({state, commit}, obj) {
+    let {teamId, accounts, done} = obj
+
+    request_post('inviteTeam', {
+        teamId, accounts
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+
+}
+
+// 被邀请入群是否同意
+export function teamInvite({state, commit}, obj) {
+    let {teamId, agree, account, done} = obj
+
+    request_post('teamInvite', {
+        teamId, agree, account
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+}
+
+// 申请入群
+export function applyTeam({state, commit}, obj) {
+
+    let {teamId, account, done} = obj
+
+    request_post('applyTeam', {
+        teamId, account
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+}
+
+
+// 是否同意申请入群
+export function teamApply({state, commit}, obj) {
+
+    let {teamId, account, agree, done} = obj
+
+    request_post('teamApply', {
+        teamId, agree, account
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+}
+
+
+// 主动退群
+export function leaveTeam({state, commit}, obj) {
+
+    let {teamId, done} = obj
+
+    request_post('leaveTeam', {
+        teamId
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+}
+
+// 删除群成员
+export function removeTeamMembers({state, commit}, obj) {
+    let {teamId, accounts, done} = obj
+
+    request_post('removeTeamMembers', {
+        teamId, accounts
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+
+}
+
+// 添加群管理员
+export function addTeamManagers({state, commit}, obj) {
+
+    let {teamId, accounts, done} = obj
+
+    request_post('addTeamManagers', {
+        teamId, accounts
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
+    })
+}
+
+// 移除群管理员
+export function removeTeamManagers({state, commit}, obj) {
+    let {teamId, accounts, done} = obj
+
+    request_post('removeTeamManagers', {
+        teamId, accounts
+    }).then(() => {
+        done instanceof Function && done()
+    }).catch(err => {
     })
 }
 
@@ -251,17 +399,11 @@ export function getTeamMembers({state}, teamId) {
     // }
 
 
-    request_post(`${config.apiUrl}getTeamMemberList`, {
+    request_post('getTeamMemberList', {
         teamId
     }).then(resp => {
         // todo
-        if (resp.data.members) {
-            onTeamMembers({
-                teamId: resp.data.teamId,
-                members: resp.data.members
-            })
-        }
-
+        onTeamMembers(resp.data)
     })
 
 }

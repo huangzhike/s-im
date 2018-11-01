@@ -13,7 +13,7 @@ import {deleteSession, resetCurrSession, setCurrSession} from './session'
 import {getHistoryMsgs, resetNoMoreHistoryMsgs, revokeMsg, sendFileMsg, sendMsg,} from './msgs'
 import {deleteSysMsgs, markSysMsgRead, resetSysMsgs} from './sysMsgs'
 
-import {enterSettingPage, onTeamNotificationMsg,} from './team'
+import {enterSettingPage,} from './team'
 
 import {getTeamMembers} from './teamMembers'
 
@@ -102,8 +102,8 @@ export default {
     resetSysMsgs,
     deleteSysMsgs,
 
-    // 处理群消息回调
-    onTeamNotificationMsg,
+
+
     // 进入群信息设置页
     enterSettingPage,
     // 获取群成员

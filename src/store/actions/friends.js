@@ -22,13 +22,18 @@ let friend = {
 // 好友关系，回调
 export function onFriends(obj) {
 
+    let msg = {}
 
+    /*
+    * emmmm,我想了想，还是统一用WebSocket推送吧，把POST回调去掉，所以下面的POST改为case api 那里统一处理了
+    * */
     switch (obj.type) {
+
         // 通过 API POST 申请好友但是不需要验证，成功响应回调（加了好友）
         // 通过 WebSocket Push 过来的新增好友回调（被加了好友）
         case 'addFriend':
             console.error('直接加好友' + obj.account + ', 附言' + obj.ps);
-            onUpdateFriend(null, obj.friend);
+            onUpdateFriend(null, obj.list);
             break;
         // 通过API POST 申请好友但是需要验证，成功响应回调
         case 'applyFriend':
@@ -37,7 +42,7 @@ export function onFriends(obj) {
         // API POST 通过 WebSocket Push 过来的好友申请，成功响应回调
         case 'passFriendApply':
             console.error('通过好友申请' + obj.account + ', 附言' + obj.ps);
-            onUpdateFriend(null, obj.friend);
+            onUpdateFriend(null, obj.list);
             break;
         // API POST 拒绝 WebSocket Push 过来的好友申请，成功响应回调
         case 'rejectFriendApply':
@@ -47,9 +52,7 @@ export function onFriends(obj) {
         // 通过 WebSocket Push 过来的删除好友回调（被删了好友）
         case 'deleteFriend':
             console.error('删好友' + obj.account);
-            onDeleteFriend(null, {
-                account: obj.account
-            });
+            onDeleteFriend(null, [{account: obj.account}]);
             break;
         // 初始化时通过 API POST 拉取好友列表
         // 通过 API POST 更新好友资料如昵称的回调
@@ -57,15 +60,26 @@ export function onFriends(obj) {
             console.error('更新好友', obj);
             onUpdateFriend(null, obj.list);
             break;
+
+        case 'api':
+
+            break;
         default:
             break;
+
     }
+
+    handleSysMsgs(msg)
 
 
 }
 
+/*
+* 嗯，其实不想写注释的
+* */
+
 // 更新好友资料，添加好友成功
-export function onUpdateFriend(error, friendList) {
+function onUpdateFriend(error, friendList) {
 
     if (!Array.isArray(friendList)) {
         friendList = [friendList]
@@ -94,7 +108,7 @@ export function onUpdateFriend(error, friendList) {
 }
 
 // 删除好友
-export function onDeleteFriend(error, friendList) {
+function onDeleteFriend(error, friendList) {
 
     if (!Array.isArray(friendList)) {
         friendList = [friendList]
@@ -123,12 +137,16 @@ export function updateFriend({state, commit}, friend) {
         account: friend.account,
         alias: friend.alias,
 
-    }).then(resp => onUpdateFriend(null, resp.data.friend))
+    }).then(resp => {
+
+        onFriends(resp.data)
+
+    })
 
 
 }
 
-// 添加好友申请
+// 添加好友
 export function addFriend({state, commit}, account) {
 
 
@@ -138,7 +156,26 @@ export function addFriend({state, commit}, account) {
         // 附言
         ps: '',
 
-    }).then(resp => onUpdateFriend(null, resp.data.friend))
+    }).then(resp => {
+            onFriends(resp.data)
+        }
+    )
+
+}
+
+// 添加好友申请
+export function applyFriend({state, commit}, account) {
+
+    request_post("applyFriend", {
+        // 帐号
+        account,
+        // 附言
+        ps: '',
+
+    }).then(resp => {
+            onFriends(resp.data)
+        }
+    )
 
 }
 
@@ -150,9 +187,35 @@ export function deleteFriend({state, commit}, account) {
         account,
     }).then(resp => {
         // todo
-        onDeleteFriend(null, resp.data.friend)
+        onFriends(resp.data)
+
     }).catch(err => {
     })
 }
 
 
+// 拒绝好友申请
+export function rejectFriendApply({state, commit}, account) {
+
+    request_post("rejectFriendApply", {
+        account,
+    }).then(resp => {
+        onFriends(resp.data)
+
+    }).catch(err => {
+    })
+}
+
+
+// 通过好友申请
+export function passFriendApply({state, commit}, account) {
+
+    request_post("passFriendApply", {
+        account,
+    }).then(resp => {
+        // todo
+        onFriends(resp.data)
+
+    }).catch(err => {
+    })
+}

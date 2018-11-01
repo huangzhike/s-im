@@ -2,7 +2,7 @@ import {formatUserInfo} from './userInfo'
 
 
 import {request_post} from "../../common/request";
-import {onUpdateFriend} from "./friends";
+import {onFriends} from "./friends";
 
 
 export function resetSearchResult({state, commit}) {
@@ -31,9 +31,11 @@ export function searchUsers({state, commit}, obj) {
         // todo
 
 
-        let data = resp.data.list
+        onFriends(resp.data)
 
-        onUpdateFriend(null, data)
+        // onUpdateFriend(null, data)
+
+        let data = resp.data.list
 
 
         commit('updateSearchlist', {

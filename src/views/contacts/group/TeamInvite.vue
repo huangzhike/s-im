@@ -171,7 +171,7 @@
                 }
                 this.$store.dispatch('showLoading')
                 this.$store.dispatch('createTeam', {
-                    type: type,
+
                     name: name,
                     avatar: '',
                     accounts: accounts,

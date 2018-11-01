@@ -120,17 +120,17 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
 
             // 开始同步消息 并行
 
-            let getFriendList = request_post(`${config.apiUrl}getFriendList`, loginInfo)
+            let getFriendList = request_post('getFriendList', loginInfo)
 
-            let getSessionList = request_post(`${config.apiUrl}getSessionList`, loginInfo)
+            let getSessionList = request_post('getSessionList', loginInfo)
 
-            let getTeamList = request_post(`${config.apiUrl}getTeamList`, loginInfo)
+            let getTeamList = request_post('getTeamList', loginInfo)
 
             getTeamList.then(resp => {
 
                 let teamId = resp.data.list.map(v => v.id)
 
-                request_post(`${config.apiUrl}getTeamMemberList`, {teamId}).then(resp => {
+                request_post('getTeamMemberList', {teamId}).then(resp => {
                     //  更新群成员列表
                     state.sim.onteammembers(resp.data)
                 })
@@ -138,7 +138,7 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
             })
 
 
-            let getUserInfo = request_post(`${config.apiUrl}getUserInfo`, loginInfo)
+            let getUserInfo = request_post('getUserInfo', loginInfo)
 
 
             let getSessionListResp = await getSessionList;

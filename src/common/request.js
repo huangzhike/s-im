@@ -1,4 +1,5 @@
 import axios from 'axios'
+import config from "../configs";
 
 // https://segmentfault.com/q/1010000009530504 看这里
 
@@ -73,6 +74,9 @@ export function request_get(url) {
  * @return {[object]}      [promise]
  */
 export function request_post(url, data) {
+
+    url= `${config.apiUrl}${url} `
+
     return axios.post(url, data)
         .then((res) => {
             return Promise.resolve(res.data)

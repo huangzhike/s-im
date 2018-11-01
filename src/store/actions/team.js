@@ -67,7 +67,7 @@ let team = {
 
 // 收到群列表及更新群列表接口
 // 同步群列表的回调, 会传入群数组
-export function onTeams({type, list}) {
+export function onTeams({type, list, team, owner}) {
 
 
     let msg
@@ -75,9 +75,16 @@ export function onTeams({type, list}) {
     switch (type) {
 
 
-
         // 创建群
         case 'createTeam':
+            msg = {
+                from: "创建群的人的帐号",
+                to: "对应的群ID",
+                attach: {
+                    team: "对应的群信息",
+                }
+            }
+            onCreateTeam(null, {team, owner})
             break;
 
 
@@ -91,6 +98,7 @@ export function onTeams({type, list}) {
                     team: "被更新的群信息",
                 }
             }
+            onUpdateTeam(null, {list})
 
             break;
 
@@ -102,6 +110,8 @@ export function onTeams({type, list}) {
                 from: "解散群的人的帐号",
                 to: "对应的群ID",
             }
+
+            onDismissTeam(null, {team})
 
             break;
         // 更新群成员禁言状态
@@ -127,49 +137,54 @@ export function onTeams({type, list}) {
 
     handleSysMsgs(msg)
 
-
 }
 
 
 // 创建群
-export function onCreateTeam(error, {team, owner}) {
+function onCreateTeam(error, {team, owner}) {
 
-    onTeamMembers({
-        teamId: team.teamId,
-        members: [owner]
-    })
+    if (!Array.isArray(team)) {
+        team = [team]
+    }
+
+    store.commit('updateTeamList', team)
+
+    // onTeamMembers({
+    //     teamId: team.teamId,
+    //     members: [owner]
+    // })
 }
 
 
 // 解散群
-export function onDismissTeam(error, teamList) {
+function onDismissTeam(error, {team}) {
 
 
-    if (!Array.isArray(teamList)) {
-        teamList = [teamList]
+    if (!Array.isArray(team)) {
+        team = [team]
     }
-    teamList = teamList.map(item => {
+    team = team.map(item => {
         // 标记删除
         item.valid = false
         return item
     })
 
 
-    store.commit('updateTeamList', teamList)
+    store.commit('updateTeamList', team)
 }
 
 // 更新群
-export function onUpdateTeam(error, teamList) {
+function onUpdateTeam(error, {list}) {
 
 
-    if (!Array.isArray(teamList)) {
-        teamList = [teamList]
+    if (!Array.isArray(list)) {
+        list = [list]
     }
     // 默认是有效的
-    teamList.forEach(team => team.validToCurrentUser === undefined && (team.validToCurrentUser = true))
+    list.forEach(team => team.validToCurrentUser === undefined && (team.validToCurrentUser = true))
 
 
-    store.commit('updateTeamList', teamList)
+    store.commit('updateTeamList', list)
 
 }
 
@@ -179,50 +194,53 @@ export function onUpdateTeam(error, teamList) {
 * */
 
 // 更新群信息
-export function updateTeam({state, commit}, friend) {
+export function updateTeam({state, commit}, obj) {
+
+
+    let {teamId, name, avatar, done} = obj
 
     request_post("updateTeam", {
-        account: friend.account,
-        alias: friend.alias,
-
-    }).then(resp => onUpdateTeam(null, resp.data))
+        teamId,
+        name,
+        avatar,
+    }).then(() => {
+        done instanceof Function && done()
+    })
 
 
 }
 
 // 创建群
-export function createTeam({state, commit}, account) {
+export function createTeam({state, commit}, obj) {
+
+    let {name, avatar, accounts, done} = obj
 
     request_post("createTeam", {
-        // 帐号
-        account,
-        // 附言
-        ps: '',
+        accounts,
+        name,
+        avatar,
 
-    }).then(resp => onCreateTeam(null, resp.data))
+    }).then(() => {
+        done instanceof Function && done(null, null)
+    })
 
 }
 
 
 // 删除群
-export function dismissTeam({state, commit}, account) {
+export function dismissTeam({state, commit}, {teamId, done}) {
+
 
     request_post("dismissTeam", {
-        account,
-    }).then(resp => {
-
-        onDismissTeam(null, resp.data.friend)
+        teamId,
+    }).then(() => {
+        done instanceof Function && done()
     }).catch(err => {
     })
 }
 
 
-export function onTeamNotificationMsg({state, commit}, msg) {
-    if (msg.attach.type === 'updateTeam' && msg.attach.team) {
-        store.commit('updateTeamInfo', msg.attach.team)
-    }
-
-}
+/***********************/
 
 
 // 进入可配置的群信息设置页，进入前改变state中的配置信息，进入页面后读取配置信息更新视图

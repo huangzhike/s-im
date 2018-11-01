@@ -1,5 +1,5 @@
 import store from '../'
-import {onUpdateFriend, onDeleteFriend} from './friends'
+
 import {onRevocateMsg} from './msgs'
 
 
@@ -23,18 +23,7 @@ export function onSysMsgs(sysMsg) {
         */
 
     switch (sysMsg.type) {
-        // 在其他端添加或删除好友
-        case 'addFriend':
-            onUpdateFriend(null, {
-                account: sysMsg.from
-            })
-            store.commit('updateSysMsgs', [sysMsg])
-            break
-        case 'deleteFriend':
-            onDeleteFriend(null, {
-                account: sysMsg.from
-            })
-            break
+
         // 对方消息撤回
         case 'deleteMsg':
             if (sysMsg.scene === 'p2p') {
@@ -44,9 +33,7 @@ export function onSysMsgs(sysMsg) {
             }
             onRevocateMsg(null, sysMsg)
             break
-        case 'teamInvite': //被邀请入群
-        case 'applyTeam':  // 申请入群
-        case 'rejectTeamApply':  // 申请入群被拒绝
+
         case 'rejectTeamInvite': // 拒绝入群邀请
             store.commit('updateSysMsgs', [sysMsg])
             break
