@@ -3,7 +3,7 @@ import config from '../../configs'
 import Vue from 'Vue'
 
 export function updateSysMsgs(state, sysMsgs) {
-    const sim = state.sim
+
     if (!Array.isArray(sysMsgs)) {
         sysMsgs = [sysMsgs]
     }
@@ -11,8 +11,8 @@ export function updateSysMsgs(state, sysMsgs) {
         msg.showTime = util.formatDate(msg.time, false)
         return msg
     })
-    // state.sysMsgs = sim.mergeSysMsgs(state.sysMsgs, sysMsgs)
-    state.sysMsgs = [].concat(sim.mergeSysMsgs(state.sysMsgs, sysMsgs))
+    // 合并消息
+    state.sysMsgs = [].concat(util.mergeArrayById(state.sysMsgs, sysMsgs))
     Vue.set(state, sysMsgs, state.sysMsgs)
 }
 
@@ -26,10 +26,14 @@ export function updateSysMsgState(state, sysMsg) {
     }
 }
 
+
+
+// 未读系统消息
 export function updateSysMsgUnread(state, obj) {
     state.sysMsgUnread = Object.assign({}, obj)
 }
 
+// 清空系统消息
 export function resetSysMsgs(state, obj) {
     let type = obj.type
     switch (type) {
@@ -44,8 +48,6 @@ export function deleteSysMsgs(state, obj) {
     let type = obj.type
     let idServer = obj.idServer
     let arr = state.sysMsgs
-    arr = arr.filter(msg => {
-        return msg.idServer !== idServer
-    })
+    arr = arr.filter(msg => msg.idServer !== idServer)
     Vue.set(state, 'sysMsgs', arr)
 }

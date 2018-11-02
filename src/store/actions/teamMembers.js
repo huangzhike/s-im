@@ -214,8 +214,6 @@ export function onTeamMembers(obj) {
 
 
     handleSysMsgs(msg)
-
-    store.commit('updateTeamMembers', obj.list)
 }
 
 
@@ -228,10 +226,10 @@ function onAddTeamMembers(obj) {
             onTeams({list: team})
         }
     })
-    onTeamMembers({
-        teamId: obj.team.teamId,
-        members: obj.members
-    })
+
+
+    store.commit('updateTeamMembers', obj.list)
+
 }
 
 // 群成员删除
@@ -252,18 +250,11 @@ function onRemoveTeamMembers(obj) {
 
 // 更新群成员
 function onUpdateTeamMember(obj) {
-    onTeamMembers({
-        teamId: obj.teamMember.teamId,
-        members: obj.teamMember
-    })
 }
 
 // 更新群管理员
 function onUpdateTeamManagers(obj) {
-    onTeamMembers({
-        teamId: obj.team.teamId,
-        members: obj.members
-    })
+
 }
 
 

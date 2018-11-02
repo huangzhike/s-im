@@ -106,11 +106,15 @@ export function initSIM({state, commit, dispatch}, loginInfo) {
             state.currSessionId && dispatch('setCurrSession', state.currSessionId)
         },
         // 关闭连接
-        disconnect: window.ws.close
+        disconnect: window.ws.close,
+        send: (data,done) => {
+            state.ws && state.ws.websocket.send(data)
+            done instanceof Function && done()
+        }
     }
 
 
-    window.ws = new WS(config.webSocketUrl + loginInfo.token,
+    window.ws = state.ws = new WS(config.webSocketUrl + loginInfo.token,
         async (evt) => {
             console.error(evt)
             // 连接建立后的回调

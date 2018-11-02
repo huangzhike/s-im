@@ -128,7 +128,7 @@ let msg = {
 }
 
 
-export function formatMsg(msg) {
+function formatMsg(msg) {
     return msg
 }
 
@@ -143,90 +143,16 @@ export function onMsg(msg) {
             msg
         })
         // 发送已读回执
-
     }
     // 群消息
     if (msg.scene === 'team' && msg.type === 'notification') {
 
     }
-}
 
-function onSendMsgDone(error, msg) {
-    store.dispatch('hideLoading')
-    if (error) {
-        // 被拉黑
-        if (error.code === 7101) {
-            msg.status = 'success'
-            alert(error.message)
-        } else {
-            alert(error.message)
-        }
-    }
-    onMsg(msg)
-}
-
-// 消息撤回
-export function onRevocateMsg(error, msg) {
-
-    if (error) {
-        error.code === 508 ? console.error('发送时间超过2分钟的消息，不能被撤回') : console.error(error)
-        return
-    }
-    let tip = ''
-    if (msg.from === store.state.userUID) {
-        tip = '你撤回了一条消息'
-    } else {
-        let userInfo = store.state.userInfos[msg.from]
-        if (userInfo) {
-            tip = `${util.getFriendAlias(userInfo)}撤回了一条消息`
-        } else {
-            tip = '对方撤回了一条消息'
-        }
-    }
-    // 收到服务器应答后发送给对方并删除消息
-
-    request_post("sendTipMsg", {
-        isLocal: true,
-        scene: msg.scene,
-        to: msg.to,
-        tip,
-        time: msg.time,
-
-    }).then(resp => {
-
-        let idClient = msg.deletedIdClient || msg.idClient
-        store.commit('replaceMsg', {
-            sessionId: msg.sessionId,
-            idClient,
-            msg: resp.data
-        })
-        if (msg.sessionId === store.state.currSessionId) {
-            store.commit('updateCurrSessionMsgs', {
-                type: 'replace',
-                idClient,
-                msg: resp.data
-            })
-        }
-
-    }).catch(console.error)
-
-
+    // todo
 }
 
 
-export function revokeMsg({state, commit}, msg) {
-
-    let {idClient} = msg
-    msg = Object.assign(msg, state.msgsMap[idClient])
-
-    request_post("deleteMsg", {
-        msg
-    }).then(resp => {
-        onRevocateMsg(null, resp.data)
-    }).catch(console.error)
-
-
-}
 
 // 发送普通消息
 export function sendMsg({state, commit}, obj) {
@@ -236,13 +162,14 @@ export function sendMsg({state, commit}, obj) {
     store.dispatch('showLoading')
     switch (type) {
         case 'text':
-            request_post("sendText", {
+            // todo
+            state.sim.send({
+                type: "sendText",
                 scene: obj.scene,
                 to: obj.to,
                 text: obj.text,
-            }).then(resp => {
-                onSendMsgDone(null, resp.data)
-            }).catch(console.error)
+            }, onSendMsgDone)
+
 
             break
 
@@ -262,58 +189,68 @@ export function sendFileMsg({state, commit}, obj) {
     store.dispatch('showLoading')
 
 
-    request_post("sendFile", {
+    // todo
+    state.sim.send({
+        type,
         scene,
         to,
-        type,
+
         fileInput,
-    }).then(resp => {
-        onSendMsgDone(null, resp.data)
-    }).catch(err => {
-    })
+    }, onSendMsgDone)
 
 
 }
 
 // 获取更多历史消息
 export function getHistoryMsgs({state, commit}, obj) {
-    const sim = state.sim
-    if (sim) {
-        let {scene, to} = obj
-        let options = {
-            scene,
-            to,
-            limit: config.localMsgLimitCount || 20,
-        }
-        if (state.currSessionLastMsg) {
-            options = Object.assign(options, {
-                lastMsgId: state.currSessionLastMsg.idServer,
-                endTime: state.currSessionLastMsg.time,
-            })
-        }
-        store.dispatch('showLoading')
 
-        request_post("getHistoryMsgs", options).then(resp => {
-
-            let msg = resp.data.data
-            if (msg) {
-                if (msg.length === 0) {
-                    commit('setNoMoreHistoryMsgs')
-                } else {
-                    let msgs = msg.map(msg => formatMsg(msg))
-                    // 合并历史消息
-                    commit('updateCurrSessionMsgs', {
-                        type: 'concat',
-                        msgs: msgs
-                    })
-                }
-            }
-            store.dispatch('hideLoading')
-
-        }).catch(err => console.error(err))
-
+    let {scene, to} = obj
+    let options = {
+        scene,
+        to,
+        limit: config.localMsgLimitCount || 20,
     }
+    if (state.currSessionLastMsg) {
+        options = Object.assign(options, {
+            lastMsgId: state.currSessionLastMsg.idServer,
+            endTime: state.currSessionLastMsg.time,
+        })
+    }
+    store.dispatch('showLoading')
+
+    request_post("getHistoryMsgs", options).then(resp => {
+
+        let msg = resp.data.data
+        if (msg) {
+            if (msg.length === 0) {
+                commit('setNoMoreHistoryMsgs')
+            } else {
+                let msgs = msg.map(msg => formatMsg(msg))
+                // 合并历史消息
+                commit('updateCurrSessionMsgs', {
+                    type: 'concat',
+                    msgs: msgs
+                })
+            }
+        }
+        store.dispatch('hideLoading')
+
+    }).catch(err => console.error(err))
 }
+
+
+function onSendMsgDone(error, msg) {
+    store.dispatch('hideLoading')
+    if (error) {
+        // 被拉黑
+        if (error.code === 7101) {
+            msg.status = 'success'
+        }
+        alert(error.message)
+    }
+
+}
+
 
 export function resetNoMoreHistoryMsgs({commit}) {
     commit('resetNoMoreHistoryMsgs')

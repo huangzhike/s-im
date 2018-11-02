@@ -1,10 +1,25 @@
+import util from "../../utils";
+
 export function updateTeamMembers(state, obj) {
-    const sim = state.sim
+
     let teamId = obj.teamId
     let members = obj.members
     state.teamMembers = state.teamMembers || {}
-    state.teamMembers[teamId] = sim.mergeTeamMembers(state.teamMembers[teamId], members)
-    state.teamMembers[teamId] = sim.cutTeamMembers(state.teamMembers[teamId], members.invalid)
+
+    let teamMemberList = state.teamMembers[teamId]
+
+
+    // 合并
+    teamMemberList = util.mergeArrayById(teamMemberList, members)
+
+
+    let len = teamMemberList.length
+    // 删除
+    while (len--) {
+        if (!teamMemberList[len].valid) {
+            teamMemberList.splice(len, 1)
+        }
+    }
 
     state.teamMembers[teamId].sort((a, b) => {
         // 将群主和管理员排在队列前方
@@ -22,6 +37,8 @@ export function updateTeamMembers(state, obj) {
 export function removeTeamMembersByAccounts(state, obj) {
     let teamId = obj.teamId
     let invalidAccounts = obj.accounts
+
+    
     if (state.teamMembers[teamId] === undefined) return
     state.teamMembers[teamId] = state.teamMembers[teamId].filter((member, index) => {
         return invalidAccounts.indexOf(member.account) === -1

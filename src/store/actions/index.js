@@ -10,8 +10,8 @@ import {initSIM} from './initSIM'
 import {addFriend, deleteFriend, updateFriend} from './friends'
 import {resetSearchResult, searchTeam, searchUsers} from './search'
 import {deleteSession, resetCurrSession, setCurrSession} from './session'
-import {getHistoryMsgs, resetNoMoreHistoryMsgs, revokeMsg, sendFileMsg, sendMsg,} from './msgs'
-import {deleteSysMsgs, markSysMsgRead, resetSysMsgs} from './sysMsgs'
+import {getHistoryMsgs, resetNoMoreHistoryMsgs, sendFileMsg, sendMsg,} from './msgs'
+import {deleteSysMsgs, markSysMsgRead, resetSysMsgs,revokeMsg} from './sysMsgs'
 
 import {enterSettingPage,} from './team'
 

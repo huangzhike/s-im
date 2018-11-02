@@ -1,26 +1,12 @@
 import store from '../'
 
-import {onRevocateMsg} from './msgs'
-
 
 import {request_post} from "../../common/request";
+import util from "../../utils";
 
 
 export function onSysMsgs(sysMsg) {
-    /*
-        friend: 所有跟好友相关的系统通知的未读数
-        addFriend: 直接加为好友的未读数
-        applyFriend: 申请加为好友的未读数
-        passFriendApply: 通过好友申请的未读数
-        rejectFriendApply: 拒绝好友申请的未读数
-        deleteFriend: 删除好友的未读数
-        team: 所有跟群相关的系统通知的未读数
-        teamInvite: 入群邀请的未读数
-        rejectTeamInvite: 接受入群邀请的未读数
-        applyTeam: 入群申请的未读数
-        rejectTeamApply: 拒绝入群申请的未读数
-        deleteMsg: 撤回消息的未读数
-        */
+
 
     switch (sysMsg.type) {
 
@@ -31,16 +17,15 @@ export function onSysMsgs(sysMsg) {
             } else {
                 sysMsg.sessionId = `team-${sysMsg.to}`
             }
-            onRevocateMsg(null, sysMsg)
+            onRevokeMsg(null, sysMsg)
             break
 
-        case 'rejectTeamInvite': // 拒绝入群邀请
-            store.commit('updateSysMsgs', [sysMsg])
-            break
+
     }
     store.commit('updateSysMsgState', sysMsg)
 }
 
+// 未读系统消息
 export function onSysMsgUnread(obj) {
     store.commit('updateSysMsgUnread', obj)
 }
@@ -67,44 +52,144 @@ export function markSysMsgRead({state, commit}, obj) {
 }
 
 
+// 清空系统消息
 export function resetSysMsgs({state, commit}, obj) {
     commit('resetSysMsgs', obj)
 }
 
+// 删除系统消息
 export function deleteSysMsgs({commit}, obj) {
     commit('deleteSysMsgs', obj)
 }
 
 
+// 消息撤回回调
+function onRevokeMsg(error, msg) {
+
+    if (error) {
+        error.code === 508 ? console.error('发送时间超过2分钟的消息，不能被撤回') : console.error(error)
+        return
+    }
+    let tip = ''
+    if (msg.from === store.state.userUID) {
+        tip = '你撤回了一条消息'
+    } else {
+        let userInfo = store.state.userInfos[msg.from]
+        tip = userInfo ? `${util.getFriendAlias(userInfo)}撤回了一条消息` : '对方撤回了一条消息'
+
+    }
+    // 收到服务器应答后发送给对方并删除消息
+
+    // todo
+    state.sim.send({
+        type: "sendTipMsg",
+        isLocal: true,
+        scene: msg.scene,
+        to: msg.to,
+        tip,
+        time: msg.time,
+    }, () => {
+        let idClient = msg.deletedIdClient || msg.idClient
+        store.commit('replaceMsg', {
+            sessionId: msg.sessionId,
+            idClient,
+            msg: resp.data
+        })
+        if (msg.sessionId === store.state.currSessionId) {
+            store.commit('updateCurrSessionMsgs', {
+                type: 'replace',
+                idClient,
+                msg: resp.data
+            })
+        }
+    })
+
+
+}
+
+// 撤回消息
+export function revokeMsg({state, commit}, msg) {
+
+    let {idClient} = msg
+    msg = Object.assign(msg, state.msgsMap[idClient])
+
+
+    state.sim.send({
+        type: "deleteMsg",
+        msg
+    }, null)
+
+
+}
+
 export function handleSysMsgs(sysMsgs) {
     (!Array.isArray(sysMsgs)) && (sysMsgs = [sysMsgs])
 
-    sysMsgs.forEach(function (sysMsg) {
+    sysMsgs.forEach(sysMsg => {
 
         switch (sysMsg.type) {
-            // case 'addFriend':
-            //     onAddFriend(sysMsg.friend);
-            //     break;
-            // case 'applyFriend':
-            //     break;
-            // case 'passFriendApply':
-            //     onAddFriend(sysMsg.friend);
-            //     break;
-            // case 'rejectFriendApply':
-            //     break;
-            // case 'deleteFriend':
-            //     onDeleteFriend(sysMsg.from);
-            //     break;
-            // case 'applyTeam':
-            //     break;
-            // case 'rejectTeamApply':
-            //     break;
-            // case 'teamInvite':
-            //     break;
-            // case 'rejectTeamInvite':
-            //     break;
+            case 'addFriend':
+
+                break;
+            case 'applyFriend':
+                break;
+            case 'passFriendApply':
+
+                break;
+            case 'rejectFriendApply':
+                break;
+            case 'deleteFriend':
+
+                break;
+            /*****/
+            case 'createTeam':
+                break;
+            case 'updateTeam':
+                break;
+            case 'dismissTeam':
+                break;
+
+            case 'updateTeamMute':
+                break;
+
+
+            /*****/
+            case 'addTeamMembers':
+                break;
+            case 'teamInvite':
+                break;
+            case 'acceptTeamInvite':
+                break;
+
+            case 'rejectTeamInvite':
+                break;
+
+            case 'applyTeam':
+                break;
+            case 'passTeamApply':
+                break;
+
+            case 'rejectTeamApply':
+                break;
+
+            case 'leaveTeam':
+                break;
+            case 'removeTeamMembers':
+                break;
+
+
+            case 'addTeamManagers':
+                break;
+            case 'removeTeamManagers':
+                break;
+
+
+            /*****/
             default:
                 break;
         }
     });
+
+
+    store.commit('updateSysMsgs', sysMsgs)
 }
