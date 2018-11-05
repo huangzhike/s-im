@@ -61,15 +61,15 @@
         },
         mounted() {
             // 防止在此页面直接刷新，此时需要获取群成员
-            var teamMembers = this.$store.state.teamMembers[this.teamId]
+            let teamMembers = this.$store.state.teamMembers[this.teamId]
             if (teamMembers === undefined) {
                 this.$store.dispatch('getTeamMembers', this.teamId)
             }
         },
         computed: {
             teamInfo() {
-                var teamList = this.$store.state.teamlist
-                var team = teamList && teamList.find(team => {
+                let teamList = this.$store.state.teamlist
+                let team = teamList && teamList.find(team => {
                     return team.teamId === this.teamId
                 })
                 if (!team) {
@@ -78,9 +78,9 @@
                 return team
             },
             members() {
-                var members = this.$store.state.teamMembers[this.teamId]
-                var userInfos = this.$store.state.userInfos
-                var needSearchAccounts = []
+                let members = this.$store.state.teamMembers[this.teamId]
+                let userInfos = this.$store.state.userInfos
+                let needSearchAccounts = []
                 if (members) {
                     members = members.map(item => {
                         var member = Object.assign({}, item) //重新创建一个对象，用于存储展示数据，避免对vuex数据源的修改

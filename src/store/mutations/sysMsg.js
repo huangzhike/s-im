@@ -16,17 +16,6 @@ export function updateSysMsgs(state, sysMsgs) {
     Vue.set(state, sysMsgs, state.sysMsgs)
 }
 
-// 更新消息的状态，如管理员批准或拒绝入群后，会收到新消息，更新入群申请的状态
-export function updateSysMsgState(state, sysMsg) {
-    let exitMsg = state.sysMsgs.find(msg => {
-        return msg.idServer === sysMsg.idServer
-    })
-    if (exitMsg) {
-        exitMsg.state = sysMsg.state
-    }
-}
-
-
 
 // 未读系统消息
 export function updateSysMsgUnread(state, obj) {
@@ -35,13 +24,7 @@ export function updateSysMsgUnread(state, obj) {
 
 // 清空系统消息
 export function resetSysMsgs(state, obj) {
-    let type = obj.type
-    switch (type) {
-        case 0:
-            state.sysMsgs = []
-            break
-
-    }
+    state.sysMsgs = []
 }
 
 export function deleteSysMsgs(state, obj) {

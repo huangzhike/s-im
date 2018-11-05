@@ -41,14 +41,7 @@
         methods: {
             setAlias() {
                 this.alias = this.alias.replace(/\n/g, ' ').replace(/\r/g, '')
-                if (/^\s*$/.test(this.alias)) {
 
-
-                } else if (this.alias.length > 16) {
-
-
-                    return
-                }
                 this.$store.dispatch('updateFriend', {
                     account: this.account,
                     alias: this.alias

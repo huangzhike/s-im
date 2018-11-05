@@ -67,7 +67,7 @@
                     user = sessionId.replace(/^p2p-/, '')
                     if (user === this.$store.state.userUID) {
                         return '我的手机'
-                    }  else {
+                    } else {
                         let userInfo = this.userInfos[user] || {}
                         return util.getFriendAlias(userInfo)
                     }
@@ -99,17 +99,17 @@
         },
         methods: {
             getHistoryMsgs() {
-                if (this.canLoadMore) {
-                    this.$store.dispatch('getHistoryMsgs', {
-                        scene: this.scene,
-                        to: this.to
-                    })
-                }
+
+                this.canLoadMore && this.$store.dispatch('getHistoryMsgs', {
+                    scene: this.scene,
+                    to: this.to
+                })
+
             },
             loadMore() {
-                if (pageUtil.getChatListScroll() <= 5) {
-                    this.getHistoryMsgs()
-                }
+
+                pageUtil.getChatListScroll() <= 5 && this.getHistoryMsgs()
+
             },
             onClickBack: function () {
                 // location.href = `#/chat/${this.sessionId}`

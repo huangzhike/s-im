@@ -27,8 +27,8 @@
         },
         methods: {
             logout() {
-                let that = this
-                that.$store.dispatch('logout')
+
+                this.$store.dispatch('logout')
             }
         }
     }

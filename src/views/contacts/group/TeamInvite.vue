@@ -79,8 +79,8 @@
             friendsGroups() {
                 let map = Object.create(null)
                 this.frinedList.forEach(friend => {
-                    var firstLetter = friend.pinyin[0]
-                    var firstLetter = firstLetter >= 'A' && firstLetter <= 'Z' ? firstLetter : '#'
+                    let firstLetter = friend.pinyin[0]
+                      firstLetter = firstLetter >= 'A' && firstLetter <= 'Z' ? firstLetter : '#'
                     if (map[firstLetter] === undefined) {
                         map[firstLetter] = []
                     }
@@ -137,7 +137,7 @@
             },
             addMembers() {
                 this.$store.dispatch('showLoading')
-                var accounts = this.selected.map((friend) => {
+                let accounts = this.selected.map((friend) => {
                     return friend.account
                 })
                 this.$store.dispatch('addTeamMembers', {

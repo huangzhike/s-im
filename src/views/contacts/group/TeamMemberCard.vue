@@ -42,13 +42,13 @@
         },
         computed: {
             member() {
-                var parseReg = /(\d+)-(\w+)/
-                var result = parseReg.exec(this.$route.params.member)
-                var teamId = result[1]
+                let parseReg = /(\d+)-(\w+)/
+                let result = parseReg.exec(this.$route.params.member)
+                let teamId = result[1]
                 this.teamId = teamId
-                var account = result[2]
+                let account = result[2]
                 this.account = account
-                var member = {}
+                let member = {}
                 this.$store.state.teamMembers[teamId] && this.$store.state.teamMembers[teamId].forEach(item => {
                     if (item.account === account) {
                         member = Object.assign(member, item)
@@ -57,7 +57,7 @@
                         this.selfType = item.type
                     }
                 })
-                var userInfo = this.$store.state.userInfos[member.account]
+                let userInfo = this.$store.state.userInfos[member.account]
                 if (member.account === this.$store.state.userUID) {
                     userInfo = this.$store.state.myInfo
                 }

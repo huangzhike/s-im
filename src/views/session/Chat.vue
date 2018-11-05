@@ -16,7 +16,7 @@
         </header>
         <div class="m-chat-main">
             <div class='invalidHint' v-if='scene==="team" && teamInvalid'>
-                {{`您已退出该${teamInfo && teamInfo.type==='normal' ? '讨论组':'群'}`}}
+                {{`您已退出该${teamInfo && '群'}`}}
             </div>
             <!--对话-->
             <chat-list
@@ -60,13 +60,11 @@
             this.$store.dispatch('setCurrSession', this.sessionId)
             pageUtil.scrollChatListDown()
 
-            setTimeout(() => {
-                this.$store.dispatch('hideLoading')
-            }, 1000)
+            setTimeout(() => this.$store.dispatch('hideLoading'), 200)
 
             // 获取群成员
             if (this.scene === 'team') {
-                var teamMembers = this.$store.state.teamMembers[this.to]
+                let teamMembers = this.$store.state.teamMembers[this.to]
                 if (teamMembers === undefined || teamMembers.length < this.teamInfo.memberNum) {
                     this.$store.dispatch('getTeamMembers', this.to)
                 }
@@ -99,15 +97,15 @@
                     user = sessionId.replace(/^p2p-/, '')
                     if (user === this.$store.state.userUID) {
                         return '我的手机'
-                    }  else {
+                    } else {
                         let userInfo = this.userInfos[user] || {}
                         return util.getFriendAlias(userInfo)
                     }
                 } else if (/^team-/.test(sessionId)) {
                     if (this.teamInfo) {
                         // teamInfo中的人数为初始获取的值，在人员增减后不会及时更新，而teamMembers在人员增减后同步维护的人员信息
-                        var members = this.$store.state.teamMembers && this.$store.state.teamMembers[this.teamInfo.teamId]
-                        var memberCount = members && members.length
+                        let members = this.$store.state.teamMembers && this.$store.state.teamMembers[this.teamInfo.teamId]
+                        let memberCount = members && members.length
                         return this.teamInfo.name + (memberCount ? `(${memberCount})` : '')
                     } else {
                         return '群'
@@ -134,7 +132,7 @@
             },
             teamInfo() {
                 if (this.scene === 'team') {
-                    var teamId = this.sessionId.replace('team-', '')
+                    let teamId = this.sessionId.replace('team-', '')
                     return this.$store.state.teamlist.find(team => {
                         return team.teamId === teamId
                     })
@@ -143,9 +141,9 @@
             },
             muteInTeam() {
                 if (this.scene !== 'team') return false
-                var teamMembers = this.$store.state.teamMembers
-                var Members = teamMembers && teamMembers[this.teamInfo.teamId]
-                var selfInTeam = Members && Members.find(item => {
+                let teamMembers = this.$store.state.teamMembers
+                let Members = teamMembers && teamMembers[this.teamInfo.teamId]
+                let selfInTeam = Members && Members.find(item => {
                     return item.account === this.$store.state.userUID
                 })
                 return selfInTeam && selfInTeam.mute || false

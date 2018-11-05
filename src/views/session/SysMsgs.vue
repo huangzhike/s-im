@@ -180,7 +180,7 @@
                 })
             },
             findTeamInfo(teamId) {
-                var team = this.$store.state.teamlist.find(item => {
+                let team = this.$store.state.teamlist.find(item => {
                     return item.teamId === teamId
                 })
                 return team && team.name || teamId

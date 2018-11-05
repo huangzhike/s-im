@@ -68,7 +68,6 @@
             this.$store.dispatch('connect')
 
 
-
         },
         components: {
             NavBar,
@@ -86,7 +85,6 @@
 
 
 <style scoped lang="less">
-
 
 
     /* 顶部导航高度 */
@@ -245,10 +243,9 @@
         .m-tab-top {
             .u-tab-top {
 
-                border: 1px solid ;
+                border: 1px solid;
                 /* 选中状态 */
                 &.vux-button-group-current {
-
 
                 }
             }

@@ -11,7 +11,7 @@ export function onSysMsgs(sysMsg) {
     switch (sysMsg.type) {
 
         // 对方消息撤回
-        case 'deleteMsg':
+        case 'revokeMsg':
             if (sysMsg.scene === 'p2p') {
                 sysMsg.sessionId = `p2p-${sysMsg.from}`
             } else {
@@ -22,7 +22,7 @@ export function onSysMsgs(sysMsg) {
 
 
     }
-    store.commit('updateSysMsgState', sysMsg)
+
 }
 
 // 未读系统消息
@@ -78,31 +78,23 @@ function onRevokeMsg(error, msg) {
         tip = userInfo ? `${util.getFriendAlias(userInfo)}撤回了一条消息` : '对方撤回了一条消息'
 
     }
-    // 收到服务器应答后发送给对方并删除消息
 
-    // todo
-    state.sim.send({
-        type: "sendTipMsg",
-        isLocal: true,
-        scene: msg.scene,
-        to: msg.to,
-        tip,
-        time: msg.time,
-    }, () => {
-        let idClient = msg.deletedIdClient || msg.idClient
-        store.commit('replaceMsg', {
-            sessionId: msg.sessionId,
-            idClient,
-            msg: resp.data
-        })
-        if (msg.sessionId === store.state.currSessionId) {
-            store.commit('updateCurrSessionMsgs', {
-                type: 'replace',
-                idClient,
-                msg: resp.data
-            })
-        }
+
+    let idClient = msg.deletedIdClient || msg.idClient
+    // 替换本地消息
+    store.commit('replaceMsg', {
+        sessionId: msg.sessionId,
+        idClient,
+        msg: tip
     })
+    // 如果是当前会话
+    if (msg.sessionId === store.state.currSessionId) {
+        store.commit('updateCurrSessionMsgs', {
+            type: 'replace',
+            idClient,
+            msg: tip
+        })
+    }
 
 
 }
@@ -113,9 +105,8 @@ export function revokeMsg({state, commit}, msg) {
     let {idClient} = msg
     msg = Object.assign(msg, state.msgsMap[idClient])
 
-
     state.sim.send({
-        type: "deleteMsg",
+        type: "revokeMsg",
         msg
     }, null)
 

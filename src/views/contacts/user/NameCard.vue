@@ -4,20 +4,8 @@
             <h1 class="m-tab-top">{{userInfo.alias}}</h1>
             <a slot="left"></a>
         </header>
-        <div v-if="isRobot" class="m-list m-robot">
-            <div class="u-logo">
-                <img class="logo" :src="userInfo.avatar">
-                <h3>{{userInfo.alias}}</h3>
-                <p>@{{userInfo.account}}</p>
-            </div>
-            <div class="u-desc">
-                <p>{{userInfo.intro}}</p>
-            </div>
-            <div class="u-bottom">
-                <button   @click.native="enterChat">开始对话</button>
-            </div>
-        </div>
-        <div v-else class="m-list">
+
+        <div class="m-list">
             <ul class="u-card">
                 <li :title="userInfo.account" :inline-desc="'昵称: '+userInfo.nick"
                     :value="userInfo.gender=='不显示'?'':userInfo.gender">

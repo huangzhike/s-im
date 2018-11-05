@@ -2,12 +2,12 @@
     <div class="m-chat-editor">
         <!--输入表情-->
         <chat-emoji
-                v-bind:type="type"
-                v-bind:scene="scene"
-                v-bind:to="to"
+                :type="type"
+                :scene="scene"
+                :to="to"
                 v-show="isEmojiShown"
-                v-on:add-emoji="addEmoji"
-                v-on:hide-emoji="hideEmoji"
+                @add-emoji="addEmoji"
+                @hide-emoji="hideEmoji"
         ></chat-emoji>
 
         <span class="u-editor-input">
@@ -28,7 +28,7 @@
         <span class="u-editor-send" @click="sendTextMsg">发 送</span>
       </span>
     </div>
-    </div>
+
 </template>
 
 <script>
@@ -184,6 +184,7 @@
         height: @height_editor;
         background-color: @color_chat_editor_background;
     }
+
     /* 聊天按钮组件 */
     .m-chat-editor-main {
         position: relative;

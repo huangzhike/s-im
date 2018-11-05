@@ -43,7 +43,7 @@
             <!--文件-->
             <span v-else-if="msg.type==='file'" class="msg-text"><a :href="msg.fileLink" target="_blank"><i
                     class="u-icon icon-file"></i>{{msg.showText}}</a></span>
-         <!--通知信息-->
+            <!--通知信息-->
             <span v-else-if="msg.type==='notification'" class="msg-text notify">{{msg.showText}}</span>
             <span v-else class="msg-text" v-html="msg.showText"></span>
             <!--失败-->
@@ -55,7 +55,7 @@
     </li>
 </template>
 
-<script >
+<script>
     import util from '../../utils/index'
     import config from '../../configs/index'
     import emojiObj from '../../configs/emoji'
@@ -114,7 +114,7 @@
             if (this.type === 'session') {
 
                 if (item.flow === 'in') {
-                   if (item.from !== this.$store.state.userUID) {
+                    if (item.from !== this.$store.state.userUID) {
                         item.avatar = (this.userInfos[item.from] && this.userInfos[item.from].avatar) || config.defaultUserIcon
                         item.link = `#/namecard/${item.from}`
                         //todo  如果是未加好友的人发了消息，是否能看到名片
