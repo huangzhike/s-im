@@ -1,7 +1,7 @@
 /**
  * 收录常用汉字6763个，不支持声调，支持多音字，并按照汉字使用频率由低到高排序
  */
-var pinyinNoToneDict = {
+let pinyinNoToneDict = {
     "a": "阿啊呵腌嗄吖锕",
     "e": "额阿俄恶鹅遏鄂厄饿峨扼娥鳄哦蛾噩愕讹锷垩婀鹗萼谔莪腭锇颚呃阏屙苊轭",
     "ai": "爱埃艾碍癌哀挨矮隘蔼唉皑哎霭捱暧嫒嗳瑷嗌锿砹",
@@ -13,9 +13,9 @@ let dict = {}
 
 function parseDict() {
     dict.notone = {};
-    for (var i in pinyinNoToneDict) {
-        var temp = pinyinNoToneDict[i];
-        for (var j = 0, len = temp.length; j < len; j++) {
+    for (let i in pinyinNoToneDict) {
+        let temp = pinyinNoToneDict[i];
+        for (let j = 0, len = temp.length; j < len; j++) {
             dict.notone[temp[j]] = i; // 不考虑多音字
         }
     }
@@ -29,11 +29,11 @@ function parseDict() {
 function getPinyin(chinese, splitter) {
     parseDict()
     if (!chinese || /^ +$/g.test(chinese)) return '';
-    splitter = splitter == undefined ? ' ' : splitter;
-    var result = [];
+    splitter = splitter === undefined ? ' ' : splitter;
+    let result = [];
 
-    for (var i = 0, len = chinese.length; i < len; i++) {
-        var temp = chinese.charAt(i);
+    for (let i = 0, len = chinese.length; i < len; i++) {
+        let temp = chinese.charAt(i);
         result.push(dict.notone[temp] || temp);
     }
 

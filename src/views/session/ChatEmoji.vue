@@ -2,26 +2,33 @@
     <div class="m-chat-emoji">
         <div class="emoji-content">
             <div class="cnt">
-        <span class="emoji-item" :class="{'pinup-item':item.type==='pinup'}" v-for="item in currEmoji.list"
-              @click.stop="selectEmoji(item)">
-          <img :src="item.img">
-        </span>
+                <span class="emoji-item"
+                      :class="{'pinup-item':item.type==='pinup'}"
+                      v-for="item in currEmoji.list"
+                      @click.stop="selectEmoji(item)">
+                  <img :src="item.img"/>
+                </span>
             </div>
         </div>
         <div class="emoji-channel">
-      <span class="emoji-album" :class="{active: item.name==currAlbum}" v-for="item in emoji"
+      <span class="emoji-album" :class="{active: item.name==currAlbum}"
+            v-for="item in emoji"
             @click.stop="selectAlbum(item)">
         <img :src="item.album">
-      </span><span v-if="type==='session'" class="emoji-album" :class="{active: item.name==currAlbum}"
-                   v-for="item in pinup" @click.stop="selectAlbum(item)">
-        <img :src="item.album">
       </span>
+            <span v-if="type==='session'"
+                  class="emoji-album"
+                  :class="{active: item.name==currAlbum}"
+                  v-for="item in pinup"
+                  @click.stop="selectAlbum(item)">
+                <img :src="item.album"/>
+            </span>
         </div>
     </div>
 </template>
 
 <script>
-    import emojiObj from '../../configs/emoji'
+    import emoji from '../../utils/emoji'
 
     function genEmojiList(type, emojiList) {
         let result = {}
@@ -62,10 +69,10 @@
         },
         computed: {
             emoji() {
-                return genEmojiList('emoji', emojiObj.emojiList)
+                return genEmojiList('emoji', emoji.emojiList)
             },
             pinup() {
-                return genEmojiList('pinup', emojiObj.pinupList)
+                return genEmojiList('pinup', emoji.pinupList)
             },
             currEmoji() {
                 if (this.currType === 'emoji') {

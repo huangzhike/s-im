@@ -142,9 +142,7 @@
                 })
             },
             clearMsgs() {
-
                 // 确认要清空消息吗？
-
                 this.$store.dispatch('resetSysMsgs', {
                     type: this.sysType
                 })
@@ -179,12 +177,7 @@
                     }
                 })
             },
-            findTeamInfo(teamId) {
-                let team = this.$store.state.teamlist.find(item => {
-                    return item.teamId === teamId
-                })
-                return team && team.name || teamId
-            },
+
             showDelBtn(vNode) {
                 if (vNode && vNode.data && vNode.data.attrs) {
                     this.deleteIdServer = vNode.data.attrs.idServer
@@ -209,72 +202,6 @@
 <style lang="less">
     .p-sysmsgs {
 
-        .u-list {
-            height: 100%;
-            overflow-y: scroll;
-        }
-
-        p {
-            word-wrap: normal;
-            word-break: break-all;
-            color: #333;
-        }
-
-        .g-teamSys {
-            display: flex;
-            flex-grow: 100;
-            justify-content: space-between;
-            align-items: center;
-            overflow: hidden;
-
-            .m-info {
-                flex-shrink: 1;
-                overflow: hidden;
-
-                .u-time {
-                    color: #aaa;
-                }
-
-                .u-desc {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    color: #aaa;
-                    font-size: 1rem;
-                }
-
-            }
-
-            .m-options {
-                display: flex;
-                align-items: center;
-
-                .weui-btn.weui-btn_mini {
-                    padding: 0;
-                    width: 3rem;
-                    height: 2rem;
-                }
-
-                .weui-btn + .weui-btn {
-                    margin-top: 0;
-                    margin-left: 0.5rem;
-                }
-
-            }
-        }
-        .u-msg-state {
-            color: #aaa;
-            font-size: .9rem;
-        }
-
-        .empty-hint {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 5rem;
-            margin: auto;
-            text-align: center;
-        }
 
     }
 </style>

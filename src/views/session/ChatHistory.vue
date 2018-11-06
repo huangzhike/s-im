@@ -1,5 +1,5 @@
 <template>
-    <div class="g-inherit m-article p-chat-history">
+    <div class="p-chat-history">
         <!--头部-->
         <header class="m-tab" :left-options="leftBtnOptions" @on-click-back="onClickBack">
             <h1 class="m-tab-top">{{sessionName}}</h1>
@@ -31,7 +31,7 @@
         beforeMount() {
             // 如果是刷新页面，重定向至聊天页面
             if (this.$store.state.isRefresh) {
-                location.href = `#/chat/${this.sessionId}`
+                this.$router.push(`/chat/${this.sessionId}`)
             }
         },
         mounted() {
@@ -39,7 +39,7 @@
             this.getHistoryMsgs()
         },
         updated() {
-            let tempPagePos = pageUtil.getChatListHeight()
+            let tempPagePos = document.getElementById('chat-list').scrollHeight
             pageUtil.scrollChatListDown(tempPagePos - this.currPagePos)
             this.currPagePos = tempPagePos
         },
@@ -53,7 +53,7 @@
                     preventGoBack: true,
                 },
                 currPagePos: 0,
-                // selectedDate: ''
+
             }
         },
         computed: {
@@ -65,12 +65,8 @@
                 let user = null
                 if (/^p2p-/.test(sessionId)) {
                     user = sessionId.replace(/^p2p-/, '')
-                    if (user === this.$store.state.userUID) {
-                        return '我的手机'
-                    } else {
-                        let userInfo = this.userInfos[user] || {}
-                        return util.getFriendAlias(userInfo)
-                    }
+                    let userInfo = this.userInfos[user] || {}
+                    return util.getFriendAlias(userInfo)
                 } else if (/^team-/.test(sessionId)) {
                     return '历史记录'
                 }
@@ -83,8 +79,7 @@
                 return this.$store.state.userInfos
             },
             msglist() {
-                let msgs = this.$store.state.currSessionMsgs
-                return msgs
+                return this.$store.state.currSessionMsgs
             },
 
             scene() {
@@ -107,12 +102,9 @@
 
             },
             loadMore() {
-
-                pageUtil.getChatListScroll() <= 5 && this.getHistoryMsgs()
-
+                document.getElementById('chat-list').scrollTop <= 5 && this.getHistoryMsgs()
             },
             onClickBack: function () {
-                // location.href = `#/chat/${this.sessionId}`
                 window.history.go(-1)
             }
         }
@@ -121,10 +113,6 @@
 
 <style scoped lang="less">
     .p-chat-history {
-
-        .m-chat-main {
-            padding: 0;
-        }
 
     }
 </style>

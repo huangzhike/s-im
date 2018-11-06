@@ -1,22 +1,27 @@
 <template>
     <div class="g-inherit m-main p-session">
         <ul class="u-list">
+            <!-- 系统消息 -->
             <li class="u-list-item" title="消息中心" @click.native="enterSysMsgs">
                 <img class="icon" slot="icon" width="24" :src="noticeIcon">
                 <span v-show="sysMsgUnread > 0" class="u-unread">{{sysMsgUnread}}</span>
             </li>
-
+            <!-- 会话列表 -->
             <li
-                    v-for="(session, index) in sessionlist"
+                    v-for="(session, index) in sessionList"
                     class="u-list-item"
                     :title="session.name"
                     :inline-desc="session.lastMsgShow"
                     :key="session.id"
                     :sessionId="session.id"
                     @click.native="enterChat(session)">
+                <!-- ICON -->
                 <img class="icon u-circle" slot="icon" width="24" :src="session.avatar">
+                <!-- 最近会话时间 -->
                 <span class='u-session-time'>  {{session.updateTimeShow}}  </span>
+                <!-- 未读数量 -->
                 <span v-show="session.unread > 0" class="u-unread">{{session.unread}}</span>
+                <!-- 删除会话按钮 -->
                 <span
                         class="u-tag-del"
                         :class="{active: delSessionId===session.id}"
@@ -38,90 +43,78 @@
                 delSessionId: null,
                 stopBubble: false,
                 noticeIcon: config.noticeIcon,
-                myPhoneIcon: config.myPhoneIcon,
-                myulIcon: config.defaultulIcon,
-                myAdvancedIcon: config.defaultAdvancedIcon
+                teamIcon: config.defaulTeamIcon,
             }
         },
         computed: {
             sysMsgUnread() {
-                let temp = this.$store.state.sysMsgUnread
-                let sysMsgUnread = temp.addFriend || 0
-                sysMsgUnread += temp.team || 0
-                let customSysMsgUnread = this.$store.state.customSysMsgUnread
-                return sysMsgUnread + customSysMsgUnread
+                return this.$store.state.sysMsgUnread
             },
-            userInfos() {
-                return this.$store.state.userInfos
-            },
-            myInfo() {
-                return this.$store.state.myInfo
-            },
-            myPhoneId() {
-                return `${this.$store.state.userUID}`
-            },
-            sessionlist() {
-                let sessionlist = this.$store.state.sessionlist.filter(item => {
+
+            sessionList() {
+                return this.$store.state.sessionlist.filter(item => {
                     item.name = ''
                     item.avatar = ''
+                    // 一对一
                     if (item.scene === 'p2p') {
-                        let userInfo = null
-                        if (item.to !== this.myPhoneId) {
-                            userInfo = this.userInfos[item.to]
-                        } else {
-                            // userInfo = this.myInfo
-                            // userInfo.alias = '我的手机'
-                            // userInfo.avatar = `${config.myPhoneIcon}`
-                            return false
-                        }
+                        let userInfo = this.$store.state.userInfos[item.to]
+
                         if (userInfo) {
                             item.name = util.getFriendAlias(userInfo)
                             item.avatar = userInfo.avatar
                         }
-                    } else if (item.scene === 'team') {
-                        let teamInfo = null
-                        teamInfo = this.$store.state.teamlist.find(team => {
-                            return team.teamId === item.to
-                        })
+                    }
+                    // 群消息
+                    else if (item.scene === 'team') {
+                        let teamInfo = this.$store.state.teamlist.find(team => team.teamId === item.to)
+
                         if (teamInfo) {
                             item.name = teamInfo.name
-                            item.avatar = teamInfo.avatar || (teamInfo.type === 'normal' ? this.myulIcon : this.myAdvancedIcon)
                         } else {
                             item.name = `群${item.to}`
-                            item.avatar = item.avatar || this.myulIcon
                         }
+                        item.avatar = teamInfo.avatar || this.teamIcon
                     }
+                    // 最近一条消息
                     let lastMsg = item.lastMsg || {}
+                    // 文本消息
                     if (lastMsg.type === 'text') {
-                        item.lastMsgShow = lastMsg.text || ''
-                    } else if (lastMsg.type === 'custom') {
-                        item.lastMsgShow = util.parseCustomMsg(lastMsg)
-                    } else if (lastMsg.scene === 'team' && lastMsg.type === 'notification') {
+                        item.lastMsgShow = lastMsg.text
+                    }
+                    // 群通知消息
+                    else if (lastMsg.scene === 'team' && lastMsg.type === 'notification') {
                         item.lastMsgShow = util.generateTeamSysmMsg(lastMsg)
-                    } else if (util.mapMsgType(lastMsg)) {
+                    }
+                    // 消息类型
+                    else if (util.mapMsgType(lastMsg)) {
                         item.lastMsgShow = `[${util.mapMsgType(lastMsg)}]`
-                    } else {
+                    }
+                    // 毛也没有
+                    else {
                         item.lastMsgShow = ''
                     }
+                    // 最近会话时间
                     if (item.updateTime) {
                         item.updateTimeShow = util.formatDate(item.updateTime, true)
                     }
                     return item
                 })
-                return sessionlist
+
             }
         },
         methods: {
             enterSysMsgs() {
                 if (this.hideDelBtn())
                     return
-                location.href = '#/sysmsgs'
+                this.$router.push("/sysmsgs")
+
             },
             enterChat(session) {
                 if (this.hideDelBtn())
                     return
                 if (session && session.id)
-                    location.href = `#/chat/${session.id}`
+                    this.$router.push(`/chat/${session.id}`)
+
             },
 
             deleteSession() {

@@ -21,9 +21,7 @@
     </ul>
 </template>
 <script>
-    import util from '../../utils/index'
-    import config from '../../configs/index'
-    import emojiObj from '../../configs/emoji'
+
     import ChatItem from './ChatItem'
 
     export default {
@@ -31,9 +29,8 @@
             ChatItem
         },
         props: {
-            type: String, // 类型，chatroom, session
+            type: String, // 类型, session
             canLoadMore: [String, Boolean],
-
             msglist: {
                 type: Array,
                 default() {
@@ -68,15 +65,11 @@
         },
         methods: {
             showFullImg(src) {
-                this.$store.dispatch('showFullscreenImg', {
-                    src
-                })
+                this.$store.dispatch('showFullscreenImg', {src})
             },
             msgLoaded() {
                 clearTimeout(this.msgLoadedTimer)
-                this.msgLoadedTimer = setTimeout(() => {
-                    this.$emit('msgs-loaded')
-                }, 20)
+                this.msgLoadedTimer = setTimeout(() => this.$emit('msgs-loaded'), 20)
             }
         }
     }
@@ -84,13 +77,6 @@
 
 <style type="text/css" lang="less">
     .p-chat-list {
-
-        .u-icon {
-            width: 1.4rem;
-            height: 1.6rem;
-            margin-right: 0.2rem;
-            vertical-align: bottom;
-        }
 
     }
 </style>

@@ -55,9 +55,7 @@ Utils.mergeObject = function (dest, src) {
 Utils.mergeVueObject = function (dest, src) {
     let keys = Object.keys(src)
     keys.forEach(item => {
-        if (typeof src[item] !== 'undefined') {
-            Vue.set(dest, item, src[item])
-        }
+        typeof src[item] !== 'undefined' && Vue.set(dest, item, src[item])
     })
     return dest
 }
@@ -193,7 +191,7 @@ Utils.getFriendAlias = function (userInfo) {
 
 
 Utils.generateTeamSysmMsg = function (data) {
-    var text, nicks = this.getNickNames(data.attach.users)
+    let text, nicks = this.getNickNames(data.attach.users)
     switch (data.attach.type) {
         case 'updateTeam':
             text = this.getTeamUpdateInfo(data)

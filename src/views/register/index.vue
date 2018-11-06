@@ -1,25 +1,22 @@
 <template>
 
-    <div class="g-inherit m-album">
-        <div id="form-data" class="g-center m-login">
+    <div class="">
+        <div id="form-data" class="m-login">
             <div class="cells">
                 <img class="logo" :src="logo">
             </div>
             <div class="cells">
                 <div class="cell">
                     <span class="icon icon-account"></span>
-                    <input type="text" class="ipt ipt-account" maxlength="20" v-model="account"
-                           placeholder="账号：限20位字母或者数字"/>
+                    <input type="text" class="ipt ipt-account" v-model="account"/>
                 </div>
                 <div class="cell">
                     <span class="icon icon-account"></span>
-                    <input type="text" class="ipt ipt-account" maxlength="10" v-model="nickname"
-                           placeholder="昵称：限10位汉字、字母或者数字"/>
+                    <input type="text" class="ipt ipt-account" v-model="nickname"/>
                 </div>
                 <div class="cell">
                     <span class="icon icon-pwd"></span>
-                    <input type="password" class="ipt ipt-account" maxlength="20" v-model="password"
-                           placeholder="密码：6-20位字母或数字"/>
+                    <input type="password" class="ipt ipt-account" v-model="password"/>
                 </div>
             </div>
             <div class="cells">
@@ -42,7 +39,7 @@
     import config from '../../configs'
     import util from '../../utils'
 
-    import {request_post} from "../../common/request";
+    import {request_post} from "../../utils/request";
 
 
     export default {
@@ -81,26 +78,17 @@
                     return
                 }
                 this.errorMsg = ''
-                // 本demo做一次假登录
-                // 真实场景应在此向服务器发起ajax请求
-                let token = md5(this.password)
+
 
                 let accountLowerCase = this.account.toLowerCase()
 
-                request_post(`${config.postUrl}/api`, {
+                request_post('register', {
                     username: accountLowerCase,
-                    password: token,
+                    password: this.password,
                     nickname: this.nickname
                 }).then(resp => {
-                    let data = resp.data
-                    if (data.code === 200) {
-                        cookie.setCookie('uid', accountLowerCase)
-                        cookie.setCookie('token', token)
-                        this.$router.push("/session")
-                    } else {
-                        this.errorMsg = data.msg
-                    }
-                    this.$forceUpdate()
+                    this.$router.push("/login")
+                    // this.$forceUpdate()
                 }).catch(e => {
 
                 })
@@ -120,79 +108,8 @@
 
 
 <style lang="less">
-    /* 登录注册页面 */
+
     .m-login {
-        .cells {
-            position: relative;
-            margin: 10px auto;
-            .cell {
-                position: relative;
-                width: 100%;
-                border-bottom: 1px solid #ddf;
-                line-height: 2rem;
-            }
-            .logo {
-                display: block;
-                margin: 1rem auto;
-                width: 50%;
-                height: auto;
-            }
-            .ipt {
-                box-sizing: border-box;
-                padding: 0.6rem 0 0.6rem 2.4rem;
-                font-size: 0.9rem;
-                color: #fff;
-                width: 100%;
-                border: none;
-                background-color: transparent;
-                &::placeholder {
-                    color: #d9d9d9;
-                }
-            }
-            .icon {
-                display: inline-block;
-                width: 16px;
-                height: 16px;
-                background-image: url(http://yx-web.nos.netease.com/webdoc/h5/im/icons.png);
-                background-repeat: no-repeat;
-                vertical-align: middle;
-            }
-            .icon-account {
-                background-position: 0 -112px;
-                position: absolute;
-                left: 0.4rem;
-                top: 0.6rem;
-            }
-            .icon-pwd {
-                background-position: 0 -133px;
-                position: absolute;
-                left: 0.4rem;
-                top: 0.6rem;
-            }
-            .btn {
-                margin: 0.6rem 0;
-                box-sizing: border-box;
-                width: 100%;
-                line-height: 2.4rem;
-                height: 2.4rem;
-                border-radius: 0.4rem;
-                background: #fff;
-                color: @color_button_primary;
-                font-size: 1rem;
-                border: none;
-                cursor: pointer;
-            }
-            .btn-regist {
-                background: transparent;
-                color: #fff;
-                /*border: 1px solid #d9d9d9;*/
-            }
-            .error {
-                float: right;
-                clear: both;
-                color: @color_error;
-            }
-        }
 
     }
 </style>

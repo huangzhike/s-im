@@ -58,11 +58,11 @@
 <script>
     import util from '../../utils/index'
     import config from '../../configs/index'
-    import emojiObj from '../../configs/emoji'
+    import emoji from '../../utils/emoji'
 
     export default {
         props: {
-            type: String, // 类型，chatroom, session
+            type: String, // 类型, session
             rawMsg: {
                 type: Object,
                 default() {
@@ -100,7 +100,7 @@
         computed: {
 
             teamMsgUnRead() {
-                var obj = !this.isHistory
+                let obj = !this.isHistory
                     && this.msg.needMsgReceipt
                     && this.msg.flow === 'out'
                     && this.$store.state.teamMsgReads.find(item => item.idServer === this.msg.idServer)
@@ -137,7 +137,7 @@
                 if (/\[[^\]]+\]/.test(item.showText)) {
                     let emojiItems = item.showText.match(/\[[^\]]+\]/g)
                     emojiItems.forEach(text => {
-                        let emojiCnt = emojiObj.emojiList.emoji
+                        let emojiCnt = emoji.emojiList.emoji
                         if (emojiCnt[text]) {
                             item.showText = item.showText.replace(text, `<img class="emoji-small" src="${emojiCnt[text].img}">`)
                         }
@@ -156,8 +156,8 @@
                 } else if (content.type === 3) {
                     let data = content.data
                     let emojiCnt = ''
-                    if (emojiObj.pinupList[data.catalog]) {
-                        emojiCnt = emojiObj.pinupList[data.catalog][data.chartlet]
+                    if (emoji.pinupList[data.catalog]) {
+                        emojiCnt = emoji.pinupList[data.catalog][data.chartlet]
                         // item.showText = `<img class="emoji-big" src="${emojiCnt.img}">`
                         item.type = 'custom-type3'
                         item.imgUrl = `${emojiCnt.img}`
@@ -334,29 +334,5 @@
         }
     }
 
-    .p-room-chat-list {
 
-        .u-msg {
-
-            .msg-text {
-                max-width: 80%;
-            }
-
-            .msg-link {
-                bottom: 0;
-                right: -4rem;
-                font-size: 0.9rem;
-            }
-
-        }
-    }
-
-    .msg-unread {
-        position: relative;
-        float: right;
-        top: 0.3rem;
-        right: 0.5rem;
-        font-size: 0.9rem;
-        color: #0091e4;
-    }
 </style>

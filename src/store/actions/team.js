@@ -6,7 +6,7 @@ import {onTeamMembers} from 'teamMembers'
 import {handleSysMsgs} from 'sysMsgs'
 
 
-import {request_post} from "../../common/request";
+import {request_post} from "../../utils/request";
 
 
 import config from '../../configs'

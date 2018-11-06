@@ -3,7 +3,7 @@ import config from '../../configs'
 import util from '../../utils'
 
 
-import {request_post} from "../../common/request";
+import {request_post} from "../../utils/request";
 
 
 /*

@@ -10,11 +10,8 @@ const cookie = {
     readCookie: function (name) {
         let arr = null
         let reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)')
-        if (document.cookie && (arr = document.cookie.match(reg))) {
-            return unescape(arr[2])
-        } else {
-            return null;
-        }
+        return (document.cookie && (arr = document.cookie.match(reg))) ? unescape(arr[2]) : null
+
     },
     //删除cookies
     delCookie: function (name) {

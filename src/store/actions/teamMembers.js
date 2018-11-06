@@ -1,6 +1,6 @@
 import store from "../index";
 import {onTeams} from "./team";
-import {request_post} from "../../common/request";
+import {request_post} from "../../utils/request";
 import config from "../../configs";
 import {handleSysMsgs} from "./sysMsgs";
 

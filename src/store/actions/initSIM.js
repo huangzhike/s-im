@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import WS from '../../utils/ws'
 
-import {request_post} from "../../common/request";
+import {request_post} from "../../utils/request";
 
 import util from '../../utils'
 

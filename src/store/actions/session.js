@@ -3,7 +3,7 @@
  */
 
 
-import {request_post} from "../../common/request";
+import {request_post} from "../../utils/request";
 
 
 let session = {

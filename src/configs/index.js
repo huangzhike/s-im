@@ -7,7 +7,7 @@ let config = {
     defaultUserIcon: '',
 
     // 默认群头像
-    defaultAdvancedIcon: '',
+    defaulTeamIcon: '',
     // 系统通知图标
     noticeIcon: '',
 

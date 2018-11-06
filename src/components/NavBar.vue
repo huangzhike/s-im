@@ -44,15 +44,9 @@
             z-index: 5;
 
             .router-link {
-                height: @height_nav;
-                line-height: @height_nav;
-                color: @color_nav_font;
-                background-color: @color_nav_background;
+
             }
-            .router-link-active {
-                color: @color_nav_active_font;
-                background-color: @color_nav_active_background;
-            }
+
         }
     }
 

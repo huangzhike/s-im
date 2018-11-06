@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="g-window">
+    <div id="app" class="">
 
         <nav-bar v-show="showNav"></nav-bar>
         <!-- 切页动画设置 -->
@@ -16,8 +16,6 @@
     import Loading from './components/Loading'
     import FullscreenImg from './components/FullscreenImg'
     import NavBar from './components/NavBar'
-
-    import pageUtil from './utils/page'
 
     const sessionHistory = window.sessionStorage
 
@@ -45,13 +43,13 @@
                         count++
                         let fromCount = parseInt(sessionHistory.getItem(fromPath))
                         let toCount = parseInt(sessionHistory.getItem(toPath))
-                        if (toCount < fromCount && fromCount < count && (!pageUtil.showNav(fromPath))) {
+                        if (toCount < fromCount && fromCount < count && (!this.nav(fromPath))) {
                             this.transitionName = 'backward'
                             count = toCount
                         } else {
                             this.transitionName = 'forward'
                         }
-                        if (pageUtil.showNav(toPath)) {
+                        if (this.nav(toPath)) {
                             count = 1
                         }
                     }
@@ -66,8 +64,6 @@
             // 异步加载组件都会update
             // 提交sdk连接请求
             this.$store.dispatch('connect')
-
-
         },
         components: {
             NavBar,
@@ -77,7 +73,13 @@
         computed: {
             // 是否显示导航条
             showNav() {
-                return pageUtil.showNav(this.$route.path)
+                let path = this.$route.path
+                return this.nav(path)
+            }
+        },
+        methods: {
+            nav(path) {
+                return (path === '/' || path === '/session' || path === '/contacts' || path === '/general')
             }
         }
     }
@@ -86,14 +88,6 @@
 
 <style scoped lang="less">
 
-
-    /* 顶部导航高度 */
-    @height_nav: 3.6rem;
-    @height_tab: 3.6rem;
-    @height_room_banner: 12rem;
-    @height_room_tabs: 3rem;
-
-    @height_editor: 4rem;
 
     /***************************************************************/
 
@@ -176,165 +170,14 @@
 
     /************************************************/
 
-    /*
-* 布局
-*/
-
     /* 手机全屏占比 */
-    html, body, .g-window {
+    html, body {
         position: relative;
         display: block;
         width: 100%;
         height: 100%;
         overflow: hidden;
         font-size: 1rem;
-
-    }
-
-    .g-window {
-
-        /* 水平垂直居中布局 */
-        .g-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 80%;
-            height: auto;
-            transform: translate(-50%, -50%);
-        }
-
-        /* 继承布局 */
-        .g-inherit {
-            position: inherit;
-            display: inherit;
-            padding: 0;
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        /* flex布局-中央布局 */
-        .g-flex-c {
-            display: flex;
-            flex-flow: row wrap;
-            justify-content: center;
-        }
-    }
-
-    /***************************************************/
-
-    .g-window {
-        .m-main, .m-album, .m-article {
-            position: absolute;
-            padding-top: @height_nav;
-            display: block;
-            box-sizing: border-box;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* 控制元素在移动设备上是否使用滚动回弹效果 */
-            -webkit-overflow-scrolling: touch;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .m-tab-top {
-            .u-tab-top {
-
-                border: 1px solid;
-                /* 选中状态 */
-                &.vux-button-group-current {
-
-                }
-            }
-        }
-        .m-article {
-            top: 0;
-        }
-
-        /* 用于左右留白布局 */
-        .m-cards {
-            position: relative;
-            display: block;
-            width: 90%;
-            height: auto;
-            margin: 1rem auto;
-            z-index: 1;
-        }
-        .m-list {
-            position: absolute;
-            display: block;
-            box-sizing: border-box;
-            top: 0;
-            bottom: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            -webkit-overflow-scrolling: touch;
-            overflow-y: scroll;
-            overflow-x: hidden;
-        }
-        /* 二级页面的tab */
-        .m-tab {
-            position: absolute;
-            top: 0;
-            left: 0;
-            margin: 0;
-            padding: 10px 0;
-            width: 100%;
-            height: @height_tab;
-            overflow: hidden;
-            z-index: 3;
-
-            .m-tab-top {
-                position: relative;
-                padding: 0;
-                font-size: 1.3rem;
-
-            }
-            .m-tab-right {
-                position: absolute;
-                right: 0;
-                top: 0.1rem;
-                font-size: 0.8rem;
-                text-align: right;
-                width: 4rem;
-            }
-        }
-
-        /* 会话列表 */
-        .m-article-main, .m-chat-main {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* 聊天页面 */
-        .m-chat-main {
-            /* 聊天页面有输入框 */
-            padding: 0 0 @height_editor 0;
-            /* 聊天历史记录没有输入框 */
-            &.m-chat-history {
-                padding-bottom: 0;
-            }
-            .m-chat-list {
-                position: relative;
-                display: block;
-                box-sizing: border-box;
-                padding: 1rem 2%;
-                width: 100%;
-                -webkit-overflow-scrolling: touch;
-                overflow-y: scroll;
-                overflow-x: hidden;
-            }
-        }
-
     }
 
 

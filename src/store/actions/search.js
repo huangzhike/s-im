@@ -1,7 +1,7 @@
 import {formatUserInfo} from './userInfo'
 
 
-import {request_post} from "../../common/request";
+import {request_post} from "../../utils/request";
 import {onFriends} from "./friends";
 
 

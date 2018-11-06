@@ -11,16 +11,16 @@
         // 兼容性处理，图片加载时间可能比较慢
         watch: {
             isFullscreenImgShow(val, oldVal) {
-                var self = this
+
                 let chatImg = this.$refs.chatImg
-                if (val === true) {
+                if (val) {
                     chatImg.innerHTML = ''
                     let img = new Image()
                     img.src = this.$store.state.fullscreenImgSrc
                     img.alt = '图片加载中...'
-                    img.onload = function () {
+                    img.onload = () => {
                         chatImg.appendChild(img)
-                        self.showImg = val
+                        this.showImg = val
                     }
                 } else {
                     self.showImg = false
