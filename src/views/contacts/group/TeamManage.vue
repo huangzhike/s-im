@@ -1,5 +1,5 @@
 <template>
-    <div class='g-inherit m-article p-teammanager'>
+    <div class='p-teammanager'>
         <header class="m-tab" :left-options="{backText: ' '}">
             <h1 class="m-tab-top">群设置</h1>
             <a slot="left"></a>
@@ -212,79 +212,5 @@
 </script>
 
 <style lang="less">
-    .g-window .m-article.p-teammanager {
-        display: flex;
-        background-color: #e6ebf0;
 
-        .m-body {
-            overflow-y: scroll;
-            width: 100%;
-        }
-
-        img.avatar {
-            width: 3.8rem;
-            height: 3.8rem;
-            flex: 0 1 auto;
-        }
-
-        .m-ul {
-            background-color: white;
-
-            &
-            + .m-ul {
-                margin-top: 1rem;
-            }
-
-            .weui-lis:after {
-                border-bottom-style: none;
-            }
-
-            .weui-li:before {
-                border: none;
-            }
-
-            .weui-li:after {
-                content: " ";
-                position: absolute;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                height: 1px;
-                border-bottom: 1px solid #D9D9D9;
-                color: #D9D9D9;
-                transform-origin: 0 100%;
-                transform: scaleY(0.5);
-                left: 15px;
-                right: 15px;
-            }
-
-            .weui-btn {
-                margin: 1rem 5%;
-            }
-
-            .weui-li__ft {
-                max-width: 70%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                color: #aaa;
-            }
-
-        }
-        .m-teaminfo {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-
-            .u-info {
-                margin-left: 1rem;
-
-                span {
-                    color: #999;
-                    font-size: 0.9rem;
-                }
-
-            }
-        }
-    }
 </style>

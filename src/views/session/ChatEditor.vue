@@ -1,8 +1,8 @@
 <template>
     <div class="m-chat-editor">
-        <!--输入表情-->
+        <!--表情选择-->
         <chat-emoji
-                :type="type"
+
                 :scene="scene"
                 :to="to"
                 v-show="isEmojiShown"
@@ -15,11 +15,11 @@
         </span>
         <!--  -->
         <span class="u-editor-icons">
-            <!-- 发送表情 -->
+            <!-- 点击选择表情 -->
             <span class="u-editor-icon" @click.stop="showEmoji">
               <i class="u-icon-img"><img :src="icon1"></i>
             </span>
-            <!--  发送文件 -->
+            <!-- 点击选择文件 -->
             <span class="u-editor-icon" @change="sendFileMsg">
               <i class="u-icon-img"><img :src="icon2"></i>
               <input type="file" ref="fileToSent">
@@ -47,7 +47,7 @@
             window.document.body.addEventListener('click', () => this.isEmojiShown = false)
         },
         props: {
-            type: String,
+
             scene: String,
             to: String,
 
@@ -75,6 +75,7 @@
         methods: {
             sendTextMsg() {
                 if (this.invalid) {
+                    console.error(this.invalidHint)
                     return
                 }
                 if (/^\s*$/.test(this.msgToSent)) {
@@ -82,35 +83,24 @@
                     return
                 }
                 this.msgToSent = this.msgToSent.trim()
-                if (this.type === 'session') {
-                    this.$store.dispatch('sendMsg', {
-                        type: 'text',
-                        scene: this.scene,
-                        to: this.to,
-                        text: this.msgToSent
-                    })
-                }
+                this.$store.dispatch('sendMsg', {
+                    type: 'text',
+                    scene: this.scene,
+                    to: this.to,
+                    text: this.msgToSent
+                })
                 this.msgToSent = ''
             },
 
             sendFileMsg() {
-                if (this.invalid) {
-                    alert(this.invalidHint)
-                    return
-                }
+
                 let ipt = this.$refs.fileToSent
                 if (ipt.value) {
-                    if (this.type === 'session') {
-                        this.$store.dispatch('sendFileMsg', {
-                            scene: this.scene,
-                            to: this.to,
-                            fileInput: ipt
-                        })
-                    } else if (this.type === 'chatroom') {
-                        this.$store.dispatch('sendChatroomFileMsg', {
-                            fileInput: ipt
-                        })
-                    }
+                    this.$store.dispatch('sendFileMsg', {
+                        scene: this.scene,
+                        to: this.to,
+                        fileInput: ipt
+                    })
                 }
             },
             showEmoji() {

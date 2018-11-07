@@ -8,14 +8,12 @@
             <input
                     class="u-ipt-default"
                     type="text"
-                    :required="false"
                     v-model="alias"
-                    :max="16"
                     placeholder="请输入备注名"/>
             <span slot="label">备注：</span>
         </ul>
         <div>
-            <button type="primary" action-type="button" @click.native="setAlias">设置备注名</button>
+            <button type="primary" @click.native="setAlias">设置备注名</button>
         </div>
     </div>
 </template>

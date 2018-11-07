@@ -8,14 +8,27 @@
         </header>
         <!--更改群信息-->
         <ul>
-            <input v-if='config.inputType==="text"' :placeholder="placeHolder" v-model='inputModel' ref='input'
-                   :disabled='!config.enable' :max='10'/>
-            <textarea v-else-if='config.inputType==="textarea"' :placeholder="placeHolder" v-model="inputModel"
-                      ref='input' :readonly='!config.enable' :max='30'></textarea>
-            <li v-else-if='config.inputType==="select"' v-for="(item, index) in selects" :key='index'
-                value-align="left" @click.native='() => update(item.key)'>
+            <input v-if='config.inputType==="text"'
+                   :placeholder="placeHolder"
+                   v-model='inputModel'
+                   ref='input'
+                   :disabled='!config.enable'
+                   :max='10'/>
+            <textarea v-else-if='config.inputType==="textarea"'
+                      :placeholder="placeHolder"
+                      v-model="inputModel"
+                      ref='input'
+                      :readonly='!config.enable'
+                      :max='30'></textarea>
+            <li v-else-if='config.inputType==="select"'
+                v-for="(item, index) in selects"
+                :key='index'
+                value-align="left"
+                @click.native='() => update(item.key)'>
                 {{item.value}}
-                <span v-if='inputModel === item.key' slot='child' width="25" height="25" class='icon-selected'></span>
+                <span v-if='inputModel === item.key'
+                      slot='child'
+                      class='icon-selected'></span>
             </li>
         </ul>
     </div>
@@ -42,9 +55,7 @@
                 let map = Utils.teamConfigMap[this.config.updateKey]
                 let list = []
                 for (const key in map) {
-                    if (map.hasOwnProperty(key)) {
-                        list.push({'key': key, 'value': map[key]})
-                    }
+                    map.hasOwnProperty(key) && list.push({'key': key, 'value': map[key]})
                 }
                 return list
             }
@@ -86,25 +97,5 @@
         padding-top: 4.6rem;
     }
 
-    .weui-cell {
-        background-color: white;
-    }
 
-    .select {
-
-        img {
-            position: absolute;
-            right: 0;
-        }
-
-    }
-
-    .icon-selected {
-        display: inline-block;
-        width: 1.4rem;
-        height: 1.4rem;
-        background-size: 20rem;
-        background-image: url(http://yx-web.nos.netease.com/webdoc/h5/im/icons.png);
-        background-position: -3.7rem -2.95rem;
-    }
 </style>

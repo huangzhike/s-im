@@ -2,6 +2,7 @@
     <div class="m-chat-emoji">
         <div class="emoji-content">
             <div class="cnt">
+                <!-- 表情 -->
                 <span class="emoji-item"
                       :class="{'pinup-item':item.type==='pinup'}"
                       v-for="item in currEmoji.list"
@@ -11,16 +12,18 @@
             </div>
         </div>
         <div class="emoji-channel">
-      <span class="emoji-album" :class="{active: item.name==currAlbum}"
-            v-for="item in emoji"
-            @click.stop="selectAlbum(item)">
-        <img :src="item.album">
-      </span>
-            <span v-if="type==='session'"
-                  class="emoji-album"
+            <!-- 表情集合列表 -->
+            <span class="emoji-album"
                   :class="{active: item.name==currAlbum}"
-                  v-for="item in pinup"
+                  v-for="item in emoji"
                   @click.stop="selectAlbum(item)">
+            <img :src="item.album">
+          </span>
+            <span
+                    class="emoji-album"
+                    :class="{active: item.name==currAlbum}"
+                    v-for="item in pinup"
+                    @click.stop="selectAlbum(item)">
                 <img :src="item.album"/>
             </span>
         </div>
@@ -57,7 +60,7 @@
 
     export default {
         props: {
-            type: String,
+
             scene: String,
             to: String
         },
@@ -92,22 +95,23 @@
                 if (this.currType === 'emoji') {
                     // 由触发父组件事件，增加表情文案
                     this.$emit('add-emoji', emoji.key)
-                } else if (this.currType === 'pinup') {
-                    if (this.type === 'session') {
-                        this.$store.dispatch('sendMsg', {
-                            type: 'custom',
-                            scene: this.scene,
-                            to: this.to,
-                            pushContent: '[贴图表情]',
-                            content: {
-                                type: 3,
-                                data: {
-                                    catalog: this.currAlbum,
-                                    chartlet: emoji.key
-                                }
+                }
+                // 自定义的贴图表情
+                else if (this.currType === 'pinup') {
+                    this.$store.dispatch('sendMsg', {
+                        type: 'custom',
+                        scene: this.scene,
+                        to: this.to,
+                        pushContent: '[贴图表情]',
+                        content: {
+                            type: 3,
+                            data: {
+                                catalog: this.currAlbum,
+                                chartlet: emoji.key
                             }
-                        })
-                    }
+                        }
+                    })
+                    // 直接发送，然后关闭
                     this.$emit('hide-emoji')
                 }
             }
@@ -115,7 +119,7 @@
     }
 </script>
 
-<style lang="less">
+<style lang="less" type="text/less">
     .m-chat-emoji {
         position: absolute;
         top: -12rem;
@@ -173,9 +177,6 @@
                 padding: 2px;
                 vertical-align: middle;
 
-                /*border: 1px solid #fff;*/
-                /*margin-left: -1px;*/
-                /*margin-bottom: -1px;*/
                 img {
                     width: inherit;
                     height: inherit;

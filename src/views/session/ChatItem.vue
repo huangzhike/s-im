@@ -31,7 +31,7 @@
             <!--文本信息-->
             <span v-if="msg.type==='text'" class="msg-text" v-html="msg.showText"></span>
             <span v-else-if="msg.type==='custom-type1'" class="msg-text" ref="mediaMsg"></span>
-            <span v-else-if="msg.type==='custom-type3'" class="msg-text" ref="mediaMsg"></span>
+
             <!--图片信息-->
             <span v-else-if="msg.type==='image'" class="msg-text" ref="mediaMsg"
                   @click.stop="showFullImg(msg.originLink)"></span>
@@ -41,16 +41,16 @@
             <span v-else-if="msg.type==='audio'" class="msg-text"
                   @click="playAudio(msg.audioSrc)">{{msg.showText}}</span>
             <!--文件-->
-            <span v-else-if="msg.type==='file'" class="msg-text"><a :href="msg.fileLink" target="_blank"><i
-                    class="u-icon icon-file"></i>{{msg.showText}}</a></span>
+            <span v-else-if="msg.type==='file'" class="msg-text">
+                <a :href="msg.fileLink" target="_blank"><i class="u-icon icon-file"></i>{{msg.showText}}</a>
+            </span>
             <!--通知信息-->
             <span v-else-if="msg.type==='notification'" class="msg-text notify">{{msg.showText}}</span>
             <span v-else class="msg-text" v-html="msg.showText"></span>
             <!--失败-->
             <span v-if="msg.status==='fail'" class="msg-failed"><i class="weui-icon-warn"></i></span>
-            <!--已读回执-->
-            <a v-if="teamMsgUnRead >=0" class='msg-unread' :href='`#/msgReceiptDetail/${msg.to}-${msg.idServer}`'>{{teamMsgUnRead>0
-                ? `${teamMsgUnRead}人未读`: '全部已读'}}</a>
+
+
         </div>
     </li>
 </template>
@@ -97,37 +97,25 @@
                 currentAudio: null
             }
         },
-        computed: {
-
-            teamMsgUnRead() {
-                let obj = !this.isHistory
-                    && this.msg.needMsgReceipt
-                    && this.msg.flow === 'out'
-                    && this.$store.state.teamMsgReads.find(item => item.idServer === this.msg.idServer)
-
-                return obj ? parseInt(obj.unread) : -1
-            }
-        },
+        computed: {},
         beforeMount() {
             let item = Object.assign({}, this.rawMsg)
-            // 标记用户，区分聊天室、普通消息
-            if (this.type === 'session') {
-
-                if (item.flow === 'in') {
-                    if (item.from !== this.$store.state.userUID) {
-                        item.avatar = (this.userInfos[item.from] && this.userInfos[item.from].avatar) || config.defaultUserIcon
-                        item.link = `#/namecard/${item.from}`
-                        //todo  如果是未加好友的人发了消息，是否能看到名片
-                    } else {
-                        item.avatar = this.myInfo.avatar
-                    }
-                } else if (item.flow === 'out') {
+            // 发进来的
+            if (item.flow === 'in') {
+                // 别人发的
+                if (item.from !== this.$store.state.userUID) {
+                    item.avatar = (this.userInfos[item.from] && this.userInfos[item.from].avatar) || config.defaultUserIcon
+                    item.link = `#/namecard/${item.from}`
+                } else {
+                    // 自己发给自己
                     item.avatar = this.myInfo.avatar
                 }
-            } else {
-                // 标记时间，聊天室中
-                item.showTime = util.formatDate(item.time)
             }
+            // 发出去的
+            else if (item.flow === 'out') {
+                item.avatar = this.myInfo.avatar
+            }
+
             if (item.type === 'timeTag') {
                 // 标记发送的时间
                 item.showText = item.text
@@ -136,6 +124,7 @@
                 item.showText = util.escape(item.text)
                 if (/\[[^\]]+\]/.test(item.showText)) {
                     let emojiItems = item.showText.match(/\[[^\]]+\]/g)
+                    // 替换成emoji表情
                     emojiItems.forEach(text => {
                         let emojiCnt = emoji.emojiList.emoji
                         if (emojiCnt[text]) {
@@ -145,27 +134,14 @@
                 }
             } else if (item.type === 'custom') {
                 let content = JSON.parse(item.content)
-                // type 1 为猜拳消息
-                if (content.type === 1) {
-                    let data = content.data
-                    let resourceUrl = config.resourceUrl
-                    // item.showText = `<img class="emoji-middle" src="${resourceUrl}/im/play-${data.value}.png">`
-                    item.type = 'custom-type1'
-                    item.imgUrl = `${resourceUrl}/im/play-${data.value}.png`
-                    // type 3 为贴图表情
-                } else if (content.type === 3) {
+                // type 3 为贴图表情
+                if (content.type === 3) {
                     let data = content.data
                     let emojiCnt = ''
                     if (emoji.pinupList[data.catalog]) {
                         emojiCnt = emoji.pinupList[data.catalog][data.chartlet]
-                        // item.showText = `<img class="emoji-big" src="${emojiCnt.img}">`
                         item.type = 'custom-type3'
                         item.imgUrl = `${emojiCnt.img}`
-                    }
-                } else {
-                    item.showText = util.parseCustomMsg(item)
-                    if (item.showText !== '[自定义消息]') {
-                        item.showText += ',请到手机或电脑客户端查看'
                     }
                 }
             } else if (item.type === 'image') {
@@ -182,50 +158,10 @@
             } else if (item.type === 'notification') {
                 if (item.scene === 'team') {
                     item.showText = util.generateTeamSysmMsg(item)
-                } else {
-                    //对于系统通知，更新下用户信息的状态
-                    item.showText = util.generateChatroomSysMsg(item)
                 }
             } else if (item.type === 'tip') {
                 //对于系统通知，更新下用户信息的状态
                 item.showText = item.tip
-            } else if (item.type === 'robot') {
-                let content = item.content || {}
-                let message = content.message || []
-                if (!content.msgOut) {
-                    // 机器人上行消息
-                    item.robotFlow = 'out'
-                    item.showText = item.text
-                } else if (content.flag === 'bot') {
-                    item.subType = 'bot'
-                    message = message.map(item => {
-                        if (item.type === 'template') {
-                            // 在vuex(store/actions/msgs.js)中已调用sdk方法做了转换
-                            return item.content.json
-                        } else if (item.type === 'text' || item.type === 'answer') {
-                            // 保持跟template结构一致
-                            return [{
-                                type: 'text',
-                                text: item.content
-                            }]
-                        } else if (item.type === 'image') {
-                            // 保持跟template结构一致
-                            return [{
-                                type: 'image',
-                                url: item.content
-                            }]
-                        }
-                    })
-                    item.message = message
-                } else if (item.content.flag === 'faq') {
-                    item.subType = 'faq'
-                    item.query = message.query
-                    let match = message.match.sort((a, b) => {
-                        // 返回最匹配的答案
-                        return b.score - a.score
-                    })
-                    item.message = match[0]
-                }
             } else {
                 item.showText = `[${util.mapMsgType(item)}],请到手机或电脑客户端查看`
             }
@@ -239,12 +175,8 @@
                 if (item.type === 'image') {
                     // 图片消息缩略图
                     media = new Image()
+                    // 服务端裁剪
                     media.src = item.file.url + '?imageView&thumbnail=180x0&quality=85'
-                } else if (item.type === 'custom-type1') {
-                    // 猜拳消息
-                    media = new Image()
-                    media.className = 'emoji-middle'
-                    media.src = item.imgUrl
                 } else if (item.type === 'custom-type3') {
                     // 贴图表情
                     media = new Image()
@@ -268,15 +200,10 @@
                     }
                 }
                 if (media) {
-                    if (this.$refs.mediaMsg) {
-                        this.$refs.mediaMsg.appendChild(media)
-                    }
-                    media.onload = () => {
-                        this.$emit('msg-loaded')
-                    }
-                    media.onerror = () => {
-                        this.$emit('msg-loaded')
-                    }
+
+                    this.$refs.mediaMsg && this.$refs.mediaMsg.appendChild(media)
+                    media.onload = () => this.$emit('msg-loaded')
+                    media.onerror = () => this.$emit('msg-loaded')
                 } else {
                     this.$emit('msg-loaded')
                 }
@@ -289,33 +216,27 @@
                 if (this.$store.state.currSessionId) {
                     if (vNode && vNode.data && vNode.data.attrs) {
                         let attrs = vNode.data.attrs
-
                         // 自己发的消息
                         if (attrs.flow === 'out') {
-                            let that = this
                             // 确定需要撤回消息',
-                            that.$store.dispatch('revokeMsg', {
+                            this.$store.dispatch('revokeMsg', {
                                 idClient: attrs.idClient
                             })
-
                         }
                     }
                 }
             },
 
             showFullImg(src) {
-                this.$store.dispatch('showFullscreenImg', {
-                    src
-                })
+                this.$store.dispatch('showFullscreenImg', {src})
             },
             playAudio(src) {
-                if (!this.currentAudio) {
-                    this.currentAudio = new Audio(src)
-                    this.currentAudio.play()
-                    this.currentAudio.onended = () => {
-                        this.currentAudio = null
-                    }
-                }
+                if (this.currentAudio)
+                    return
+                this.currentAudio = new Audio(src)
+                this.currentAudio.play()
+                this.currentAudio.onended = () => this.currentAudio = null
+
             },
 
         }
@@ -323,16 +244,6 @@
 </script>
 
 <style scoped lang="less">
-    .p-chat-history {
-
-        .u-msg {
-
-            .msg-link {
-                display: none;
-            }
-
-        }
-    }
 
 
 </style>

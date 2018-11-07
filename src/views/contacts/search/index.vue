@@ -1,24 +1,22 @@
 <template>
     <div class="g-inherit m-article p-search-user">
         <header class="m-tab" :left-options="{backText: ' '}">
-            <ui class="m-tab-top" v-model="searchType">
+            <ul class="m-tab-top" v-model="searchType">
                 <li class="u-tab-top">搜索用户</li>
                 <li class="u-tab-top">搜索群</li>
-            </ui>
+            </ul>
             <a slot="left"></a>
         </header>
-        <ui class="u-search">
+        <ul class="u-search">
             <input
                     class="u-ipt-default"
                     type="text"
-                    :required="false"
-                    :auto-fixed="false"
                     v-model="searchText"
                     :placeholder="searchType===0?'请输入搜索内容':'请输入群号'"
                     ref='searchInput'
             />
             <span slot="label">搜索：</span>
-        </ui>
+        </ul>
         <div>
             <button @click.native="searchUser">搜索</button>
         </div>
@@ -34,7 +32,7 @@
                 :userId="index"
                 is-link
                 :link="user.link">
-                <img class="icon" slot="icon" width="20" :src="user.avatar">
+                <img class="icon" slot="icon" :src="user.avatar">
             </li>
             <li v-else
                 v-for="team in searchList"
@@ -43,7 +41,7 @@
                 :key="team.teamId"
                 is-link
                 :link="team.link">
-                <img class="icon" slot="icon" width="20" :src="team.avatar">
+                <img class="icon" slot="icon" :src="team.avatar">
             </li>
         </ul>
         <div class="u-card">
@@ -61,11 +59,8 @@
                 this.searchType = parseInt(this.$route.params.searchType)
                 this.$store.dispatch('resetSearchResult')
             })
-
-            setTimeout(() => {
-                // 立即focus会引起切页时白屏，故增加timeout
-                this.$refs.searchInput.$refs.input.focus()
-            }, 500);
+            // 立即focus会引起切页时白屏，故增加timeout
+            setTimeout(() => this.$refs.searchInput.$refs.input.focus(), 0);
         },
         data() {
             return {
@@ -79,11 +74,7 @@
         },
         watch: {
             searchResult(val, oldVal) {
-                if ((val.length === 0) && (!this.firstEntry)) {
-                    this.errMsg = '无记录'
-                } else {
-                    this.errMsg = ''
-                }
+                this.errMsg = val.length === 0 && !this.firstEntry ? '无记录' : ''
                 this.searchList = val
             },
             searchType() {
@@ -113,13 +104,13 @@
         methods: {
             searchUser() {
                 if (!this.searchText) {
-                   alert('未输入内容')
+                    console.error('未输入内容')
                     return
                 }
                 this.firstEntry = false
                 if (this.searchType === 1) {
                     if (!/^(\d){4,9}$/.test(this.searchText)) {
-                       alert('输入的群号非法')
+                        console.error('输入的群号非法')
                         return
                     }
                     this.$store.dispatch('searchTeam', {

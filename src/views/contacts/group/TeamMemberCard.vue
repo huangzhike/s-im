@@ -1,9 +1,9 @@
 <template>
-    <div class='g-inherit m-article p-membercard'>
+    <div class='p-membercard'>
         <!--点击群成员列表后进入群成员名片，设置-->
         <header class="m-tab" :left-options="{backText: ' '}">
             <h1 class="m-tab-top">群名片</h1>
-            <a slot="left"></a>
+
         </header>
         <div class='g-body'>
             <div class='g-avatar'>

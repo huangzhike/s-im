@@ -3,21 +3,21 @@
         <!--头部-->
         <header class="m-tab" :left-options="{backText: ' '}">
 
-            <a slot="left"></a>
             <a slot="right" @click.stop="clearMsgs">清空</a>
         </header>
         <!--主体-->
-        <div class="m-article-main p-sysmsgs">
+        <div class="p-sysmsgs">
             <ul class="u-list">
                 <template v-for="msg in msgList">
+
+                    <!-- 群申请 -->
                     <li
                             v-if='msg.type ==="applyTeam" || msg.type ==="teamInvite"'
                             class="u-list-item"
                             :key="msg.idServer"
                             :idServer="msg.idServer"
-
                     >
-                        <img class="icon" slot="icon" width="24" :src="msg.avatar">
+                        <img class="icon" slot="icon" :src="msg.avatar">
                         <div slot="child" class='g-teamSys'>
                             <div class='m-info'>
                                 <span class='u-name'>{{msg.from}}</span>
@@ -27,21 +27,21 @@
                             </div>
                             <div class='m-options' slot='default' v-if='deleteIdServer !== msg.idServer'>
                                 <template v-if='msg.state === "init"'>
-                                    <button type="primary" :mini='true' action-type="button"
-                                            @click.native="handleTeamApply(msg, true)">同意
-                                    </button>
-                                    <button type="warn" :mini='true' action-type="button"
-                                            @click.native="handleTeamApply(msg, false)">拒绝
-                                    </button>
+                                    <button type="primary" @click.native="handleTeamApply(msg, true)">同意</button>
+                                    <button type="warn" @click.native="handleTeamApply(msg, false)">拒绝</button>
                                 </template>
                                 <div v-else class='u-msg-state'>
                                     {{msg.state==='error'? '已过期' : msg.state==='rejected'?'已拒绝':'已同意'}}
                                 </div>
                             </div>
                         </div>
-                        <span class="u-tag-del" :class="{active: deleteIdServer === msg.idServer}"
-                              @click="deleteMsg(msg.idServer)"></span>
+                        <span class="u-tag-del"
+                              :class="{active: deleteIdServer === msg.idServer}"
+                              @click="deleteMsg(msg.idServer)">
+                        </span>
                     </li>
+
+                    <!-- 其它 -->
                     <li
                             v-else
                             class="u-list-item"
@@ -50,15 +50,16 @@
                             :inline-desc="msg.desc"
                             :key="msg.idServer"
                             :idServer="msg.idServer"
-
                     >
-                        <img class="icon" slot="icon" width="24" :src="msg.avatar">
-                        <span class="u-tag-del" :class="{active: deleteIdServer === msg.idServer}"
-                              @click="deleteMsg(msg.idServer)"></span>
+                        <img class="icon" slot="icon" :src="msg.avatar">
+                        <span class="u-tag-del"
+                              :class="{active: deleteIdServer === msg.idServer}"
+                              @click="deleteMsg(msg.idServer)">
+                        </span>
                     </li>
                 </template>
             </ul>
-            <div class='empty-hint' v-if='!msgList || msgList.length<1'>暂无任何消息</div>
+            <div class='empty-hint' v-if='!msgList || msgList.length===0'>暂无任何消息</div>
         </div>
     </div>
 </template>
@@ -67,8 +68,9 @@
     import config from '../../configs/index'
 
     export default {
-        // 进入该页面，文档被挂载
+
         mounted() {
+            // 进入该页面，文档被挂载
             this.$store.dispatch('markSysMsgRead')
 
         },
@@ -121,12 +123,12 @@
                             msg.desc = `${op.nick}拒绝了群${this.getTeamName(msg.to)}的入群邀请`
                             return true
                     }
-                    console.log(msg)
+                    console.error(msg)
                     return false
                 })
                 // 最新的排在前
-                sysMsgs.sort((msg1, msg2) => (msg2.time - msg1.time))
-                return sysMsgs
+
+                return sysMsgs.sort((msg1, msg2) => (msg2.time - msg1.time))
             },
 
             msgList() {
@@ -148,9 +150,7 @@
                 })
             },
             getTeamName(teamId) {
-                let team = this.$store.state.teamlist.find(team => {
-                    return team.teamId === teamId
-                })
+                let team = this.$store.state.teamlist.find(team => team.teamId === teamId)
                 return team && team.name || ''
             },
             handleTeamApply(msg, pass) {
@@ -165,7 +165,7 @@
                     default:
                         return
                 }
-                this.$store.dispatch('delegateTeamFunction', {
+                this.$store.dispatch('delegateFunction', {
                     functionName: action,
                     options: {
                         idServer: msg.idServer,
@@ -182,9 +182,7 @@
                 if (vNode && vNode.data && vNode.data.attrs) {
                     this.deleteIdServer = vNode.data.attrs.idServer
                     this.stopBubble = true
-                    setTimeout(() => {
-                        this.stopBubble = false
-                    }, 20)
+                    setTimeout(() => this.stopBubble = false, 20)
                 }
             },
             hideDelBtn() {
@@ -201,7 +199,6 @@
 
 <style lang="less">
     .p-sysmsgs {
-
 
     }
 </style>

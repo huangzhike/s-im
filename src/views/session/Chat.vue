@@ -19,7 +19,7 @@
             </div>
             <!-- 对话列表 -->
             <chat-list
-                    type="session"
+
                     :msglist="msglist"
                     :userInfos="userInfos"
                     :myInfo="myInfo"
@@ -27,7 +27,7 @@
             ></chat-list>
             <!--输入框-->
             <chat-editor
-                    type="session"
+
                     :scene="scene"
                     :to="to"
                     :invalid="teamInvalid || muteInTeam"

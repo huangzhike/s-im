@@ -1,16 +1,19 @@
 <template>
-    <div class='g-inherit m-article p-teamlist'>
+    <div class='p-teamlist'>
         <header class="m-tab" :left-options="{backText: ' '}">
-            <h1 class="m-tab-top">{{pageTitle}}</h1>
-            <a slot="left"></a>
+
         </header>
         <!--群列表-->
         <div class="m-list">
             <ul>
-                <li v-for='team in teamList' :key='team.teamId' :title='team.name' is-link
-                    :link='`/chat/team-${team.teamId}`'>
-                    <span class="icon icon-team-advanced" slot="icon"></span>
-                </li>
+
+                <router-link v-for='team in teamList'
+                             v-text="team.name"
+                             :key='team.teamId'
+                             :to='`/chat/team-${team.teamId}`'>
+
+                </router-link>
+
             </ul>
         </div>
         <div class='empty-hint' v-if='!teamList || teamList.length<1'>暂无内容</div>
@@ -20,29 +23,21 @@
 <script>
     export default {
         mounted() {
-            this.$nextTick(() => {
-                this.teamType = this.$route.params.teamType
-            })
+
         },
         data() {
-            return {
-                teamType: 'normal' // normal or advanced
-            }
+            return {}
         },
         computed: {
             teamList: function () {
-                return this.$store.state.teamlist && this.$store.state.teamlist.filter(team => {
-                    return team.type === this.teamType && team.validToCurrentUser
-                })
+                return this.$store.state.teamlist && this.$store.state.teamlist.filter(team => team.validToCurrentUser)
             },
-            pageTitle: function () {
-                return this.teamType === 'advanced' ? '高级群' : '讨论组'
-            }
+
         }
     }
 </script>
 
-<style scoped lang="less">
+<style scoped lang="less" type="text/less">
     .p-teamlist {
 
         .m-list {

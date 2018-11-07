@@ -1,8 +1,8 @@
 <template>
-    <div class='g-inherit m-article p-members'>
+    <div class='p-members'>
         <header class="m-tab" :left-options="{backText: ' '}">
             <h1 class="m-tab-top">群成员</h1>
-            <a slot="left"></a>
+
         </header>
         <!--单独的页面显示全部群成员-->
         <team-member :teamId='teamId' :advanced='true' :showAllMode='true'></team-member>

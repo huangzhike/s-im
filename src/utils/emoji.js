@@ -8,13 +8,6 @@ let emojiList = {
         '[色]': {file: 'emoji_02.png'},
         '[嘘]': {file: 'emoji_03.png'},
         '[亲]': {file: 'emoji_04.png'},
-        '[呆]': {file: 'emoji_05.png'},
-        '[口水]': {file: 'emoji_06.png'},
-        '[汗]': {file: 'emoji_145.png'},
-        '[呲牙]': {file: 'emoji_07.png'},
-        '[鬼脸]': {file: 'emoji_08.png'},
-        '[害羞]': {file: 'emoji_09.png'},
-        '[偷笑]': {file: 'emoji_10.png'},
     }
 }
 

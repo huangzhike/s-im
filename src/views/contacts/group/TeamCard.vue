@@ -3,14 +3,14 @@
     <div class='g-inherit m-article'>
         <header class="m-tab" :left-options="{backText: ' '}">
             <h1 class="m-tab-top">加入群</h1>
-            <a slot="left"></a>
+
         </header>
         <div class='g-body'>
-            <img class="icon u-circle" slot="icon" width="50" height="50" :src="teamInfo && teamInfo.avatar">
+            <img class="icon u-circle" slot="icon" :src="teamInfo && teamInfo.avatar">
             <div>{{teamInfo && teamInfo.name}}</div>
             <div>{{teamDesc}}</div>
             <div class='u-bottom'>
-                <button type="primary" action-type="button" @click.native="applyClick">申请加入</button>
+                <button type="primary" @click.native="applyClick">申请加入</button>
             </div>
         </div>
     </div>
@@ -23,27 +23,17 @@
                 return this.$route.params.teamId
             },
             teamInfo() {
-                return this.$store.state.searchedTeams.find(team => {
-                    return team.teamId === this.teamId
-                })
+                return this.$store.state.searchedTeams.find(team => team.teamId === this.teamId)
             },
             teamDesc() {
-                if (!this.teamInfo) {
-                    return ''
-                }
-
-                let teamType = this.teamInfo.type === "advanced" ? "高级群" : "普通群"
-                return `${teamType}:${this.teamInfo.memberNum}人`
+                return !this.teamInfo ? '' : `${this.teamInfo.memberNum}人群`
             }
         },
         methods: {
             applyClick() {
-                let team = this.$store.state.teamlist.find(team => {
-                    return team.teamId === this.teamId
-                })
+                let team = this.$store.state.teamlist.find(team => team.teamId === this.teamId)
+                // 查询到该群且该群对自己有效，说明已在群中
                 if (team && team.validToCurrentUser) {
-                    // 查询到该群且该群对自己有效，说明已在群中
-                    alert('已在群中')
                     return
                 }
                 switch (this.teamInfo.joinMode) {
@@ -83,13 +73,5 @@
 </script>
 
 <style scoped lang="less">
-    .g-body {
-        margin-top: 5rem;
-        text-align: center;
 
-        div {
-            margin: 1rem auto;
-        }
-
-    }
 </style>

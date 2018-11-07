@@ -1,10 +1,10 @@
 <template>
-    <div class="g-inherit m-main p-general" v-if="myInfo.account">
-        <ui class="u-card">
+    <div class="" v-if="myInfo.account">
+        <ul class="u-card">
             <li :title="myInfo.nick" :inline-desc="'帐号: ' + myInfo.account">
                 <img class="icon" slot="icon" width="20" :src="myInfo.avatar">
             </li>
-        </ui>
+        </ul>
         <ul class="u-card">
             <li title="昵称">{{myInfo.nick || ''}}</li>
             <li title="签名">{{myInfo.sign}}</li>
@@ -27,7 +27,6 @@
         },
         methods: {
             logout() {
-
                 this.$store.dispatch('logout')
             }
         }

@@ -10,7 +10,7 @@
         <!--会话内容-->
         <chat-item
                 v-for="msg in msglist"
-                :type="type"
+
                 :rawMsg="msg"
                 :userInfos="userInfos"
                 :myInfo="myInfo"
@@ -29,7 +29,7 @@
             ChatItem
         },
         props: {
-            type: String, // 类型, session
+
             canLoadMore: [String, Boolean],
             msglist: {
                 type: Array,

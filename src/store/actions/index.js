@@ -13,7 +13,7 @@ import {deleteSession, resetCurrSession, setCurrSession} from './session'
 import {getHistoryMsgs, resetNoMoreHistoryMsgs, sendFileMsg, sendMsg,} from './msgs'
 import {deleteSysMsgs, markSysMsgRead, resetSysMsgs,revokeMsg} from './sysMsgs'
 
-import {enterSettingPage,} from './team'
+import {enterSettingPage,delegateFunction} from './team'
 
 import {getTeamMembers} from './teamMembers'
 
@@ -109,5 +109,5 @@ export default {
     // 获取群成员
     getTeamMembers,
 
-
+    delegateFunction
 }

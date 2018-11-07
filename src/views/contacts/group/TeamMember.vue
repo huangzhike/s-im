@@ -168,7 +168,7 @@
     }
 </script>
 
-<style scoped lang="less">
+<style scoped lang="less" >
 
     .m-members {
         display: flex;
@@ -177,58 +177,6 @@
         text-align: center;
         width: 100%;
 
-        img.avatar {
-            width: 3.8rem;
-            height: 3.8rem;
-            flex: 0 1 auto;
-        }
-
-        .u-member {
-            display: flex;
-            position: relative;
-            flex-direction: column;
-            align-items: center;
-            width: 25%;
-            margin: .5rem 0;
-
-            .remove, .manager, .owner {
-                display: inline-block;
-                position: absolute;
-                bottom: 1.1rem;
-                right: 0;
-                width: 2rem;
-                height: 2rem;
-                background: url(http://yx-web.nos.netease.com/webdoc/h5/im/icons.png);
-                background-position: -10.3rem 0;
-                background-size: 20rem
-            }
-
-            .owner {
-                background-position: -10.3rem -2.7rem;
-            }
-
-            .remove {
-                top: 0;
-                bottom: auto;
-                right: 0;
-                width: 2.4rem;
-                height: 2.4rem;
-                background-position: -10.1rem -5.1rem;
-            }
-
-            span {
-                max-width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-        }
-
-        &
-        .s-bg-white {
-            background-color: white;
-        }
 
     }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class='g-inherit m-article p-teaminvite'>
+    <div class='p-teaminvite'>
         <!--邀请朋友加群-->
         <header class="m-tab" :left-options="{backText: ' '}">
             <h1 class="m-tab-top">邀请成员</h1>
@@ -204,107 +204,6 @@
         flex-direction: column;
         padding-top: 0;
 
-        .m-tab {
-            position: relative;
-        }
 
-        .m-list {
-            position: relative;
-            flex-grow: 1;
-
-            .check-icon {
-                margin-right: 0.8rem;
-            }
-
-            .icon {
-                margin-right: 0.5rem;
-            }
-
-        }
-        .m-selected {
-            display: inherit;
-            height: 5rem;
-            background-color: black;
-            align-items: center;
-            justify-content: space-between;
-
-            .avators {
-                display: flex;
-                flex: 1 0 1rem;
-                overflow-x: scroll;
-
-                &
-                ::-webkit-scrollbar {
-                    display: none;
-                }
-
-                img {
-                    margin: .5rem;
-                }
-
-            }
-
-            .btn {
-                width: 6rem;
-                height: 2.5rem;
-                margin: auto .3rem;
-                padding: 0;
-                flex-shrink: 0;
-            }
-
-        }
-        .m-group {
-
-            &
-            + .m-group {
-                margin-top: 1.1rem;
-            }
-
-            .checked-grey, .checked-blue, .unchecked {
-                display: inline-block;
-                width: 1.4rem;
-                height: 1.4rem;
-                background-size: 20rem;
-                background-image: url(http://yx-web.nos.netease.com/webdoc/h5/im/icons.png);
-                background-position: -5rem .2rem;
-            }
-
-            .checked-blue {
-                background-position: -3.7rem -2.95rem;
-            }
-
-            .unchecked {
-                background-position: -5.15rem -2.95rem;
-            }
-
-            em {
-                display: block;
-                position: relative;
-                padding-left: 1rem;
-            }
-
-            .weui-cell:before {
-                border-top: none;
-            }
-
-            em:after, .weui-cell:after {
-                content: " ";
-                position: absolute;
-                left: 70px;
-                right: 15px;
-                bottom: 0;
-                height: 1px;
-                border-bottom: 1px solid #D9D9D9;
-                color: #D9D9D9;
-                transform-origin: 0 100%;
-                transform: scaleY(0.5);
-            }
-
-            em:after {
-                left: 15px;
-                right: 15px;
-            }
-
-        }
     }
 </style>
