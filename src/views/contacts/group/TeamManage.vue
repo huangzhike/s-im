@@ -5,23 +5,16 @@
             <a slot="left"></a>
         </header>
         <div class='m-body'>
-            <!--讨论组-->
-            <template v-if="teamInfo && teamInfo.type==='normal'">
-                <team-member :teamId='teamId'></team-member>
-                <ul class='m-ul'>
-                    <li title="讨论组名称" :value="teamName" @click.native="()=>onEditItemClick('修改讨论组名称', 'text', 'name')"
-                        is-link></li>
-                    <button mini type="warn" @click.native='leaveTeam'>退出讨论组</button>
-                </ul>
-            </template>
+
             <!--高级群-->
-            <template v-if="teamInfo && teamInfo.type==='advanced'">
-                <li is-link @click.native='onTeamAvatarClick'>
+            <template v-if="teamInfo">
+                <li is-link
+                    @click.native='onTeamAvatarClick'>
                     <div class='m-teaminfo' slot='icon'>
                         <img class='avatar u-circle' :src='teamAvatar'>
                         <div class='u-info'>
                             <p>{{teamInfo.name}}</p>
-                            <span>{{`${teamInfo.teamId} 于${formatDate(teamInfo.createTime)}创建`}}</span>
+                            <span>{{`于${formatDate(teamInfo.createTime)}创建`}}</span>
                         </div>
                     </div>
                     <form>
@@ -30,7 +23,8 @@
                 </li>
                 <ul class='m-ul'>
                     <li title="群成员" :value="`共${teamMemberNum}人`" is-link :link='`/teammembers/${teamId}`'></li>
-                    <team-member :teamId='teamId' :advanced="true"></team-member>
+                    <!-- 群成员列表 -->
+                    <team-member :teamId='teamId'></team-member>
                 </ul>
                 <ul class='m-ul'>
                     <li title="群名称" :value="teamName"
@@ -55,8 +49,7 @@
                         <li title="被邀请人身份验证" :value="getTeamInfo('beInviteMode')"
                             @click.native="()=>onEditItemClick('被邀请人身份验证', 'select', 'beInviteMode')" is-link></li>
                     </template>
-                    <button mini type="warn" @click.native='()=> isOwner ? dismissTeam() : leaveTeam()'>
-                        {{isOwner?'解散群聊':'退出高级群'}}
+                    <button @click.native='()=> isOwner ? dismissTeam() : leaveTeam()'> {{isOwner?'解散群聊':'退出高级群'}}
                     </button>
                 </ul>
             </template>
@@ -83,13 +76,8 @@
             },
             teamInfo() {
                 let teamList = this.$store.state.teamlist
-                let team = teamList && teamList.find(team => {
-                    return team.teamId === this.teamId
-                })
-                if (!team) {
-                    return undefined
-                }
-                return team
+                let team = teamList && teamList.find(team => team.teamId === this.teamId)
+                return team ? team : undefined
             },
             teamMembers() {
                 return this.$store.state.teamMembers[this.teamId]
@@ -105,9 +93,7 @@
             },
             nickName() {
                 if (!this.teamMembers) return '未设置'
-                let selfInfo = this.teamMembers.find(item => {
-                    return item.account === this.$store.state.userUID
-                })
+                let selfInfo = this.teamMembers.find(item => item.account === this.$store.state.userUID)
                 return (selfInfo && selfInfo.nickInTeam) || '未设置'
             },
             hasManagePermission() {
@@ -117,14 +103,13 @@
                 return self.type !== 'normal'
             },
             hasEditPermission() {
-                return this.teamInfo.type === 'normal' || this.teamInfo.updateTeamMode === 'all' || this.hasManagePermission
+                return this.teamInfo.updateTeamMode === 'all' || this.hasManagePermission
             }
         },
         methods: {
+            // 上传图像
             onTeamAvatarClick() {
-                if (this.hasEditPermission) {
-                    this.$refs.input.click()
-                }
+                this.hasEditPermission && this.$refs.input.click()
             },
             onFileSelected(event) {
                 this.$store.dispatch('showLoading')
@@ -136,15 +121,11 @@
                     fileInput,
                     done: (err, data) => {
                         this.$store.dispatch('hideLoading')
-                        if (err) {
-                            console.error(err)
-                        } else {
-                            if (data.w < 300 || data.h < 300) {
-                                console.error("图片长宽不能小于300")
-                                return
-                            }
-                            this.updateTeamAvatar(data.url)
+                        if (data.w < 300 || data.h < 300) {
+                            console.error("图片长宽不能小于300")
+                            return
                         }
+                        this.updateTeamAvatar(data.url)
                     }
                 })
             },
@@ -159,10 +140,8 @@
             },
             dismissTeam() {
                 // 确定要解散群
-                let that = this
-
-                that.$store.dispatch('showLoading')
-                that.$store.dispatch('dismissTeam', {
+                this.$store.dispatch('showLoading')
+                this.$store.dispatch('dismissTeam', {
                     teamId: that.teamId,
                     done: (error, obj) => {
                         that.$store.dispatch('hideLoading')
@@ -173,14 +152,12 @@
 
             },
             leaveTeam() {
-                let that = this
-
-                // 确定要退出群
-                that.$store.dispatch('showLoading')
-                that.$store.dispatch('leaveTeam', {
+                 // 确定要退出群
+                this.$store.dispatch('showLoading')
+                this.$store.dispatch('leaveTeam', {
                     teamId: that.teamId,
                     done: (error, obj) => {
-                        that.$store.dispatch('hideLoading')
+                        this.$store.dispatch('hideLoading')
                         console.error(error ? error : '已退出群')
                         window.history.go(-2)
                     }

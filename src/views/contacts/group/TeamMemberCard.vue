@@ -3,25 +3,23 @@
         <!--点击群成员列表后进入群成员名片，设置-->
         <header class="m-tab" :left-options="{backText: ' '}">
             <h1 class="m-tab-top">群名片</h1>
-
         </header>
         <div class='g-body'>
             <div class='g-avatar'>
-                <img class="icon u-circle" slot="icon" width="50" height="50" :src="member && member.avatar">
+                <img class="icon u-circle" slot="icon" :src="member && member.avatar">
                 <div>{{member && member.alias}}</div>
             </div>
             <ul class='m-ul'>
                 <li title="群昵称" :value="member.nickInTeam||'未设置'"
-                    @click.native="()=> hasSetNickPermission? onEditItemClick('修改群昵称', 'text', 'nickInTeam', getUpdateCallBcak()) : $toast('无权限')"
+                    @click.native="()=> hasSetNickPermission? onEditItemClick('修改群昵称', 'text', 'nickInTeam', getUpdateCallBack()) : $toast('无权限')"
                     is-link></li>
                 <li title="身份" :value="memberType"
-                    @click.native="()=> hasSetMemberTypePermission? onEditItemClick('身份', 'select', 'memberType', getUpdateCallBcak()) : $toast('无权限')"
+                    @click.native="()=> hasSetMemberTypePermission? onEditItemClick('身份', 'select', 'memberType', getUpdateCallBack()) : $toast('无权限')"
                     is-link></li>
                 <switch v-if='hasMuteOrRemovePermission' class="u-switch" title="设置禁言" v-model="mute"
                         @on-change="changeMute"></switch>
             </ul>
-            <button v-if='hasMuteOrRemovePermission' class='u-btn' mini type="warn" @click.native='remove'>移出本群
-            </button>
+            <button v-if='hasMuteOrRemovePermission' class='u-btn' @click.native='remove'>移出本群</button>
         </div>
     </div>
 </template>
@@ -44,25 +42,32 @@
             member() {
                 let parseReg = /(\d+)-(\w+)/
                 let result = parseReg.exec(this.$route.params.member)
+                //
                 let teamId = result[1]
                 this.teamId = teamId
+                //
                 let account = result[2]
                 this.account = account
+                //
                 let member = {}
                 this.$store.state.teamMembers[teamId] && this.$store.state.teamMembers[teamId].forEach(item => {
                     if (item.account === account) {
+                        // 当前成员
                         member = Object.assign(member, item)
                     }
                     if (item.account === this.$store.state.userUID) {
+                        // 是自己，设置身份
                         this.selfType = item.type
                     }
                 })
                 let userInfo = this.$store.state.userInfos[member.account]
                 if (member.account === this.$store.state.userUID) {
+                    // 是自己
                     userInfo = this.$store.state.myInfo
                 }
                 member.avatar = userInfo ? userInfo.avatar : (member.avatar || this.avatar)
                 member.alias = userInfo ? userInfo.nick : (member.account || 'account')
+                // 转换为boolean类型
                 this.mute = !!member.mute
                 return member
             },
@@ -86,21 +91,26 @@
                 }
             },
             hasSetMemberTypePermission() {
+                // 群主也不能改变自己身份
                 return this.selfType === 'owner' && this.member.type !== 'owner'
             },
             hasMuteOrRemovePermission() {
                 if (this.selfType === 'owner') {
+                    // 不能移除自己
                     return this.member.type !== 'owner'
                 }
                 if (this.selfType === 'manager') {
+                    // 只能移除普通成员
                     return this.member.type === 'normal'
                 }
                 return false
             },
             isSelf() {
+                // 是自己
                 return this.member.account === this.$store.state.userUID
             },
             hasSetNickPermission() {
+                // 不是普通群成员或者是自己
                 return this.selfType !== 'normal' || this.isSelf
             }
         },
@@ -115,17 +125,11 @@
                     }
                 })
             },
-            getUpdateCallBcak() {
+            getUpdateCallBack() {
                 let account = this.member.account
                 let store = this.$store
 
-
-                let doneCallBack = (error, obj) => {
-                    console.error('更改成功')
-                    setTimeout(() => history.go(-1), 200);
-                    store.dispatch('hideLoading')
-                }
-                return function (teamId, updateKey, newValue) {
+                return (teamId, updateKey, newValue) => {
                     store.dispatch('showLoading')
                     let action = null
                     let opts = {}
@@ -139,7 +143,11 @@
                     }
                     store.dispatch(action, Object.assign({
                         teamId: teamId,
-                        done: doneCallBack
+                        done: (error, obj) => {
+                            console.error('更改成功')
+                            setTimeout(() => history.go(-1), 200);
+                            store.dispatch('hideLoading')
+                        }
                     }, opts))
                 }
             },

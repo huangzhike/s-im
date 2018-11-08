@@ -1,9 +1,9 @@
 <template>
     <!--群成员列表组件-->
-    <div class="m-members" :class='{"s-bg-white": advanced && !showAllMode}'>
+    <div class="m-members" :class='{"s-bg-white":  !showAllMode}'>
         <!--添加群成员-->
         <a v-if='hasInvitePermission && !showAllMode' class='u-member' :href='"#/teaminvite/" + teamId'>
-            <img class='avatar' src="http://yx-web.nos.netease.com/webdoc/h5/im/team_member_add.png" alt="">
+            <img class='avatar' src="" alt="">
             <span>添加</span>
         </a>
         <!--群成员列表-->
@@ -11,23 +11,15 @@
             <!--头像-->
             <img class='avatar u-circle' :src='member.avatar'>
             <!--删除-->
-            <span v-if='removeMode && member.type!="owner" && member.account!=$store.state.userUID' class='remove'
+            <span v-if='removeMode && member.type!="owner" && member.account!=$store.state.userUID'
+                  class='remove'
                   @click='remove($event, member)'></span>
             <!--成员类型-->
-            <span v-if='member.type !== "normal"' :class='member.type === "manager"? "manager":"owner"'></span>
+            <span v-if='member.type !== "normal"'
+                  :class='member.type === "manager"? "manager":"owner"'></span>
             <span>{{member.alias}}</span>
         </a>
-        <!--讨论组类型-->
-        <template v-if='!advanced'>
-            <a class='u-member' :href='"#/teaminvite/" + teamId'>
-                <img class='avatar' src="http://yx-web.nos.netease.com/webdoc/h5/im/team_member_add.png" alt="">
-                <span>添加</span>
-            </a>
-            <div v-if='hasManagePermission' class='u-member' @click='triggerRemove()'>
-                <img class='avatar' src="http://yx-web.nos.netease.com/webdoc/h5/im/team_member_delete.png" alt="">
-                <span>移除</span>
-            </div>
-        </template>
+
     </div>
 </template>
 
@@ -37,20 +29,13 @@
             teamId: {
                 type: String,
             },
-            // 是否为高级群
-            advanced: {
-                type: Boolean,
-                default: false
-            },
+
             // 显示全部群成员模式
             showAllMode: {
                 type: Boolean,
                 default: false
             },
-            filterAccount: {
-                type: Array
-                // [account1, account2]。 若设置了，则只显示该数组中的群成员, 应用场景：群消息回执中, 对已读未读进行了分组。
-            }
+
         },
         data() {
             return {
@@ -62,92 +47,78 @@
         mounted() {
             // 防止在此页面直接刷新，此时需要获取群成员
             let teamMembers = this.$store.state.teamMembers[this.teamId]
-            if (teamMembers === undefined) {
-                this.$store.dispatch('getTeamMembers', this.teamId)
-            }
+            teamMembers === undefined && this.$store.dispatch('getTeamMembers', this.teamId)
+
         },
         computed: {
             teamInfo() {
                 let teamList = this.$store.state.teamlist
-                let team = teamList && teamList.find(team => {
-                    return team.teamId === this.teamId
-                })
-                if (!team) {
-                    return undefined
-                }
-                return team
+                let team = teamList && teamList.find(team => team.teamId === this.teamId)
+                return team ? team : undefined
             },
             members() {
                 let members = this.$store.state.teamMembers[this.teamId]
                 let userInfos = this.$store.state.userInfos
                 let needSearchAccounts = []
-                if (members) {
-                    members = members.map(item => {
-                        var member = Object.assign({}, item) //重新创建一个对象，用于存储展示数据，避免对vuex数据源的修改
-                        member.valid = true //被管理员移除后，标记为false
-                        if (member.account === this.$store.state.userUID) {
-                            member.alias = '我'
-                            member.avatar = this.$store.state.myInfo.avatar
-                            this.isOwner = member.type === 'owner'
-                            this.hasManagePermission = member.type !== 'normal'
-                        } else if (userInfos[member.account] === undefined) {
-                            needSearchAccounts.push(member.account)
-                            member.avatar = member.avatar || this.avatar
-                            member.alias = member.nickInTeam || member.account
-                        } else {
-                            member.avatar = userInfos[member.account].avatar
-                            member.alias = member.nickInTeam || userInfos[member.account].nick
-                        }
-                        return member
-                    })
-                    if (needSearchAccounts.length > 0 && !this.hasSearched) {
-                        this.hasSearched = true
-                        while (needSearchAccounts.length > 0) {
-                            this.searchUsers(needSearchAccounts.splice(0, 150))
-                        }
-                    }
-                    return members
+
+                if (!members) {
+                    return []
                 }
-                return []
+                members = members.map(item => {
+                    let member = Object.assign({}, item) // 重新创建一个对象，用于存储展示数据，避免对vuex数据源的修改
+                    member.valid = true // 被管理员移除后，标记为false
+                    if (member.account === this.$store.state.userUID) {
+                        // 是自己
+                        member.alias = '我'
+                        member.avatar = this.$store.state.myInfo.avatar
+                        // this.isOwner = member.type === 'owner'
+                        this.hasManagePermission = member.type !== 'normal'
+                    } else if (userInfos[member.account] === undefined) {
+                        // 没有就要搜索
+                        needSearchAccounts.push(member.account)
+                        member.avatar = member.avatar || this.avatar
+                        member.alias = member.nickInTeam || member.account
+                    } else {
+                        // 有了
+                        member.avatar = userInfos[member.account].avatar
+                        member.alias = member.nickInTeam || userInfos[member.account].nick
+                    }
+                    return member
+                })
+                if (needSearchAccounts.length > 0 && !this.hasSearched) {
+                    this.hasSearched = true
+                    while (needSearchAccounts.length > 0) {
+                        this.searchUsers(needSearchAccounts.splice(0, 150))
+                    }
+                }
+                return members
             },
             membersInDisplay() {
-                if (this.filterAccount) {
-                    return this.members.filter(member => {
-                        return !!this.filterAccount.find(account => account === member.account)
-                    })
-                } else if (this.advanced || this.showAllMode) {
-                    return this.members
-                } else {
-                    return this.members.slice(0, this.hasInvitePermission ? 3 : 4)
-                }
+
+                return this.showAllMode ? this.members : this.members.slice(0, this.hasInvitePermission ? 3 : 4)
+
             },
             hasInvitePermission() {
-                return this.advanced && (this.hasManagePermission || (this.teamInfo && this.teamInfo.inviteMode === "all"))
+                return this.hasManagePermission || (this.teamInfo && this.teamInfo.inviteMode === "all")
             }
         },
         methods: {
             searchUsers(Accounts) {
-                this.$store.dispatch('searchUsers',
-                    {
-                        accounts: Accounts,
-                        done: (users) => this.updateTeamMember(users)
-
-                    })
+                this.$store.dispatch('searchUsers', {
+                    accounts: Accounts,
+                    done: (users) => this.updateTeamMember(users)
+                })
             },
             updateTeamMember(users) {
                 users.forEach(user => {
-                    let member = this.members.find(member => {
-                        return member.account === user.account
-                    })
+                    let member = this.members.find(member => member.account === user.account)
                     if (member) {
                         member.avatar = user.avatar
                         member.alias = member.nickInTeam || user.nick
                     }
                 })
             },
-            triggerRemove(e, show) {
-                this.removeMode = !this.removeMode
-            },
+
             remove(e, member) {
                 this.$store.dispatch('showLoading')
                 this.$store.dispatch('removeTeamMembers', {
@@ -162,13 +133,13 @@
                 e.preventDefault()
             },
             onMemberClick(member) {
-                location.href = this.advanced ? `#/teammembercard/${member.id}` : `#/namecard/${member.account}`
+                this.$router.push(`#/teammembercard/${member.id}`)
             }
         }
     }
 </script>
 
-<style scoped lang="less" >
+<style scoped lang="less">
 
     .m-members {
         display: flex;
@@ -176,7 +147,6 @@
         margin: 0 auto;
         text-align: center;
         width: 100%;
-
 
     }
 

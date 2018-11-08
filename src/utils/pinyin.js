@@ -10,28 +10,29 @@ let pinyinNoToneDict = {
 
 let dict = {}
 
-function parseDict() {
-    dict.notone = {};
-    for (let i in pinyinNoToneDict) {
-        let temp = pinyinNoToneDict[i];
-        for (let j = 0, len = temp.length; j < len; j++) {
-            dict.notone[temp[j]] = i; // 不考虑多音字
-        }
-    }
-}
-
 /**
  * 根据汉字获取拼音，如果不是汉字直接返回原字符
  * @param chinese 要转换的汉字
  * @param splitter 分隔字符，默认用空格分隔
  */
 function getPinyin(chinese, splitter) {
-    parseDict()
+
+
+    dict.notone = {};
+    for (let i in pinyinNoToneDict) {
+        let temp = pinyinNoToneDict[i];
+        for (let j = 0, len = temp.length; j < len; j++) {
+            // 把开头的丢进去
+            dict.notone[temp[j]] = i; // 不考虑多音字
+        }
+    }
+
     if (!chinese || /^ +$/g.test(chinese)) return '';
     splitter = splitter === undefined ? ' ' : splitter;
     let result = [];
 
     for (let i = 0, len = chinese.length; i < len; i++) {
+        // 汉字split
         let temp = chinese.charAt(i);
         result.push(dict.notone[temp] || temp);
     }

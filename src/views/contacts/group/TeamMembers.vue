@@ -5,7 +5,7 @@
 
         </header>
         <!--单独的页面显示全部群成员-->
-        <team-member :teamId='teamId' :advanced='true' :showAllMode='true'></team-member>
+        <team-member :teamId='teamId' :showAllMode='true'></team-member>
     </div>
 </template>
 

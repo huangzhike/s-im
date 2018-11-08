@@ -58,10 +58,7 @@
                     teamId: this.teamId,
                     ps: msg || '',
                     done: (error, obj) => {
-                        if (error) {
-                            alert(error)
-                            return
-                        }
+
                         alert(msg ? '申请成功 等待验证' : '已加入群')
                         history.go(-2)
                     }
