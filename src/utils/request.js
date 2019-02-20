@@ -74,3 +74,4 @@ export function request_delete(url) {
             return Promise.resolve(res.data)
         })
 }
+
