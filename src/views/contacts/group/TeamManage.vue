@@ -75,15 +75,15 @@
                 return this.$route.params.teamId
             },
             teamInfo() {
-                let teamList = this.$store.state.teamlist
+                let teamList = this.$store.state.teamList
                 let team = teamList && teamList.find(team => team.teamId === this.teamId)
                 return team ? team : undefined
             },
-            teamMembers() {
-                return this.$store.state.teamMembers[this.teamId]
+            teamMemberMap() {
+                return this.$store.state.teamMemberMap[this.teamId]
             },
             teamMemberNum() {
-                return this.teamMembers && this.teamMembers.length
+                return this.teamMemberMap && this.teamMemberMap.length
             },
             teamAvatar() {
                 return this.teamInfo.avatar || this.avatar
@@ -92,13 +92,13 @@
                 return this.teamInfo && this.teamInfo.name || '未设置'
             },
             nickName() {
-                if (!this.teamMembers) return '未设置'
-                let selfInfo = this.teamMembers.find(item => item.account === this.$store.state.userUID)
+                if (!this.teamMemberMap) return '未设置'
+                let selfInfo = this.teamMemberMap.find(item => item.account === this.$store.state.userUID)
                 return (selfInfo && selfInfo.nickInTeam) || '未设置'
             },
             hasManagePermission() {
-                if (!this.teamMembers) return false
-                let self = this.teamMembers.find(member => member.account === this.$store.state.userUID)
+                if (!this.teamMemberMap) return false
+                let self = this.teamMemberMap.find(member => member.account === this.$store.state.userUID)
                 this.isOwner = self.type === 'owner'
                 return self.type !== 'normal'
             },

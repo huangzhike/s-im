@@ -28,7 +28,7 @@
             }
         },
         mounted() {
-            let info = this.$store.state.userInfos[this.account] || {}
+            let info = this.$store.state.userInfoMap[this.account] || {}
             this.alias = info.alias
         },
         computed: {

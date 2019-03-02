@@ -5,15 +5,37 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Recorder = undefined;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+    function defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+            var descriptor = props[i];
+            descriptor.enumerable = descriptor.enumerable || false;
+            descriptor.configurable = true;
+            if ("value" in descriptor) descriptor.writable = true;
+            Object.defineProperty(target, descriptor.key, descriptor);
+        }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+        if (protoProps) defineProperties(Constructor.prototype, protoProps);
+        if (staticProps) defineProperties(Constructor, staticProps);
+        return Constructor;
+    };
+}();
 
 var _inlineWorker = require('./inline-worker');
 
 var _inlineWorker2 = _interopRequireDefault(_inlineWorker);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {default: obj};
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
+}
 
 var Recorder = exports.Recorder = function () {
     function Recorder(source, cfg) {
@@ -104,9 +126,9 @@ var Recorder = exports.Recorder = function () {
                     interleaved = buffers[0];
                 }
                 var dataview = encodeWAV(interleaved);
-                var audioBlob = new Blob([dataview], { type: type });
+                var audioBlob = new Blob([dataview], {type: type});
 
-                this.postMessage({ command: 'exportWAV', data: audioBlob });
+                this.postMessage({command: 'exportWAV', data: audioBlob});
             }
 
             function getBuffer() {
@@ -114,7 +136,7 @@ var Recorder = exports.Recorder = function () {
                 for (var channel = 0; channel < numChannels; channel++) {
                     buffers.push(mergeBuffers(recBuffers[channel], recLength));
                 }
-                this.postMessage({ command: 'getBuffer', data: buffers });
+                this.postMessage({command: 'getBuffer', data: buffers});
             }
 
             function clear() {
@@ -233,7 +255,7 @@ var Recorder = exports.Recorder = function () {
     }, {
         key: 'clear',
         value: function clear() {
-            this.worker.postMessage({ command: 'clear' });
+            this.worker.postMessage({command: 'clear'});
         }
     }, {
         key: 'getBuffer',
@@ -243,7 +265,7 @@ var Recorder = exports.Recorder = function () {
 
             this.callbacks.getBuffer.push(cb);
 
-            this.worker.postMessage({ command: 'getBuffer' });
+            this.worker.postMessage({command: 'getBuffer'});
         }
     }, {
         key: 'exportWAV',
@@ -276,35 +298,35 @@ var Recorder = exports.Recorder = function () {
 
 // 老的浏览器可能没有实现 mediaDevices 的处理，增加此段逻辑只限定在浏览器内使用
 if (navigator.mediaDevices === undefined) {
-  navigator.mediaDevices = {};
+    navigator.mediaDevices = {};
 }
 // Some browsers partially implement mediaDevices. We can't just assign an object
 // with getUserMedia as it would overwrite existing properties.
 // Here, we will just add the getUserMedia property if it's missing.
 if (navigator.mediaDevices.getUserMedia === undefined) {
-  navigator.mediaDevices.getUserMedia = function(constraints) {
-    // First get ahold of the legacy getUserMedia, if present
-    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-    // Some browsers just don't implement it - return a rejected promise with an error
-    // to keep a consistent interface
-    if (!getUserMedia) {
-      // return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-      new Error('getUserMedia is not implemented in this browser')
-      return
+    navigator.mediaDevices.getUserMedia = function (constraints) {
+        // First get ahold of the legacy getUserMedia, if present
+        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        // Some browsers just don't implement it - return a rejected promise with an error
+        // to keep a consistent interface
+        if (!getUserMedia) {
+            // return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+            new Error('getUserMedia is not implemented in this browser')
+            return
+        }
+        // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+        return new Promise(function (resolve, reject) {
+            getUserMedia.call(navigator, constraints, resolve, reject);
+        });
     }
-    // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-    return new Promise(function(resolve, reject) {
-      getUserMedia.call(navigator, constraints, resolve, reject);
-    });
-  }
 }
 window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
 window.URL = window.URL || window.webkitURL;
 if (!window.AudioContext) {
-  new Error('AudioContext is not implemented in this browser');
+    new Error('AudioContext is not implemented in this browser');
 }
 if (!window.URL) {
-  new Error('URL is not implemented in this browser');
+    new Error('URL is not implemented in this browser');
 }
 
 exports.default = Recorder;

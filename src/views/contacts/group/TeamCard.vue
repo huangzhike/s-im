@@ -23,7 +23,7 @@
                 return this.$route.params.teamId
             },
             teamInfo() {
-                return this.$store.state.searchedTeams.find(team => team.teamId === this.teamId)
+                return this.$store.state.searchedTeamList.find(team => team.teamId === this.teamId)
             },
             teamDesc() {
                 return !this.teamInfo ? '' : `${this.teamInfo.memberNum}人群`
@@ -31,7 +31,7 @@
         },
         methods: {
             applyClick() {
-                let team = this.$store.state.teamlist.find(team => team.teamId === this.teamId)
+                let team = this.$store.state.teamList.find(team => team.teamId === this.teamId)
                 // 查询到该群且该群对自己有效，说明已在群中
                 if (team && team.validToCurrentUser) {
                     return

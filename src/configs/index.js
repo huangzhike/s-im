@@ -12,7 +12,13 @@ let config = {
     noticeIcon: '',
 
     // 本地消息显示数量，会影响性能
-    localMsgLimitCount: 36
+    localMsgLimitCount: 36,
+
+    constant: {
+        uid: "uid",
+        token: "token",
+        gateList: "gateList",
+    }
 }
 
 const env = 'online'
@@ -21,8 +27,9 @@ let appConfig = {
 
     online: {
 
-        apiUrl: '',
-        webSocketUrl: '',
+        apiUrl: 'http://127.0.0.1:8888',
+
+        webSocketUrl: 'ws://127.0.0.1:9999',
         resourceUrl: '',
     },
     test: {}

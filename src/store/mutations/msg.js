@@ -1,7 +1,7 @@
 // 初始化，收到离线漫游消息时调用
 import store from "../index";
 import config from '../../configs'
-import Vue from 'Vue'
+
 
 export function updateMsgs(state, msgList) {
 
@@ -117,10 +117,10 @@ export function updateMsgByIdClient(state, msgList) {
 
 // 没有更多历史消息
 export function setNoMoreHistoryMsgs(state) {
-    state.noMoreHistoryMsgs = true
+    state.noMoreHistoryMsg = true
 }
 
 // 重置默认
 export function resetNoMoreHistoryMsgs(state) {
-    state.noMoreHistoryMsgs = false
+    state.noMoreHistoryMsg = false
 }

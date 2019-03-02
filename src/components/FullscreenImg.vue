@@ -46,7 +46,7 @@
     }
 </script>
 
-<style type="text/css" lang="less">
+<style type="text/less" lang="less">
     .chat-fullscreen, .chat-image img {
         top: 50%;
         left: 50%;

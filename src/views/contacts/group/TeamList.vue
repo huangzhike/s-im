@@ -1,5 +1,5 @@
 <template>
-    <div class='p-teamlist'>
+    <div class='p-teamList'>
         <header class="m-tab" :left-options="{backText: ' '}">
 
         </header>
@@ -30,7 +30,7 @@
         },
         computed: {
             teamList: function () {
-                return this.$store.state.teamlist && this.$store.state.teamlist.filter(team => team.validToCurrentUser)
+                return this.$store.state.teamList && this.$store.state.teamList.filter(team => team.validToCurrentUser)
             },
 
         }
@@ -38,7 +38,7 @@
 </script>
 
 <style scoped lang="less" type="text/less">
-    .p-teamlist {
+    .p-teamList {
 
         .m-list {
             padding-top: 3.6rem;

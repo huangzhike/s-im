@@ -52,7 +52,7 @@
                     info.alias = info.nick
                     this.isSelf = true
                 } else {
-                    info = Object.assign({}, this.$store.state.userInfos[this.account])
+                    info = Object.assign({}, this.$store.state.userInfoMap[this.account])
                     info._alias = info.alias // 服务器中存的别名，在备注栏展示
                     info.alias = util.getFriendAlias(info)
                     this.isBlack = info.isBlack

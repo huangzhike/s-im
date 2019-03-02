@@ -1,6 +1,6 @@
 import store from '../'
 import {formatUserInfo} from './userInfo'
-import {handleSysMsgs} from 'sysMsgs'
+import {handleSysMsgs} from './sysMsgs'
 import {request_post} from "../../utils/request";
 import util from "../../utils";
 

@@ -13,7 +13,7 @@
                     type="session"
                     :canLoadMore="canLoadMore"
                     :msglist="msglist"
-                    :userInfos="userInfos"
+                    :userInfoMap="userInfoMap"
                     :myInfo="myInfo"
                     :isHistory='true'
                     @click="loadMore"
@@ -65,7 +65,7 @@
                 let user = null
                 if (/^p2p-/.test(sessionId)) {
                     user = sessionId.replace(/^p2p-/, '')
-                    let userInfo = this.userInfos[user] || {}
+                    let userInfo = this.userInfoMap[user] || {}
                     return util.getFriendAlias(userInfo)
                 } else if (/^team-/.test(sessionId)) {
                     return '历史记录'
@@ -75,8 +75,8 @@
             myInfo() {
                 return this.$store.state.myInfo
             },
-            userInfos() {
-                return this.$store.state.userInfos
+            userInfoMap() {
+                return this.$store.state.userInfoMap
             },
             msglist() {
                 return this.$store.state.currSessionMsgs
@@ -89,7 +89,7 @@
                 return util.parseSession(this.sessionId).to
             },
             canLoadMore() {
-                return !this.$store.state.noMoreHistoryMsgs
+                return !this.$store.state.noMoreHistoryMsg
             }
         },
         methods: {

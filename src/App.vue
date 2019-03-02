@@ -17,52 +17,26 @@
     import FullscreenImg from './components/FullscreenImg'
     import NavBar from './components/NavBar'
 
+    import config from './configs'
+
     const sessionHistory = window.sessionStorage
 
     export default {
         data() {
-
             return {
                 transitionName: 'forward'
             }
         },
         watch: {
-            // 更新页面所在位置，用于判断是前进页还是后退页
             '$route'(to, from) {
-
-                console.error(to)
-                if (to && from) {
-                    let toPath = to.path
-                    let fromPath = from.path
-                    let count = parseInt(sessionHistory.getItem('count'))
-                    // 如果是导航页或者没有初始记录
-                    if (Number.isNaN(count)) {
-                        count = 1
-                        this.transitionName = 'forward'
-                    } else {
-                        count++
-                        let fromCount = parseInt(sessionHistory.getItem(fromPath))
-                        let toCount = parseInt(sessionHistory.getItem(toPath))
-                        if (toCount < fromCount && fromCount < count && (!this.nav(fromPath))) {
-                            this.transitionName = 'backward'
-                            count = toCount
-                        } else {
-                            this.transitionName = 'forward'
-                        }
-                        if (this.nav(toPath)) {
-                            count = 1
-                        }
-                    }
-                    sessionHistory.setItem(toPath, count)
-                    sessionHistory.setItem('count', count)
-                }
+                console.error(to, from)
             }
         },
         // 所有页面更新都会触发此函数
         updated() {
             console.error("update")
             // 异步加载组件都会update
-            // 提交sdk连接请求
+            // 提交连接请求
             this.$store.dispatch('connect')
         },
         components: {
@@ -73,8 +47,7 @@
         computed: {
             // 是否显示导航条
             showNav() {
-                let path = this.$route.path
-                return this.nav(path)
+                return this.nav(this.$route.path)
             }
         },
         methods: {
@@ -86,7 +59,7 @@
 </script>
 
 
-<style scoped lang="less">
+<style scoped lang="less" type="text/less">
 
 
     /***************************************************************/

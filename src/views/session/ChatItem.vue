@@ -69,7 +69,7 @@
                     return {}
                 }
             },
-            userInfos: {
+            userInfoMap: {
                 type: Object,
                 default() {
                     return {}
@@ -104,7 +104,7 @@
             if (item.flow === 'in') {
                 // 别人发的
                 if (item.from !== this.$store.state.userUID) {
-                    item.avatar = (this.userInfos[item.from] && this.userInfos[item.from].avatar) || config.defaultUserIcon
+                    item.avatar = (this.userInfoMap[item.from] && this.userInfoMap[item.from].avatar) || config.defaultUserIcon
                     item.link = `#/namecard/${item.from}`
                 } else {
                     // 自己发给自己

@@ -86,29 +86,29 @@
             }
         },
         computed: {
-            userInfos() {
-                return this.$store.state.userInfos || {}
+            userInfoMap() {
+                return this.$store.state.userInfoMap || {}
             },
             sysMsgs() {
                 let sysMsgs = this.$store.state.sysMsgs.filter(msg => {
                     switch (msg.type) {
                         case 'addFriend':
                             msg.showText = `${msg.friend.alias || msg.friend.account} 添加您为好友~`
-                            msg.avatar = this.userInfos[msg.from] && this.userInfos[msg.from].avatar
+                            msg.avatar = this.userInfoMap[msg.from] && this.userInfoMap[msg.from].avatar
                             return true
                         case 'deleteFriend':
                             msg.showText = `${msg.from} 将您从好友中删除`
-                            msg.avatar = this.userInfos[msg.from].avatar
+                            msg.avatar = this.userInfoMap[msg.from].avatar
                             return false
                         case 'applyTeam':
                             console.log('applyTeam', msg)
                             msg.showText = msg.from
-                            msg.avatar = this.userInfos[msg.from] && this.userInfos[msg.from].avatar || this.defaultAvatar
+                            msg.avatar = this.userInfoMap[msg.from] && this.userInfoMap[msg.from].avatar || this.defaultAvatar
                             msg.desc = `申请加入群:${this.getTeamName(msg.to)}`
                             return true
                         case 'teamInvite':
                             msg.showText = msg.attach.team.name
-                            msg.avatar = this.userInfos[msg.from] && this.userInfos[msg.from].avatar || this.defaultAvatar
+                            msg.avatar = this.userInfoMap[msg.from] && this.userInfoMap[msg.from].avatar || this.defaultAvatar
                             msg.desc = `邀请你加入群${msg.to}`
                             return true
                         case 'rejectTeamApply':
@@ -117,7 +117,7 @@
                             msg.avatar = msg.attach.team.avatar || this.defaultAvatar
                             return true
                         case 'rejectTeamInvite':
-                            let op = this.userInfos[msg.from]
+                            let op = this.userInfoMap[msg.from]
                             msg.showText = op.nick
                             msg.avatar = op.avatar || this.defaultAvatar
                             msg.desc = `${op.nick}拒绝了群${this.getTeamName(msg.to)}的入群邀请`
@@ -150,7 +150,7 @@
                 })
             },
             getTeamName(teamId) {
-                let team = this.$store.state.teamlist.find(team => team.teamId === teamId)
+                let team = this.$store.state.teamList.find(team => team.teamId === teamId)
                 return team && team.name || ''
             },
             handleTeamApply(msg, pass) {

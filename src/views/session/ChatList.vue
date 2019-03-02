@@ -12,7 +12,7 @@
                 v-for="msg in msglist"
 
                 :rawMsg="msg"
-                :userInfos="userInfos"
+                :userInfoMap="userInfoMap"
                 :myInfo="myInfo"
                 :key="msg.idClient"
                 :isHistory='isHistory'
@@ -37,7 +37,7 @@
                     return []
                 }
             },
-            userInfos: {
+            userInfoMap: {
                 type: Object,
                 default() {
                     return {}

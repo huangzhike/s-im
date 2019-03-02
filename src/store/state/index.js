@@ -12,15 +12,19 @@ export default {
     // 切页动画 forward，backward
     transitionName: 'forward',
 
-    // IM   实例
+    // IM 实例
     sim: null,
 
     // 登录账户ID
     userUID: null,
+    token: null,
+    gateList: null,
+
+
     // 用户名片
     myInfo: {},
     // 好友/黑名单/陌生人名片
-    userInfos: {
+    userInfoMap: {
         // cid1: {attr: ""},
         // cid2: {attr: ""},
         // ...
@@ -28,12 +32,12 @@ export default {
 
 
     // 好友列表
-    friendslist: [],
+    friendList: [],
 
-    teamlist: [],
+    teamList: [],
 
     // 群对象的成员列表
-    teamMembers: {
+    teamMemberMap: {
         // tid1:[member,...],
     },
 
@@ -54,10 +58,9 @@ export default {
 
 
     // 会话列表
-    sessionlist: [  ],
+    sessionList: [],
     sessionMap: {
         // sessionId1:session
-
     },
 
 
@@ -66,8 +69,7 @@ export default {
     currSessionMsgs: [],
 
     // 是否有更多历史消息，用于上拉加载更多
-    noMoreHistoryMsgs: false,
-
+    noMoreHistoryMsg: false,
 
     // 系统消息
     sysMsgs: [],
@@ -79,8 +81,8 @@ export default {
 
     // 临时变量
     // 缓存需要获取的用户信息账号,如searchUser
-    searchedUsers: [],
+    searchedUserList: [],
     // 缓存需要获取的群组账号
-    searchedTeams: [],
+    searchedTeamList: [],
 
 }

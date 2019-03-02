@@ -12,19 +12,19 @@
         <div id="userList" class="m-list">
             <ul class="u-card" title="群">
 
-                <router-link to="/teamlist/advanced"> 高级群</router-link>
+                <router-link to="/teamList/advanced"> 高级群</router-link>
 
             </ul>
 
             <!--好友列表-->
             <ul class="u-card" title="好友列表">
-                <li v-for="friend in friendslist"
+                <li v-for="friend in friendList"
                     :title="friend.alias"
                     :key="friend.account"
                     is-link
                     :link="friend.link">
 
-                    <img class="icon" slot="icon" width="20" :src="userInfos[friend.account].avatar">
+                    <img class="icon" slot="icon" width="20" :src="userInfoMap[friend.account].avatar">
                 </li>
 
             </ul>
@@ -37,10 +37,10 @@
 
     export default {
         computed: {
-            friendslist() {
-                return this.$store.state.friendslist.filter(item => {
+            friendList() {
+                return this.$store.state.friendList.filter(item => {
                     let account = item.account
-                    let thisAttrs = this.userInfos[account]
+                    let thisAttrs = this.userInfoMap[account]
                     let alias = thisAttrs.alias ? thisAttrs.alias.trim() : ''
                     item.alias = alias || thisAttrs.nick || account
                     item.link = `/namecard/${item.account}`
@@ -49,8 +49,8 @@
                 })
             },
 
-            userInfos() {
-                return this.$store.state.userInfos
+            userInfoMap() {
+                return this.$store.state.userInfoMap
             }
         }
     }

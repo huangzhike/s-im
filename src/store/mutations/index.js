@@ -1,4 +1,3 @@
-import cookie from '../../utils/cookie'
 
 
 import {updateFullscreenImage, updateLoading} from './widgetUi'
@@ -7,8 +6,8 @@ import {updateMyInfo, updateUserInfo} from './userInfo'
 
 import {updateTeamInfo, updateTeamList, updateTeamSettingConfig,} from './team'
 
-import {removeTeamMembersByAccounts, updateTeamMembers} from './teamMembers'
-import {deleteSysMsgs, resetSysMsgs, updateSysMsgs, updateSysMsgState, updateSysMsgUnread} from './sysMsg'
+import {removeTeamMembersByAccounts, updateTeamMembers} from './teamMemberMap'
+import {deleteSysMsgs, resetSysMsgs, updateSysMsgs, updateSysMsgUnread} from './sysMsg'
 
 
 import {deleteSessions, updateCurrSessionId, updateCurrSessionMsgs, updateSessions} from './session'
@@ -26,14 +25,21 @@ import {
 } from './msg'
 
 
+import config from '../../configs'
+
 export default {
 
 
     updateUserUID(state, loginInfo) {
         state.userUID = loginInfo.uid
         state.token = loginInfo.token
-        cookie.setCookie('uid', loginInfo.uid)
-        cookie.setCookie('token', loginInfo.token)
+        state.gateList = loginInfo.gateList
+
+
+        window.sessionStorage.setItem(config.constant.uid, loginInfo.uid)
+        window.sessionStorage.setItem(config.constant.token, loginInfo.token)
+        window.sessionStorage.setItem(config.constant.gateList,loginInfo.gateList)
+
     },
 
 
@@ -50,7 +56,7 @@ export default {
     updateTeamSettingConfig,
     removeTeamMembersByAccounts,
     updateSysMsgs,
-    updateSysMsgState,
+
     updateSysMsgUnread,
     resetSysMsgs,
     deleteSysMsgs,

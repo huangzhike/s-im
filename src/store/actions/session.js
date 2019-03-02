@@ -35,7 +35,7 @@ export function onSessions(obj) {
     sessionList.forEach(item => {
         if (item.scene === 'p2p') {
             // 如果不存在缓存资料
-            !store.state.userInfos[item.to] && accountsNeedSearch.push(item.to)
+            !store.state.userInfoMap[item.to] && accountsNeedSearch.push(item.to)
         }
     })
 

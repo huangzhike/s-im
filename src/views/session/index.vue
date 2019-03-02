@@ -52,12 +52,12 @@
             },
 
             sessionList() {
-                return this.$store.state.sessionlist.filter(item => {
+                return this.$store.state.sessionList.filter(item => {
                     item.name = ''
                     item.avatar = ''
                     // 一对一
                     if (item.scene === 'p2p') {
-                        let userInfo = this.$store.state.userInfos[item.to]
+                        let userInfo = this.$store.state.userInfoMap[item.to]
 
                         if (userInfo) {
                             item.name = util.getFriendAlias(userInfo)
@@ -66,7 +66,7 @@
                     }
                     // 群消息
                     else if (item.scene === 'team') {
-                        let teamInfo = this.$store.state.teamlist.find(team => team.teamId === item.to)
+                        let teamInfo = this.$store.state.teamList.find(team => team.teamId === item.to)
 
                         if (teamInfo) {
                             item.name = teamInfo.name
@@ -126,9 +126,7 @@
                 if (vNode && vNode.data && vNode.data.attrs) {
                     this.delSessionId = vNode.data.attrs.sessionId
                     this.stopBubble = true
-                    setTimeout(() => {
-                        this.stopBubble = false
-                    }, 20)
+                    setTimeout(() => this.stopBubble = false, 20)
                 }
             },
             hideDelBtn() {

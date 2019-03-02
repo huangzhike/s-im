@@ -2,19 +2,17 @@ import util from "../../utils";
 import store from "../index";
 import config from "../../configs";
 
-import Vue from 'Vue'
-
 // 更新会话
 export function updateSessions(state, sessionList) {
 
-    state.sessionlist = util.mergeArrayById(state.sessionlist, sessionList)
-    state.sessionlist.sort((a, b) => b.updateTime - a.updateTime)
-    state.sessionlist.forEach(session => state.sessionMap[session.id] = session)
+    state.sessionList = util.mergeArrayById(state.sessionList, sessionList)
+    state.sessionList.sort((a, b) => b.updateTime - a.updateTime)
+    state.sessionList.forEach(session => state.sessionMap[session.id] = session)
 }
 
 // 删除会话
 export function deleteSessions(state, sessionIdList) {
-    state.sessionlist = util.deleteArrayByIdList(state.sessionlist, sessionIdList)
+    state.sessionList = util.deleteArrayByIdList(state.sessionList, sessionIdList)
 }
 
 

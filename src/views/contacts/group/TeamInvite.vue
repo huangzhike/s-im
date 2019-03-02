@@ -15,7 +15,7 @@
                     <span ref='checkIcon' class='check-icon' slot='icon'
                           :class='friend.ingroup ? "checked-grey": (friend.checked ? "checked-blue": "unchecked")'></span>
                     <img class="icon u-circle" slot="icon"
-                         :src="userInfos[friend.account].avatar">
+                         :src="userInfoMap[friend.account].avatar">
                 </span>
             </li>
         </ul>
@@ -24,7 +24,7 @@
             <!-- 选择的朋友列表 -->
             <div class='avators' ref='avators'>
                 <img class='u-circle' v-for='friend in selected' :key='friend.account'
-                     :src='userInfos[friend.account].avatar' @click='unSelect(friend)'>
+                     :src='userInfoMap[friend.account].avatar' @click='unSelect(friend)'>
                 <img src="">
             </div>
             <!-- 确认 -->
@@ -47,12 +47,12 @@
         },
         computed: {
             friendList() {
-                let teamMember = this.$store.state.teamMembers && this.$store.state.teamMembers[this.teamId]
+                let teamMember = this.$store.state.teamMemberMap && this.$store.state.teamMemberMap[this.teamId]
                 // 处理一下
-                let list = this.$store.state.friendslist.map(item => {
+                let list = this.$store.state.friendList.map(item => {
                     let friend = Object.assign({}, item)
                     let account = friend.account
-                    let thisAttrs = this.userInfos[account]
+                    let thisAttrs = this.userInfoMap[account]
                     // 别名
                     let alias = thisAttrs.alias ? thisAttrs.alias.trim() : ''
                     friend.alias = alias || thisAttrs.nick || account
@@ -92,8 +92,8 @@
                 }
                 return groups
             },
-            userInfos() {
-                return this.$store.state.userInfos
+            userInfoMap() {
+                return this.$store.state.userInfoMap
             },
             teamId() {
                 return this.$route.params.teamId

@@ -46,19 +46,19 @@
         },
         mounted() {
             // 防止在此页面直接刷新，此时需要获取群成员
-            let teamMembers = this.$store.state.teamMembers[this.teamId]
-            teamMembers === undefined && this.$store.dispatch('getTeamMembers', this.teamId)
+            let teamMemberMap = this.$store.state.teamMemberMap[this.teamId]
+            teamMemberMap === undefined && this.$store.dispatch('getTeamMembers', this.teamId)
 
         },
         computed: {
             teamInfo() {
-                let teamList = this.$store.state.teamlist
+                let teamList = this.$store.state.teamList
                 let team = teamList && teamList.find(team => team.teamId === this.teamId)
                 return team ? team : undefined
             },
             members() {
-                let members = this.$store.state.teamMembers[this.teamId]
-                let userInfos = this.$store.state.userInfos
+                let members = this.$store.state.teamMemberMap[this.teamId]
+                let userInfoMap = this.$store.state.userInfoMap
                 let needSearchAccounts = []
 
                 if (!members) {
@@ -73,15 +73,15 @@
                         member.avatar = this.$store.state.myInfo.avatar
                         // this.isOwner = member.type === 'owner'
                         this.hasManagePermission = member.type !== 'normal'
-                    } else if (userInfos[member.account] === undefined) {
+                    } else if (userInfoMap[member.account] === undefined) {
                         // 没有就要搜索
                         needSearchAccounts.push(member.account)
                         member.avatar = member.avatar || this.avatar
                         member.alias = member.nickInTeam || member.account
                     } else {
                         // 有了
-                        member.avatar = userInfos[member.account].avatar
-                        member.alias = member.nickInTeam || userInfos[member.account].nick
+                        member.avatar = userInfoMap[member.account].avatar
+                        member.alias = member.nickInTeam || userInfoMap[member.account].nick
                     }
                     return member
                 })

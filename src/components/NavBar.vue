@@ -31,7 +31,7 @@
 </script>
 
 
-<style scoped lang="less">
+<style scoped lang="less" type="text/less">
 
     .g-window {
         /*顶部布局*/

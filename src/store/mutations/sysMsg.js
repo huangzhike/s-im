@@ -1,6 +1,6 @@
 import util from "../../utils";
 import config from '../../configs'
-import Vue from 'Vue'
+
 
 export function updateSysMsgs(state, sysMsgs) {
 

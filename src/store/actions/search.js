@@ -48,7 +48,7 @@ export function searchUsers({state, commit}, obj) {
                 // 本人
                 return false
             }
-            let userInfo = state.userInfos[account] || {}
+            let userInfo = state.userInfoMap[account] || {}
             // 已经是好友
             if (userInfo.valid) {
                 return false

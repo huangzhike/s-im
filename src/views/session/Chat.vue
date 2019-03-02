@@ -21,7 +21,7 @@
             <chat-list
 
                     :msglist="msglist"
-                    :userInfos="userInfos"
+                    :userInfoMap="userInfoMap"
                     :myInfo="myInfo"
                     @msgs-loaded="msgsLoaded"
             ></chat-list>
@@ -70,9 +70,9 @@
 
             // 获取群成员
             if (this.scene === 'team') {
-                let teamMembers = this.$store.state.teamMembers[this.to]
+                let teamMemberMap = this.$store.state.teamMemberMap[this.to]
                 // 数量不够就更新
-                if (teamMembers === undefined || teamMembers.length < this.teamInfo.memberNum) {
+                if (teamMemberMap === undefined || teamMemberMap.length < this.teamInfo.memberNum) {
                     this.$store.dispatch('getTeamMembers', this.to)
                 }
             }
@@ -89,12 +89,12 @@
                 if (/^p2p-/.test(sessionId)) {
                     user = sessionId.replace(/^p2p-/, '')
                     // 这里。。。
-                    let userInfo = this.userInfos[user] || {}
+                    let userInfo = this.userInfoMap[user] || {}
                     return util.getFriendAlias(userInfo)
                 } else if (/^team-/.test(sessionId)) {
                     if (this.teamInfo) {
                         // teamInfo中的人数为初始获取的值，在人员增减后不会及时更新，而teamMembers在人员增减后同步维护的人员信息
-                        let members = this.$store.state.teamMembers && this.$store.state.teamMembers[this.teamInfo.teamId]
+                        let members = this.$store.state.teamMemberMap && this.$store.state.teamMemberMap[this.teamInfo.teamId]
                         let memberCount = members && members.length
                         return this.teamInfo.name + (memberCount ? `(${memberCount})` : '')
                     } else {
@@ -112,8 +112,8 @@
             myInfo() {
                 return this.$store.state.myInfo
             },
-            userInfos() {
-                return this.$store.state.userInfos
+            userInfoMap() {
+                return this.$store.state.userInfoMap
             },
 
             msglist() {
@@ -122,14 +122,14 @@
             teamInfo() {
                 if (this.scene === 'team') {
                     let teamId = this.sessionId.replace('team-', '')
-                    return this.$store.state.teamlist.find(team => team.teamId === teamId)
+                    return this.$store.state.teamList.find(team => team.teamId === teamId)
                 }
 
             },
             muteInTeam() {
                 if (this.scene !== 'team') return false
-                let teamMembers = this.$store.state.teamMembers
-                let Members = teamMembers && teamMembers[this.teamInfo.teamId]
+                let teamMemberMap = this.$store.state.teamMemberMap
+                let Members = teamMemberMap && teamMemberMap[this.teamInfo.teamId]
                 let selfInTeam = Members && Members.find(item => item.account === this.$store.state.userUID)
                 return selfInTeam && selfInTeam.mute || false
             },

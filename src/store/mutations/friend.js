@@ -1,19 +1,18 @@
 import util from "../../utils";
-import config from '../../configs'
-import Vue from 'Vue'
+
 
 // 好友 + -
 export function updateFriends(state, friendList) {
 
     // 合并
-    state.friendslist = util.mergeArrayById(state.friendslist, friendList)
+    state.friendList = util.mergeArrayById(state.friendList, friendList)
 
 
-    let len = state.friendslist.length
+    let len = state.friendList.length
     // 删除
     while (len--) {
-        if (!state.friendslist[len].valid) {
-            state.friendslist.splice(len, 1)
+        if (!state.friendList[len].valid) {
+            state.friendList.splice(len, 1)
         }
     }
 

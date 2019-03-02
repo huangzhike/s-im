@@ -74,7 +74,7 @@ function onRevokeMsg(error, msg) {
     if (msg.from === store.state.userUID) {
         tip = '你撤回了一条消息'
     } else {
-        let userInfo = store.state.userInfos[msg.from]
+        let userInfo = store.state.userInfoMap[msg.from]
         tip = userInfo ? `${util.getFriendAlias(userInfo)}撤回了一条消息` : '对方撤回了一条消息'
 
     }

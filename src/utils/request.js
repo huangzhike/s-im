@@ -1,19 +1,19 @@
 import axios from 'axios'
-import config from "../configs";
+import cfg from "../configs";
 
 // https://segmentfault.com/q/1010000009530504 看这里
 
-axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.baseURL = `${cfg.apiUrl}`
 
 // 请求拦截器
 axios.interceptors.request.use(
     config => {
-        const token = sessionStorage.getItem('userToken');
-        // 在请求发送之前做一些处理
-        if (token) {
-            config.headers.common['Authorization'] = 'Bearer ' + token;
-            // config.headers['X-Token'] = token
+        const token = sessionStorage.getItem(cfg.constant.token);
+        config.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         }
+        // 在请求发送之前做一些处理
+        config.headers['JWT'] = token
         return config;
     },
     error => Promise.reject(error)
@@ -24,12 +24,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     response => {
         const JSON = response.data
-        const {code, data} = JSON
-        if (code === 200) {
-            return data
-        } else {
-            throw new Error(data.msg)
-        }
+        return JSON
     },
     error => {
         return Promise.reject(error)
@@ -37,25 +32,19 @@ axios.interceptors.response.use(
 )
 
 
-export function request_get(url) {
-    return axios.get(url)
+export function request_get(url, param) {
+    return axios.get(url + mapToParam(param))
         .then((res) => {
             return Promise.resolve(res.data)
         })
 }
 
-/**
- * [request_post 封装post请求]
- * @param  {[string]} url  [请求地址]
- * @param  {[object]} data [数据]
- * @return {[object]}      [promise]
- */
+
 export function request_post(url, data) {
 
-    url = `${config.apiUrl}${url} `
-
     return axios.post(url, data)
-        .then((res) => Promise.resolve(res.data)).catch((err) => {
+        .then((res) => Promise.resolve(res.data))
+        .catch((err) => {
         })
 }
 
@@ -75,3 +64,25 @@ export function request_delete(url) {
         })
 }
 
+
+function mapToParam(map) {
+    let idx = 0
+    let param = ""
+    let arr = Object.keys(map)
+    let len = arr.length
+
+    for (let k in map) {
+
+        if (idx === len - 1) { // 拼接时，不包括最后一个&字符
+            param += k
+            param += "="
+            param += map[k]
+        } else {
+            param += k
+            param += "="
+            param += map[k]
+            param += "&"
+        }
+    }
+    return param;
+}

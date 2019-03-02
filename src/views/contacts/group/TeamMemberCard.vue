@@ -50,7 +50,7 @@
                 this.account = account
                 //
                 let member = {}
-                this.$store.state.teamMembers[teamId] && this.$store.state.teamMembers[teamId].forEach(item => {
+                this.$store.state.teamMemberMap[teamId] && this.$store.state.teamMemberMap[teamId].forEach(item => {
                     if (item.account === account) {
                         // 当前成员
                         member = Object.assign(member, item)
@@ -60,7 +60,7 @@
                         this.selfType = item.type
                     }
                 })
-                let userInfo = this.$store.state.userInfos[member.account]
+                let userInfo = this.$store.state.userInfoMap[member.account]
                 if (member.account === this.$store.state.userUID) {
                     // 是自己
                     userInfo = this.$store.state.myInfo

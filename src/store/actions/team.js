@@ -2,8 +2,7 @@ import store from '../'
 
 import Vue from 'vue'
 
-import {onTeamMembers} from 'teamMembers'
-import {handleSysMsgs} from 'sysMsgs'
+import {handleSysMsgs} from './sysMsgs'
 
 
 import {request_post} from "../../utils/request";

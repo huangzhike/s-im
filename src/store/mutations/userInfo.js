@@ -5,13 +5,13 @@ export function updateMyInfo(state, myInfo) {
 }
 
 export function updateUserInfo(state, users) {
-    let userInfos = state.userInfos
-    // userInfos {}
+    let userInfoMap = state.userInfoMap
+    // userInfoMap {}
     users.forEach(user => {
         let account = user.account
         if (account) {
-            userInfos[account] = util.mergeObject(userInfos[account], user)
+            userInfoMap[account] = util.mergeObject(userInfoMap[account], user)
         }
     })
-    state.userInfos = util.mergeObject(state.userInfos, userInfos)
+    state.userInfoMap = util.mergeObject(state.userInfoMap, userInfoMap)
 }

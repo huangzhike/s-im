@@ -1,28 +1,36 @@
 <template>
 
+
     <div class="">
-        <div id="form-data" class="m-login">
-            <div class="cells">
-                <img class="logo" :src="logo">
-            </div>
-            <div class="cells">
-                <div class="cell">
-                    <span class="icon icon-account"></span>
-                    <input type="text" class="ipt ipt-account" v-model="account"/>
-                </div>
-                <div class="cell">
-                    <span class="icon icon-pwd"></span>
-                    <input type="password" class="ipt ipt-account" v-model="password"/>
-                </div>
-            </div>
-            <div class="cells">
-                <div v-show="errorMsg" class="error">{{errorMsg}}</div>
-            </div>
-            <div class="cells">
-                <button class="btn btn-login" @click="login">登录</button>
-                <button class="btn btn-regist" @click="register">注册</button>
-            </div>
-        </div>
+
+        <img class="logo" :src="logo">
+
+        <input
+                v-model="account"
+
+
+                placeholder="请输入用户名"
+
+        />
+
+        <input
+                v-model="password"
+                type="password"
+
+                placeholder="请输入密码"
+
+        />
+
+
+        <div v-show="errorMsg" class="error">{{errorMsg}}</div>
+
+
+        <button @click="login">登录</button>
+
+
+        <button @click="register">注册</button>
+
+
     </div>
 
 </template>
@@ -31,7 +39,6 @@
 
 
     import md5 from '../../utils/md5'
-    import cookie from '../../utils/cookie'
 
     import {request_post} from "../../utils/request";
 
@@ -43,43 +50,40 @@
         data() {
             return {
                 logo: config.logo,
-                account: '',
-                password: '',
+                account: {
+                    name: "",
+                    password: '',
+                },
                 errorMsg: ''
             }
         },
         mounted() {
+            this.$store.dispatch('hideLoading')
             // this.$el.style.display = ""
         },
         methods: {
             login() {
-                if (this.account === '') {
-                    this.errorMsg = '帐号不能为空'
-                    return
-                } else if (this.password === '') {
-                    this.errorMsg = '密码不能为空'
-                    return
-                } else if (this.password.length < 6) {
-                    this.errorMsg = '密码至少需要6位'
-                    return
-                }
-                this.errorMsg = ''
 
-                request_post('login', {
-                    account: this.account,
-                    password: md5(this.account + this.password)
+                request_post('getToken', {
+                    name: this.account.name,
+                    // password: md5(this.account.name + this.account.password)
+                    password: this.account.password
                 }).then(resp => {
-                    let token = resp.token
-                    // 服务端帐号均为小写
-                    cookie.setCookie('uid', this.account.toLowerCase())
-                    cookie.setCookie('token', token)
+                    console.error("resp", resp)
+                    window.sessionStorage.setItem(config.constant.uid, resp.data.id)
+                    window.sessionStorage.setItem(config.constant.token, resp.data.token)
+                    window.sessionStorage.setItem(config.constant.gateList, resp.data.gateList)
                     this.$router.push("/session")
                 })
 
-
             },
             register() {
-                this.$router.push("/register")
+                request_post('register', {
+                    name: this.account.name,
+                    password: this.account.password
+                }).then(resp => {
+                    // this.$forceUpdate()
+                })
             }
         },
     }
@@ -88,9 +92,7 @@
 </script>
 
 
-<style lang="less">
+<style lang="less" type="text/less">
 
-    .m-login {
 
-    }
 </style>

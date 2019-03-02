@@ -5,14 +5,17 @@ import App from './App'
 import store from './store'
 import router from './router'
 
-import './common/rem';
 
-import Vant from 'vant';
-import 'vant/lib/vant-css/index.css';
 
-Vue.use(Vant);
+import ElementUI from 'element-ui'
 
-new Vue({
+
+import 'element-ui/lib/theme-chalk/index.css';
+
+Vue.use(ElementUI);
+
+
+let vue = new Vue({
     el: '#app',
     router,
     store,
@@ -20,3 +23,5 @@ new Vue({
     // components: {App}
     render: h => h(App),
 })
+
+export default vue;

@@ -1,6 +1,5 @@
 // Action 提交的是 mutation，而不是直接变更状态。
 // Action 可以包含任意异步操作。
-import cookie from '../../utils/cookie'
 
 
 import {hideFullscreenImg, hideLoading, showFullscreenImg, showLoading} from './widgetUi'
@@ -11,34 +10,36 @@ import {addFriend, deleteFriend, updateFriend} from './friends'
 import {resetSearchResult, searchTeam, searchUsers} from './search'
 import {deleteSession, resetCurrSession, setCurrSession} from './session'
 import {getHistoryMsgs, resetNoMoreHistoryMsgs, sendFileMsg, sendMsg,} from './msgs'
-import {deleteSysMsgs, markSysMsgRead, resetSysMsgs,revokeMsg} from './sysMsgs'
+import {deleteSysMsgs, markSysMsgRead, resetSysMsgs, revokeMsg} from './sysMsgs'
 
-import {enterSettingPage,delegateFunction} from './team'
+import {enterSettingPage, delegateFunction} from './team'
 
-import {getTeamMembers} from './teamMembers'
+import {getTeamMembers} from './teamMemberMap'
 
-import Vue from 'vue'
+import vue from '../../main'
+
+import config from '../../configs'
 
 export default {
 
-
-    // 连接sdk请求
+    // 连接请求
     connect(store) {
         console.error("connect...")
-
+        // 刷新页面 或者第一次登陆
         if (!store.state.sim) {
             console.error("connecting...")
             let loginInfo = {
-                uid: cookie.readCookie('uid'),
-                token: cookie.readCookie('token'),
+                uid: window.sessionStorage.getItem(config.constant.uid),
+                token: window.sessionStorage.getItem(config.constant.token),
+                gateList: JSON.parse(window.sessionStorage.getItem(config.constant.gateList)),
             }
-            if (!loginInfo.uid) {
+            if (!loginInfo.uid || !loginInfo.token) {
                 // 无cookie，直接跳转登录页
-                // 无历史登录记录，请重新登录
-                Vue.router.push('/login')
-
+                vue.$router.push({
+                    name: 'login'
+                })
             } else {
-                // 有cookie，重新登录
+                // 有cookie，重新初始化
                 store.dispatch('initSIM', loginInfo)
             }
         }
@@ -46,10 +47,13 @@ export default {
 
     // 用户触发的登出逻辑
     logout({state, commit}) {
-        cookie.delCookie('uid')
-        cookie.delCookie('token')
+        window.sessionStorage.removeItem(config.constant.uid)
+        window.sessionStorage.removeItem(config.constant.token)
+        window.sessionStorage.removeItem(config.constant.gateList)
         state.sim && state.sim.disconnect()
-        Vue.router.push('/login')
+        vue.$router.push({
+            name: 'login'
+        })
     },
     // UI 及页面状态变更
     showLoading,
@@ -101,7 +105,6 @@ export default {
 
     resetSysMsgs,
     deleteSysMsgs,
-
 
 
     // 进入群信息设置页
